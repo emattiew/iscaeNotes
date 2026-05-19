@@ -12,7 +12,7 @@ import TeacherDashboard from './pages/teacher/TeacherDashboard'
 
 import AdminDashboard from './pages/admin/AdminDashboard'
 
-
+import CollectesPage from './pages/admin/CollectesPage'
 export default function App() {
 
   return (
@@ -40,7 +40,10 @@ export default function App() {
           path="/admin/dashboard"
           element={<AdminDashboard />}
         />
-
+        <Route
+          path="/admin/collectes"
+          element={<CollectesPage />}
+        />
       </Routes>
 
     </BrowserRouter>

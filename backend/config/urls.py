@@ -16,4 +16,6 @@ urlpatterns = [
 
     # Accounts
     path('api/accounts/', include('apps.accounts.urls')),
+
+    path('api/notes/', include('apps.notes.urls')),
 ]
