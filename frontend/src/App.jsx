@@ -12,7 +12,11 @@ import TeacherDashboard from './pages/teacher/TeacherDashboard'
 
 import AdminDashboard from './pages/admin/AdminDashboard'
 
+import UsersPage from './pages/admin/UsersPage'
+
 import CollectesPage from './pages/admin/CollectesPage'
+
+import CollecteNotesPage from './pages/admin/CollecteNotesPage'
 export default function App() {
 
   return (
@@ -43,6 +47,14 @@ export default function App() {
         <Route
           path="/admin/collectes"
           element={<CollectesPage />}
+        />
+        <Route
+          path="/admin/users"
+          element={<UsersPage />}
+        />
+        <Route
+          path="/admin/collectes/:id/notes"
+          element={<CollecteNotesPage />}
         />
       </Routes>
 

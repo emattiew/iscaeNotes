@@ -76,3 +76,50 @@ class StudentNoteSerializer(serializers.ModelSerializer):
         model = StudentNote
 
         fields = '__all__'
+
+        validators = []
+
+
+    def create(self, validated_data):
+
+        controle_continu = validated_data.get(
+            'controle_continu',
+            0
+        )
+
+        controle_final = validated_data.get(
+            'controle_final',
+            0
+        )
+
+        note_finale = (
+            (controle_continu * 0.4) +
+            (controle_final * 0.6)
+        )
+
+        validated_data['note_finale'] = (
+            note_finale
+        )
+
+        student_note, created = (
+            StudentNote.objects.update_or_create(
+
+                collecte=validated_data['collecte'],
+
+                student=validated_data['student'],
+
+                defaults={
+
+                    'controle_continu':
+                        controle_continu,
+
+                    'controle_final':
+                        controle_final,
+
+                    'note_finale':
+                        note_finale,
+                }
+            )
+        )
+
+        return student_note

@@ -1,11 +1,20 @@
 from rest_framework import generics
+
 from rest_framework.permissions import IsAuthenticated
 
+from .permissions import IsAdminRole
+
 from rest_framework.response import Response
+
 from rest_framework.views import APIView
 
+
 from .models import User
-from .serializers import RegisterSerializer
+
+from .serializers import (
+    RegisterSerializer,
+    UserListSerializer,
+)
 
 
 class RegisterView(generics.CreateAPIView):
@@ -30,3 +39,36 @@ class ProfileView(APIView):
             'role': user.role,
             'matricule': user.matricule,
         })
+
+
+class TeacherListView(generics.ListAPIView):
+
+    serializer_class = UserListSerializer
+
+    permission_classes = [IsAdminRole]
+
+    def get_queryset(self):
+
+        return User.objects.filter(
+            role='teacher'
+        )
+    
+class StudentListView(generics.ListAPIView):
+
+    serializer_class = UserListSerializer
+
+    permission_classes = [IsAdminRole]
+
+    def get_queryset(self):
+
+        return User.objects.filter(
+            role='student'
+        )
+
+class UserListCreateView(generics.ListCreateAPIView):
+
+    queryset = User.objects.all()
+
+    serializer_class = RegisterSerializer
+
+    permission_classes = [IsAdminRole]

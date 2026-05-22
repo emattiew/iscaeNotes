@@ -1,7 +1,7 @@
 from rest_framework.viewsets import ModelViewSet
 
-from rest_framework.permissions import IsAuthenticated
 
+from apps.accounts.permissions import IsAdminRole
 from .models import (
     Module,
     Matiere,
@@ -25,7 +25,7 @@ class ModuleViewSet(ModelViewSet):
 
     serializer_class = ModuleSerializer
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminRole]
 
 
 class MatiereViewSet(ModelViewSet):
@@ -34,7 +34,7 @@ class MatiereViewSet(ModelViewSet):
 
     serializer_class = MatiereSerializer
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminRole]
 
 
 class FiliereViewSet(ModelViewSet):
@@ -43,7 +43,7 @@ class FiliereViewSet(ModelViewSet):
 
     serializer_class = FiliereSerializer
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminRole]
 
 
 class CollecteViewSet(ModelViewSet):
@@ -52,12 +52,27 @@ class CollecteViewSet(ModelViewSet):
 
     serializer_class = CollecteNoteSerializer
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminRole]
 
 class StudentNoteViewSet(ModelViewSet):
 
-    queryset = StudentNote.objects.all()
-
     serializer_class = StudentNoteSerializer
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminRole]
+
+
+    def get_queryset(self):
+
+        queryset = StudentNote.objects.all()
+
+        collecte_id = self.request.query_params.get(
+            'collecte'
+        )
+
+        if collecte_id:
+
+            queryset = queryset.filter(
+                collecte_id=collecte_id
+            )
+
+        return queryset

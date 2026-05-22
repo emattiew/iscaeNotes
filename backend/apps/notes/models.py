@@ -122,6 +122,13 @@ class StudentNote(models.Model):
         auto_now_add=True
     )
 
+    class Meta:
+
+        unique_together = (
+            'collecte',
+            'student',
+        )
+
     def __str__(self):
 
         return f'{self.student} - {self.collecte}'

@@ -1,14 +1,20 @@
 from rest_framework import serializers
+
 from .models import User
 
 
 class RegisterSerializer(serializers.ModelSerializer):
 
-    password = serializers.CharField(write_only=True)
+    password = serializers.CharField(
+        write_only=True
+    )
 
     class Meta:
+
         model = User
+
         fields = [
+            'id',
             'username',
             'email',
             'password',
@@ -18,7 +24,17 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
 
-        password = validated_data.pop('password')
+        password = validated_data.pop(
+            'password'
+        )
+
+        matricule = validated_data.get(
+            'matricule'
+        )
+
+        if matricule == '':
+
+            validated_data['matricule'] = None
 
         user = User(**validated_data)
 
@@ -27,3 +43,18 @@ class RegisterSerializer(serializers.ModelSerializer):
         user.save()
 
         return user
+
+
+class UserListSerializer(serializers.ModelSerializer):
+
+    class Meta:
+
+        model = User
+
+        fields = [
+            'id',
+            'username',
+            'email',
+            'role',
+            'matricule',
+        ]
