@@ -309,6 +309,19 @@ export default function CollecteNotesPage() {
             )}
 
 
+            {
+                collecte.status === 'validated' && (
+
+                    <div className="bg-yellow-100 text-yellow-800 p-4 rounded mb-4">
+
+                        Cette collecte est validée.
+                        Les notes ne peuvent plus être modifiées.
+
+                    </div>
+                )
+            }
+
+
             <div className="bg-white rounded shadow overflow-hidden">
 
                 <table className="w-full">
@@ -360,6 +373,9 @@ export default function CollecteNotesPage() {
                                         type="number"
                                         className="border p-2 rounded w-24"
                                         placeholder="CC"
+                                        disabled={
+                                            collecte.status === 'validated'
+                                        }
                                         value={
                                             notes[student.id]?.controle_continu || ''
                                         }
@@ -380,6 +396,9 @@ export default function CollecteNotesPage() {
                                         type="number"
                                         className="border p-2 rounded w-24"
                                         placeholder="CF"
+                                        disabled={
+                                            collecte.status === 'validated'
+                                        }
                                         value={
                                             notes[student.id]?.controle_final || ''
                                         }
@@ -404,18 +423,23 @@ export default function CollecteNotesPage() {
             </div>
 
 
-            <div className="mt-6">
+            {
+                collecte.status !== 'validated' && (
 
-                <button
-                    onClick={saveNotes}
-                    className="bg-black text-white px-6 py-3 rounded hover:bg-gray-800"
-                >
+                    <div className="mt-6">
 
-                    Enregistrer les notes
+                        <button
+                            onClick={saveNotes}
+                            className="bg-black text-white px-6 py-3 rounded hover:bg-gray-800"
+                        >
 
-                </button>
+                            Enregistrer les notes
 
-            </div>
+                        </button>
+
+                    </div>
+                )
+            }
 
         </AdminLayout>
     );

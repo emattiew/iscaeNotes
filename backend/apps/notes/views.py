@@ -1,7 +1,14 @@
 from rest_framework.viewsets import ModelViewSet
 
+from rest_framework.decorators import action
+
+from rest_framework.response import Response
+
+from rest_framework import status
+
 
 from apps.accounts.permissions import IsAdminRole
+
 from .models import (
     Module,
     Matiere,
@@ -53,6 +60,58 @@ class CollecteViewSet(ModelViewSet):
     serializer_class = CollecteNoteSerializer
 
     permission_classes = [IsAdminRole]
+
+
+    @action(
+        detail=True,
+        methods=['post']
+    )
+    def validate(self, request, pk=None):
+
+        collecte = self.get_object()
+
+        collecte.status = 'validated'
+
+        collecte.save()
+
+
+        StudentNote.objects.filter(
+            collecte=collecte
+        ).update(
+            is_validated=True
+        )
+
+
+        return Response(
+            {
+                'message':
+                    'Collecte validée avec succès'
+            },
+            status=status.HTTP_200_OK
+        )
+
+
+    @action(
+        detail=True,
+        methods=['post']
+    )
+    def publish(self, request, pk=None):
+
+        collecte = self.get_object()
+
+        collecte.status = 'published'
+
+        collecte.save()
+
+
+        return Response(
+            {
+                'message':
+                    'Collecte publiée avec succès'
+            },
+            status=status.HTTP_200_OK
+        )
+
 
 class StudentNoteViewSet(ModelViewSet):
 

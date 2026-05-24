@@ -23,6 +23,10 @@ export default function CollectesPage() {
 
     const [filieres, setFilieres] = useState([]);
 
+    const [successMessage, setSuccessMessage] = useState('');
+
+    const [errorMessage, setErrorMessage] = useState('');
+
 
     const [formData, setFormData] = useState({
 
@@ -49,6 +53,22 @@ export default function CollectesPage() {
         fetchFilieres();
 
     }, []);
+
+
+    useEffect(() => {
+
+        if (successMessage) {
+
+            const timer = setTimeout(() => {
+
+                setSuccessMessage('');
+
+            }, 2000);
+
+            return () => clearTimeout(timer);
+        }
+
+    }, [successMessage]);
 
 
     const fetchCollectes = async () => {
@@ -149,9 +169,83 @@ export default function CollectesPage() {
 
             setShowModal(false);
 
+            setSuccessMessage(
+                "Collecte créée avec succès"
+            );
+
+            setErrorMessage('');
+
         } catch (error) {
 
             console.error(error);
+
+            setErrorMessage(
+                "Erreur lors de la création"
+            );
+
+            setSuccessMessage('');
+        }
+    };
+
+
+    const validateCollecte = async (
+        collecteId
+    ) => {
+
+        try {
+
+            await api.post(
+                `/notes/collectes/${collecteId}/validate/`
+            );
+
+            setSuccessMessage(
+                "Collecte validée avec succès"
+            );
+
+            setErrorMessage('');
+
+            fetchCollectes();
+
+        } catch (error) {
+
+            console.error(error);
+
+            setErrorMessage(
+                "Erreur lors de la validation"
+            );
+
+            setSuccessMessage('');
+        }
+    };
+
+
+    const publishCollecte = async (
+        collecteId
+    ) => {
+
+        try {
+
+            await api.post(
+                `/notes/collectes/${collecteId}/publish/`
+            );
+
+            setSuccessMessage(
+                "Collecte publiée avec succès"
+            );
+
+            setErrorMessage('');
+
+            fetchCollectes();
+
+        } catch (error) {
+
+            console.error(error);
+
+            setErrorMessage(
+                "Erreur lors de la publication"
+            );
+
+            setSuccessMessage('');
         }
     };
 
@@ -182,6 +276,26 @@ export default function CollectesPage() {
                 Collectes
 
             </h1>
+
+
+            {successMessage && (
+
+                <div className="bg-green-600 text-white p-4 rounded mb-4">
+
+                    {successMessage}
+
+                </div>
+            )}
+
+
+            {errorMessage && (
+
+                <div className="bg-red-600 text-white p-4 rounded mb-4">
+
+                    {errorMessage}
+
+                </div>
+            )}
 
 
             <button
@@ -426,11 +540,11 @@ export default function CollectesPage() {
                                     {collecte.academic_year}
                                 </td>
 
-                                <td className="p-4">
+                                <td className="p-4 capitalize">
                                     {collecte.status}
                                 </td>
 
-                                <td className="p-4">
+                                <td className="p-4 flex gap-2">
 
                                     <button
                                         onClick={() =>
@@ -444,6 +558,47 @@ export default function CollectesPage() {
                                         Gérer les notes
 
                                     </button>
+
+
+                                    {
+                                        collecte.status !== 'validated'
+                                        &&
+                                        collecte.status !== 'published'
+                                        && (
+
+                                            <button
+                                                onClick={() =>
+                                                    validateCollecte(
+                                                        collecte.id
+                                                    )
+                                                }
+                                                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                                            >
+
+                                                Valider
+
+                                            </button>
+                                        )
+                                    }
+
+
+                                    {
+                                        collecte.status === 'validated' && (
+
+                                            <button
+                                                onClick={() =>
+                                                    publishCollecte(
+                                                        collecte.id
+                                                    )
+                                                }
+                                                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                                            >
+
+                                                Publier
+
+                                            </button>
+                                        )
+                                    }
 
                                 </td>
 
