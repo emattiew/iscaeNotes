@@ -28,8 +28,6 @@ export default function CollecteNotesPage() {
 
         fetchCollecte();
 
-        fetchStudents();
-
         fetchNotes();
 
     }, []);
@@ -61,6 +59,10 @@ export default function CollecteNotesPage() {
 
             setCollecte(response.data);
 
+            fetchStudents(
+                response.data.filiere
+            );
+
         } catch (error) {
 
             console.error(error);
@@ -68,12 +70,14 @@ export default function CollecteNotesPage() {
     };
 
 
-    const fetchStudents = async () => {
+    const fetchStudents = async (
+        filiereId
+    ) => {
 
         try {
 
             const response = await api.get(
-                "/accounts/students/"
+                `/accounts/students/?filiere=${filiereId}`
             );
 
             setStudents(response.data);

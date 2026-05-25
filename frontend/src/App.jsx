@@ -56,6 +56,10 @@ export default function App() {
           path="/admin/collectes/:id/notes"
           element={<CollecteNotesPage />}
         />
+        <Route
+          path="/teacher/collectes/:id/notes"
+          element={<CollecteNotesPage />}
+        />
       </Routes>
 
     </BrowserRouter>

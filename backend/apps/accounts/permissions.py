@@ -25,9 +25,9 @@ class IsTeacherRole(BasePermission):
 
         return (
             request.user.is_authenticated
-            and request.user.role == 'teacher'
+            and
+            request.user.role == 'teacher'
         )
-
 
 class IsStudentRole(BasePermission):
 

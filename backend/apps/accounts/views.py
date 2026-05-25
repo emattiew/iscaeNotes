@@ -2,12 +2,15 @@ from rest_framework import generics
 
 from rest_framework.permissions import IsAuthenticated
 
-from .permissions import IsAdminRole
-
 from rest_framework.response import Response
 
 from rest_framework.views import APIView
 
+
+from .permissions import (
+    IsAdminRole,
+    IsTeacherRole,
+)
 
 from .models import User
 
@@ -38,6 +41,16 @@ class ProfileView(APIView):
             'email': user.email,
             'role': user.role,
             'matricule': user.matricule,
+            'filiere': (
+                user.filiere.id
+                if user.filiere
+                else None
+            ),
+            'filiere_name': (
+                user.filiere.code
+                if user.filiere
+                else None
+            ),
         })
 
 
@@ -52,18 +65,55 @@ class TeacherListView(generics.ListAPIView):
         return User.objects.filter(
             role='teacher'
         )
-    
+
+
 class StudentListView(generics.ListAPIView):
 
     serializer_class = UserListSerializer
 
-    permission_classes = [IsAdminRole]
+    permission_classes = [IsAuthenticated]
+
 
     def get_queryset(self):
 
-        return User.objects.filter(
+        user = self.request.user
+
+        queryset = User.objects.filter(
             role='student'
         )
+
+
+        filiere_id = self.request.query_params.get(
+            'filiere'
+        )
+
+
+        if filiere_id:
+
+            queryset = queryset.filter(
+                filiere_id=filiere_id
+            )
+
+
+        if user.role == 'admin_staff':
+
+            return queryset
+
+
+        if user.role == 'teacher':
+
+            teacher_collectes = user.collectes.values_list(
+                'filiere_id',
+                flat=True
+            )
+
+            return queryset.filter(
+                filiere_id__in=teacher_collectes
+            )
+
+
+        return User.objects.none()
+
 
 class UserListCreateView(generics.ListCreateAPIView):
 

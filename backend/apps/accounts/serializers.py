@@ -9,6 +9,11 @@ class RegisterSerializer(serializers.ModelSerializer):
         write_only=True
     )
 
+    filiere_name = serializers.CharField(
+        source='filiere.code',
+        read_only=True
+    )
+
     class Meta:
 
         model = User
@@ -20,6 +25,8 @@ class RegisterSerializer(serializers.ModelSerializer):
             'password',
             'role',
             'matricule',
+            'filiere',
+            'filiere_name',
         ]
 
     def create(self, validated_data):
@@ -47,6 +54,11 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 class UserListSerializer(serializers.ModelSerializer):
 
+    filiere_name = serializers.CharField(
+        source='filiere.code',
+        read_only=True
+    )
+
     class Meta:
 
         model = User
@@ -57,4 +69,6 @@ class UserListSerializer(serializers.ModelSerializer):
             'email',
             'role',
             'matricule',
+            'filiere',
+            'filiere_name',
         ]

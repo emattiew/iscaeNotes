@@ -13,6 +13,8 @@ export default function UsersPage() {
 
     const [showModal, setShowModal] = useState(false);
 
+    const [filieres, setFilieres] = useState([]);
+
     const [successMessage, setSuccessMessage] = useState('');
 
     const [errorMessage, setErrorMessage] = useState('');
@@ -29,12 +31,16 @@ export default function UsersPage() {
         role: 'student',
 
         matricule: '',
+
+        filiere: '',
     });
 
 
     useEffect(() => {
 
         fetchUsers();
+
+        fetchFilieres();
 
     }, []);
 
@@ -72,6 +78,23 @@ export default function UsersPage() {
         } finally {
 
             setLoading(false);
+        }
+    };
+
+
+    const fetchFilieres = async () => {
+
+        try {
+
+            const response = await api.get(
+                "/notes/filieres/"
+            );
+
+            setFilieres(response.data);
+
+        } catch (error) {
+
+            console.error(error);
         }
     };
 
@@ -119,6 +142,8 @@ export default function UsersPage() {
                 role: 'student',
 
                 matricule: '',
+
+                filiere: '',
             });
 
         } catch (error) {
@@ -286,6 +311,40 @@ export default function UsersPage() {
                                 />
 
 
+                                {
+                                    formData.role === 'student' && (
+
+                                        <select
+                                            name="filiere"
+                                            value={formData.filiere}
+                                            onChange={handleChange}
+                                            className="border p-3 rounded"
+                                            required
+                                        >
+
+                                            <option value="">
+
+                                                Sélectionner une filière
+
+                                            </option>
+
+                                            {filieres.map((filiere) => (
+
+                                                <option
+                                                    key={filiere.id}
+                                                    value={filiere.id}
+                                                >
+
+                                                    {filiere.code}
+
+                                                </option>
+                                            ))}
+
+                                        </select>
+                                    )
+                                }
+
+
                                 <button
                                     type="submit"
                                     className="bg-black text-white p-3 rounded hover:bg-gray-800"
@@ -328,6 +387,10 @@ export default function UsersPage() {
                                 Matricule
                             </th>
 
+                            <th className="p-4 text-left">
+                                Filière
+                            </th>
+
                         </tr>
 
                     </thead>
@@ -355,6 +418,10 @@ export default function UsersPage() {
 
                                 <td className="p-4">
                                     {user.matricule}
+                                </td>
+
+                                <td className="p-4">
+                                    {user.filiere_name}
                                 </td>
 
                             </tr>

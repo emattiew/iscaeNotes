@@ -6,6 +6,8 @@ from rest_framework.response import Response
 
 from rest_framework import status
 
+from rest_framework.permissions import IsAuthenticated
+
 
 from apps.accounts.permissions import IsAdminRole
 
@@ -55,11 +57,29 @@ class FiliereViewSet(ModelViewSet):
 
 class CollecteViewSet(ModelViewSet):
 
-    queryset = CollecteNote.objects.all()
-
     serializer_class = CollecteNoteSerializer
 
-    permission_classes = [IsAdminRole]
+    permission_classes = [IsAuthenticated]
+
+
+    def get_queryset(self):
+
+        user = self.request.user
+
+
+        if user.role == 'admin_staff':
+
+            return CollecteNote.objects.all()
+
+
+        if user.role == 'teacher':
+
+            return CollecteNote.objects.filter(
+                teacher=user
+            )
+
+
+        return CollecteNote.objects.none()
 
 
     @action(
@@ -117,7 +137,7 @@ class StudentNoteViewSet(ModelViewSet):
 
     serializer_class = StudentNoteSerializer
 
-    permission_classes = [IsAdminRole]
+    permission_classes = [IsAuthenticated]
 
 
     def get_queryset(self):
