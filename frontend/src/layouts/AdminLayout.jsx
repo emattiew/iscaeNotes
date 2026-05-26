@@ -54,7 +54,27 @@ export default function AdminLayout({ children }) {
                         >
                             Utilisateurs
                         </Link>
-                    </nav>
+
+                        <Link
+                            to="/admin/filieres"
+                            className="hover:text-gray-300"
+                        >
+                            Filières
+                        </Link>
+                        <Link
+                            to="/admin/modules"
+                            className="hover:text-gray-300"
+                        >
+                            Modules
+                        </Link>
+
+                        <Link
+                            to="/admin/matieres"
+                            className="hover:text-gray-300"
+                        >
+                            Matières
+                        </Link>
+                     </nav>
 
                 </div>
 

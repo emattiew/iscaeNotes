@@ -13,9 +13,10 @@ import TeacherDashboard from './pages/teacher/TeacherDashboard'
 import AdminDashboard from './pages/admin/AdminDashboard'
 
 import UsersPage from './pages/admin/UsersPage'
-
+import FilieresPage from './pages/admin/FilieresPage'
 import CollectesPage from './pages/admin/CollectesPage'
-
+import ModulesPage from './pages/admin/ModulesPage'
+import MatieresPage from './pages/admin/MatieresPage'
 import CollecteNotesPage from './pages/admin/CollecteNotesPage'
 export default function App() {
 
@@ -60,6 +61,19 @@ export default function App() {
           path="/teacher/collectes/:id/notes"
           element={<CollecteNotesPage />}
         />
+        <Route
+          path="/admin/filieres"
+          element={<FilieresPage />}
+        />
+        <Route
+          path="/admin/modules"
+          element={<ModulesPage />}
+        />
+        <Route
+          path="/admin/matieres"
+          element={<MatieresPage />}
+        />
+
       </Routes>
 
     </BrowserRouter>

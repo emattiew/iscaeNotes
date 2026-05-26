@@ -1,12 +1,24 @@
 from django.urls import path
 
+from rest_framework.routers import DefaultRouter
+
 from .views import (
     RegisterView,
     ProfileView,
     TeacherListView,
     StudentListView,
-    UserListCreateView,
+    UserViewSet,
 )
+
+
+router = DefaultRouter()
+
+router.register(
+    'users',
+    UserViewSet,
+    basename='users'
+)
+
 
 urlpatterns = [
 
@@ -24,12 +36,11 @@ urlpatterns = [
         'teachers/',
         TeacherListView.as_view(),
     ),
+
     path(
         'students/',
         StudentListView.as_view(),
     ),
-    path(
-        'users/',
-        UserListCreateView.as_view(),
-    ),
 ]
+
+urlpatterns += router.urls

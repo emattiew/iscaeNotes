@@ -6,7 +6,9 @@ from .models import User
 class RegisterSerializer(serializers.ModelSerializer):
 
     password = serializers.CharField(
-        write_only=True
+        write_only=True,
+        required=False,
+        allow_blank=True
     )
 
     filiere_name = serializers.CharField(
@@ -29,6 +31,7 @@ class RegisterSerializer(serializers.ModelSerializer):
             'filiere_name',
         ]
 
+
     def create(self, validated_data):
 
         password = validated_data.pop(
@@ -50,6 +53,37 @@ class RegisterSerializer(serializers.ModelSerializer):
         user.save()
 
         return user
+
+
+    def update(self, instance, validated_data):
+
+        password = validated_data.pop(
+            'password',
+            None
+        )
+
+        matricule = validated_data.get(
+            'matricule'
+        )
+
+        if matricule == '':
+
+            validated_data['matricule'] = None
+
+
+        for attr, value in validated_data.items():
+
+            setattr(instance, attr, value)
+
+
+        if password:
+
+            instance.set_password(password)
+
+
+        instance.save()
+
+        return instance
 
 
 class UserListSerializer(serializers.ModelSerializer):

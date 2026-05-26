@@ -71,6 +71,26 @@ class StudentNoteSerializer(serializers.ModelSerializer):
         read_only=True
     )
 
+    matiere_name = serializers.CharField(
+        source='collecte.matiere.name',
+        read_only=True
+    )
+
+    teacher_name = serializers.CharField(
+        source='collecte.teacher.username',
+        read_only=True
+    )
+
+    academic_year = serializers.CharField(
+        source='collecte.academic_year',
+        read_only=True
+    )
+
+    collecte_status = serializers.CharField(
+        source='collecte.status',
+        read_only=True
+    )
+
     class Meta:
 
         model = StudentNote

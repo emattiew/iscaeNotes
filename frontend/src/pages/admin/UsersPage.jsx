@@ -13,6 +13,8 @@ export default function UsersPage() {
 
     const [showModal, setShowModal] = useState(false);
 
+    const [editingUser, setEditingUser] = useState(null);
+
     const [filieres, setFilieres] = useState([]);
 
     const [successMessage, setSuccessMessage] = useState('');
@@ -159,6 +161,73 @@ export default function UsersPage() {
     };
 
 
+    const updateUser = async (e) => {
+
+        e.preventDefault();
+
+        try {
+
+            await api.put(
+                `/accounts/users/${editingUser.id}/`,
+                formData
+            );
+
+            fetchUsers();
+
+            setShowModal(false);
+
+            setEditingUser(null);
+
+            setSuccessMessage(
+                "Utilisateur modifié avec succès"
+            );
+
+            setErrorMessage('');
+
+        } catch (error) {
+
+            console.log(error.response.data);
+
+            console.error(error);
+
+            setErrorMessage(
+                "Erreur lors de la modification"
+            );
+        }
+    };
+
+
+    const deleteUser = async (id) => {
+
+        const confirmDelete = window.confirm(
+            "Supprimer cet utilisateur ?"
+        );
+
+        if (!confirmDelete) return;
+
+        try {
+
+            await api.delete(
+                `/accounts/users/${id}/`
+            );
+
+            fetchUsers();
+
+            setSuccessMessage(
+                "Utilisateur supprimé avec succès"
+            );
+
+        } catch (error) {
+
+            console.error(error);
+
+            setErrorMessage(
+                "Erreur lors de la suppression"
+            );
+        }
+    };
+
+
     if (loading) {
 
         return (
@@ -208,7 +277,27 @@ export default function UsersPage() {
 
 
             <button
-                onClick={() => setShowModal(true)}
+                onClick={() => {
+
+                    setEditingUser(null);
+
+                    setFormData({
+
+                        username: '',
+
+                        email: '',
+
+                        password: '',
+
+                        role: 'student',
+
+                        matricule: '',
+
+                        filiere: '',
+                    });
+
+                    setShowModal(true);
+                }}
                 className="bg-black text-white px-5 py-3 rounded mb-6 hover:bg-gray-800"
             >
 
@@ -225,7 +314,12 @@ export default function UsersPage() {
                         <div className="bg-white w-full max-w-2xl rounded-lg p-8 relative">
 
                             <button
-                                onClick={() => setShowModal(false)}
+                                onClick={() => {
+
+                                    setShowModal(false);
+
+                                    setEditingUser(null);
+                                }}
                                 className="absolute top-4 right-4 text-gray-500 hover:text-black text-xl"
                             >
 
@@ -236,13 +330,21 @@ export default function UsersPage() {
 
                             <h2 className="text-2xl font-bold mb-6">
 
-                                Créer un utilisateur
+                                {
+                                    editingUser
+                                        ? "Modifier utilisateur"
+                                        : "Créer un utilisateur"
+                                }
 
                             </h2>
 
 
                             <form
-                                onSubmit={createUser}
+                                onSubmit={
+                                    editingUser
+                                        ? updateUser
+                                        : createUser
+                                }
                                 className="grid grid-cols-1 md:grid-cols-2 gap-4"
                             >
 
@@ -273,9 +375,13 @@ export default function UsersPage() {
                                     name="password"
                                     value={formData.password}
                                     onChange={handleChange}
-                                    placeholder="Mot de passe"
+                                    placeholder={
+                                        editingUser
+                                            ? "Laisser vide pour ne pas changer"
+                                            : "Mot de passe"
+                                    }
                                     className="border p-3 rounded"
-                                    required
+                                    required={!editingUser}
                                 />
 
 
@@ -350,7 +456,11 @@ export default function UsersPage() {
                                     className="bg-black text-white p-3 rounded hover:bg-gray-800"
                                 >
 
-                                    Créer
+                                    {
+                                        editingUser
+                                            ? "Modifier"
+                                            : "Créer"
+                                    }
 
                                 </button>
 
@@ -391,6 +501,10 @@ export default function UsersPage() {
                                 Filière
                             </th>
 
+                            <th className="p-4 text-left">
+                                Actions
+                            </th>
+
                         </tr>
 
                     </thead>
@@ -422,6 +536,49 @@ export default function UsersPage() {
 
                                 <td className="p-4">
                                     {user.filiere_name}
+                                </td>
+
+                                <td className="p-4 flex gap-2">
+
+                                    <button
+                                        onClick={() => {
+
+                                            setEditingUser(user);
+
+                                            setFormData({
+
+                                                username: user.username,
+
+                                                email: user.email,
+
+                                                password: '',
+
+                                                role: user.role,
+
+                                                matricule: user.matricule || '',
+
+                                                filiere: user.filiere || '',
+                                            });
+
+                                            setShowModal(true);
+                                        }}
+                                        className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+                                    >
+
+                                        Modifier
+
+                                    </button>
+
+
+                                    <button
+                                        onClick={() => deleteUser(user.id)}
+                                        className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
+                                    >
+
+                                        Supprimer
+
+                                    </button>
+
                                 </td>
 
                             </tr>

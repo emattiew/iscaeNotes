@@ -142,7 +142,10 @@ class StudentNoteViewSet(ModelViewSet):
 
     def get_queryset(self):
 
+        user = self.request.user
+
         queryset = StudentNote.objects.all()
+
 
         collecte_id = self.request.query_params.get(
             'collecte'
@@ -153,5 +156,14 @@ class StudentNoteViewSet(ModelViewSet):
             queryset = queryset.filter(
                 collecte_id=collecte_id
             )
+
+
+        if user.role == 'student':
+
+            queryset = queryset.filter(
+                student=user,
+                collecte__status='published'
+            )
+
 
         return queryset
