@@ -90,6 +90,46 @@ class CollecteViewSet(ModelViewSet):
 
         collecte = self.get_object()
 
+
+        if request.user.role not in [
+            'teacher',
+            'admin_staff'
+        ]:
+
+            return Response(
+                {
+                    'error':
+                        'Permission refusée.'
+                },
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+
+        if (
+            request.user.role == 'teacher'
+            and collecte.teacher != request.user
+        ):
+
+            return Response(
+                {
+                    'error':
+                        'Cette collecte ne vous appartient pas.'
+                },
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+
+        if collecte.status != 'prepared':
+
+            return Response(
+                {
+                    'error':
+                        'Seules les collectes préparées peuvent être validées.'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+
         collecte.status = 'validated'
 
         collecte.save()
@@ -118,6 +158,29 @@ class CollecteViewSet(ModelViewSet):
     def publish(self, request, pk=None):
 
         collecte = self.get_object()
+
+
+        if request.user.role != 'admin_staff':
+
+            return Response(
+                {
+                    'error':
+                        'Seule la scolarité peut publier.'
+                },
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+
+        if collecte.status != 'validated':
+
+            return Response(
+                {
+                    'error':
+                        'La collecte doit être validée avant publication.'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
 
         collecte.status = 'published'
 

@@ -446,10 +446,6 @@ export default function CollectesPage() {
                                         Prepared
                                     </option>
 
-                                    <option value="opened">
-                                        Opened
-                                    </option>
-
                                     <option value="validated">
                                         Validated
                                     </option>

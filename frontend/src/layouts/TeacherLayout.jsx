@@ -42,7 +42,7 @@ export default function TeacherLayout({ children }) {
 
 
                         <Link
-                            to="/teacher/dashboard"
+                            to="/teacher/collectes"
                             className="hover:text-gray-300"
                         >
                             Mes collectes

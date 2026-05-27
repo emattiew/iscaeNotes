@@ -61,97 +61,111 @@ export default function TeacherDashboard() {
     }
 
 
+    const preparedCount = collectes.filter(
+        c => c.status === 'prepared'
+    ).length;
+
+
+    const validatedCount = collectes.filter(
+        c => c.status === 'validated'
+    ).length;
+
+
+    const publishedCount = collectes.filter(
+        c => c.status === 'published'
+    ).length;
+
+
     return (
 
         <TeacherLayout>
 
-            <h1 className="text-4xl font-bold mb-8">
+            <h1 className="text-5xl font-bold mb-8">
 
                 Teacher Dashboard
 
             </h1>
 
 
-            <div className="bg-white rounded shadow overflow-hidden">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
 
-                <table className="w-full">
+                <div className="bg-white p-6 rounded-2xl shadow-sm">
 
-                    <thead className="bg-gray-200">
+                    <p className="text-gray-500 mb-2">
+                        Total Collectes
+                    </p>
 
-                        <tr>
+                    <h2 className="text-4xl font-bold">
+                        {collectes.length}
+                    </h2>
 
-                            <th className="p-4 text-left">
-                                Matière
-                            </th>
+                </div>
 
-                            <th className="p-4 text-left">
-                                Filière
-                            </th>
 
-                            <th className="p-4 text-left">
-                                Année
-                            </th>
+                <div className="bg-white p-6 rounded-2xl shadow-sm">
 
-                            <th className="p-4 text-left">
-                                Status
-                            </th>
+                    <p className="text-gray-500 mb-2">
+                        Prepared
+                    </p>
 
-                            <th className="p-4 text-left">
-                                Actions
-                            </th>
+                    <h2 className="text-4xl font-bold">
+                        {preparedCount}
+                    </h2>
 
-                        </tr>
+                </div>
 
-                    </thead>
 
-                    <tbody>
+                <div className="bg-white p-6 rounded-2xl shadow-sm">
 
-                        {collectes.map((collecte) => (
+                    <p className="text-gray-500 mb-2">
+                        Validated
+                    </p>
 
-                            <tr
-                                key={collecte.id}
-                                className="border-t"
-                            >
+                    <h2 className="text-4xl font-bold">
+                        {validatedCount}
+                    </h2>
 
-                                <td className="p-4">
-                                    {collecte.matiere_name}
-                                </td>
+                </div>
 
-                                <td className="p-4">
-                                    {collecte.filiere_name}
-                                </td>
 
-                                <td className="p-4">
-                                    {collecte.academic_year}
-                                </td>
+                <div className="bg-white p-6 rounded-2xl shadow-sm">
 
-                                <td className="p-4 capitalize">
-                                    {collecte.status}
-                                </td>
+                    <p className="text-gray-500 mb-2">
+                        Published
+                    </p>
 
-                                <td className="p-4">
+                    <h2 className="text-4xl font-bold">
+                        {publishedCount}
+                    </h2>
 
-                                    <button
-                                        onClick={() =>
-                                            navigate(
-                                                `/teacher/collectes/${collecte.id}/notes`
-                                            )
-                                        }
-                                        className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800"
-                                    >
+                </div>
 
-                                        Gérer les notes
+            </div>
 
-                                    </button>
 
-                                </td>
+            <div className="bg-white rounded-2xl shadow-sm p-8">
 
-                            </tr>
-                        ))}
+                <h2 className="text-3xl font-bold mb-6">
 
-                    </tbody>
+                    Actions rapides
 
-                </table>
+                </h2>
+
+
+                <div className="flex gap-4 flex-wrap">
+
+                    <button
+                        onClick={() =>
+                            navigate('/teacher/collectes')
+                        }
+                        className="bg-black text-white px-6 py-4 rounded-xl hover:bg-gray-800"
+                    >
+
+                        Voir mes collectes
+
+                    </button>
+
+                </div>
 
             </div>
 

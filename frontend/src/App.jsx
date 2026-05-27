@@ -18,6 +18,9 @@ import CollectesPage from './pages/admin/CollectesPage'
 import ModulesPage from './pages/admin/ModulesPage'
 import MatieresPage from './pages/admin/MatieresPage'
 import CollecteNotesPage from './pages/admin/CollecteNotesPage'
+import TeacherCollectesPage from './pages/teacher/TeacherCollectesPage'
+
+import TeacherCollecteNotesPage from './pages/teacher/TeacherCollecteNotesPage'
 export default function App() {
 
   return (
@@ -58,10 +61,6 @@ export default function App() {
           element={<CollecteNotesPage />}
         />
         <Route
-          path="/teacher/collectes/:id/notes"
-          element={<CollecteNotesPage />}
-        />
-        <Route
           path="/admin/filieres"
           element={<FilieresPage />}
         />
@@ -73,7 +72,15 @@ export default function App() {
           path="/admin/matieres"
           element={<MatieresPage />}
         />
+        <Route
+            path="/teacher/collectes"
+            element={<TeacherCollectesPage />}
+        />
 
+        <Route
+            path="/teacher/collectes/:id/notes"
+            element={<TeacherCollecteNotesPage />}
+        />
       </Routes>
 
     </BrowserRouter>

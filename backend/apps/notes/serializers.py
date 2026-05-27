@@ -64,6 +64,7 @@ class CollecteNoteSerializer(serializers.ModelSerializer):
 
         fields = '__all__'
 
+
 class StudentNoteSerializer(serializers.ModelSerializer):
 
     student_name = serializers.CharField(
@@ -101,6 +102,18 @@ class StudentNoteSerializer(serializers.ModelSerializer):
 
 
     def create(self, validated_data):
+
+        collecte = validated_data['collecte']
+
+        if collecte.status in [
+            'validated',
+            'published'
+        ]:
+
+            raise serializers.ValidationError(
+                'Cette collecte ne peut plus être modifiée.'
+            )
+
 
         controle_continu = validated_data.get(
             'controle_continu',

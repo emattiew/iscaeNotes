@@ -4,10 +4,10 @@ import { useParams } from "react-router-dom";
 
 import api from "../../services/api";
 
-import AdminLayout from "../../layouts/AdminLayout";
+import TeacherLayout from "../../layouts/TeacherLayout";
 
 
-export default function CollecteNotesPage() {
+export default function TeacherCollecteNotesPage() {
 
     const { id } = useParams();
 
@@ -192,11 +192,40 @@ export default function CollecteNotesPage() {
     };
 
 
+    const validateCollecte = async () => {
+
+        try {
+
+            await api.post(
+                `/notes/collectes/${id}/validate/`
+            );
+
+            setSuccessMessage(
+                "Collecte validée avec succès"
+            );
+
+            setErrorMessage('');
+
+            fetchCollecte();
+
+        } catch (error) {
+
+            console.error(error);
+
+            setErrorMessage(
+                "Erreur lors de la validation"
+            );
+
+            setSuccessMessage('');
+        }
+    };
+
+
     if (loading || !collecte) {
 
         return (
 
-            <AdminLayout>
+            <TeacherLayout>
 
                 <div>
 
@@ -204,14 +233,14 @@ export default function CollecteNotesPage() {
 
                 </div>
 
-            </AdminLayout>
+            </TeacherLayout>
         );
     }
 
 
     return (
 
-        <AdminLayout>
+        <TeacherLayout>
 
             <h1 className="text-3xl font-bold mb-6">
 
@@ -430,7 +459,7 @@ export default function CollecteNotesPage() {
             {
                 collecte.status === 'prepared' && (
 
-                    <div className="mt-6">
+                    <div className="mt-6 flex gap-4">
 
                         <button
                             onClick={saveNotes}
@@ -441,10 +470,20 @@ export default function CollecteNotesPage() {
 
                         </button>
 
+
+                        <button
+                            onClick={validateCollecte}
+                            className="bg-green-600 text-white px-6 py-3 rounded hover:bg-green-700"
+                        >
+
+                            Valider la collecte
+
+                        </button>
+
                     </div>
                 )
             }
 
-        </AdminLayout>
+        </TeacherLayout>
     );
 }
