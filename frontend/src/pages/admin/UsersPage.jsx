@@ -21,6 +21,10 @@ export default function UsersPage() {
 
     const [errorMessage, setErrorMessage] = useState('');
 
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+    const [userToDelete, setUserToDelete] = useState(null);
+
 
     const [formData, setFormData] = useState({
 
@@ -197,18 +201,20 @@ export default function UsersPage() {
     };
 
 
-    const deleteUser = async (id) => {
+    const openDeleteModal = (id) => {
 
-        const confirmDelete = window.confirm(
-            "Supprimer cet utilisateur ?"
-        );
+        setUserToDelete(id);
 
-        if (!confirmDelete) return;
+        setShowDeleteModal(true);
+    };
+
+
+    const deleteUser = async () => {
 
         try {
 
             await api.delete(
-                `/accounts/users/${id}/`
+                `/accounts/users/${userToDelete}/`
             );
 
             fetchUsers();
@@ -216,6 +222,10 @@ export default function UsersPage() {
             setSuccessMessage(
                 "Utilisateur supprimé avec succès"
             );
+
+            setShowDeleteModal(false);
+
+            setUserToDelete(null);
 
         } catch (error) {
 
@@ -571,7 +581,9 @@ export default function UsersPage() {
 
 
                                     <button
-                                        onClick={() => deleteUser(user.id)}
+                                        onClick={() =>
+                                            openDeleteModal(user.id)
+                                        }
                                         className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
                                     >
 
@@ -589,6 +601,60 @@ export default function UsersPage() {
                 </table>
 
             </div>
+
+
+            {
+                showDeleteModal && (
+
+                    <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
+
+                        <div className="bg-white w-full max-w-md rounded-lg p-8">
+
+                            <h2 className="text-2xl font-bold mb-4">
+
+                                Confirmation
+
+                            </h2>
+
+                            <p className="text-gray-600 mb-6">
+
+                                Voulez-vous vraiment supprimer cet utilisateur ?
+
+                            </p>
+
+                            <div className="flex justify-end gap-4">
+
+                                <button
+                                    onClick={() => {
+
+                                        setShowDeleteModal(false);
+
+                                        setUserToDelete(null);
+                                    }}
+                                    className="px-5 py-2 rounded border"
+                                >
+
+                                    Annuler
+
+                                </button>
+
+
+                                <button
+                                    onClick={deleteUser}
+                                    className="bg-red-600 text-white px-5 py-2 rounded hover:bg-red-700"
+                                >
+
+                                    Supprimer
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                )
+            }
 
         </AdminLayout>
     );

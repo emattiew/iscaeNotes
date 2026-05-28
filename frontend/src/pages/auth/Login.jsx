@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 import { useNavigate } from 'react-router-dom'
 
@@ -16,6 +16,24 @@ export default function Login() {
     password: '',
   })
 
+  const [errorMessage, setErrorMessage] = useState('')
+
+
+  useEffect(() => {
+
+    if (errorMessage) {
+
+      const timer = setTimeout(() => {
+
+        setErrorMessage('')
+
+      }, 1500)
+
+      return () => clearTimeout(timer)
+    }
+
+  }, [errorMessage])
+
 
   const handleChange = (e) => {
 
@@ -32,7 +50,8 @@ export default function Login() {
 
     try {
 
-      // LOGIN
+      setErrorMessage('')
+
 
       const response = await axios.post(
         'http://127.0.0.1:8000/api/token/',
@@ -50,8 +69,6 @@ export default function Login() {
       )
 
 
-      // FETCH PROFILE
-
       const profileResponse = await api.get(
         'accounts/profile/'
       )
@@ -61,7 +78,11 @@ export default function Login() {
       console.log(user)
 
 
-      // REDIRECT BASED ON ROLE
+      localStorage.setItem(
+        'role',
+        user.role
+      )
+
 
       if (user.role === 'student') {
 
@@ -80,7 +101,9 @@ export default function Login() {
 
       console.log(error)
 
-      alert('Invalid username or password')
+      setErrorMessage(
+        'Nom d’utilisateur ou mot de passe invalide'
+      )
     }
   }
 
@@ -92,8 +115,19 @@ export default function Login() {
       <div className="bg-white p-10 rounded-2xl shadow-lg w-full max-w-md">
 
         <h1 className="text-4xl font-bold text-center mb-8">
-          ISCAE Platform
+          Plateforme ISCAE
         </h1>
+
+
+        {errorMessage && (
+
+          <div className="bg-red-100 text-red-700 p-4 rounded mb-4">
+
+            {errorMessage}
+
+          </div>
+        )}
+
 
         <form
           onSubmit={handleSubmit}
@@ -103,7 +137,7 @@ export default function Login() {
           <input
             type="text"
             name="username"
-            placeholder="Username"
+            placeholder="Nom d’utilisateur"
             onChange={handleChange}
             className="w-full border p-3 rounded-lg"
           />
@@ -111,7 +145,7 @@ export default function Login() {
           <input
             type="password"
             name="password"
-            placeholder="Password"
+            placeholder="Mot de passe"
             onChange={handleChange}
             className="w-full border p-3 rounded-lg"
           />
@@ -119,7 +153,7 @@ export default function Login() {
           <button
             className="w-full bg-black text-white p-3 rounded-lg"
           >
-            Login
+            Se connecter
           </button>
 
         </form>

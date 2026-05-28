@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'apps.students',
     'apps.teachers',
     'apps.administration',
+    'apps.ocr',
 ]
 
 

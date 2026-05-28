@@ -12,6 +12,8 @@ export default function StudentLayout({ children }) {
 
         localStorage.removeItem('refresh');
 
+        localStorage.removeItem('role');
+
         navigate('/');
     };
 

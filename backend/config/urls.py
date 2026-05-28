@@ -18,4 +18,8 @@ urlpatterns = [
     path('api/accounts/', include('apps.accounts.urls')),
 
     path('api/notes/', include('apps.notes.urls')),
+
+    path(
+    'api/ocr/',include('apps.ocr.urls')
+),
 ]

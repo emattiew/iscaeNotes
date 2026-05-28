@@ -12,6 +12,8 @@ export default function AdminLayout({ children }) {
 
         localStorage.removeItem('refresh');
 
+        localStorage.removeItem('role');
+
         navigate('/');
     };
 
@@ -61,6 +63,7 @@ export default function AdminLayout({ children }) {
                         >
                             Filières
                         </Link>
+
                         <Link
                             to="/admin/modules"
                             className="hover:text-gray-300"
@@ -74,7 +77,8 @@ export default function AdminLayout({ children }) {
                         >
                             Matières
                         </Link>
-                     </nav>
+
+                    </nav>
 
                 </div>
 
