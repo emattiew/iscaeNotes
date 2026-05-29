@@ -1,16 +1,19 @@
 from rest_framework.views import APIView
-
 from rest_framework.response import Response
-
 from rest_framework.parsers import MultiPartParser
 
 import easyocr
+
+from .parser import (
+    group_rows,
+    extract_notes,
+    match_students
+)
 
 
 class OCRUploadView(APIView):
 
     parser_classes = [MultiPartParser]
-
 
     def post(self, request):
 
@@ -20,12 +23,10 @@ class OCRUploadView(APIView):
 
             return Response(
                 {
-                    'error':
-                        'Aucune image envoyée'
+                    'error': 'Aucune image envoyée'
                 },
                 status=400
             )
-
 
         reader = easyocr.Reader(['fr'])
 
@@ -33,15 +34,14 @@ class OCRUploadView(APIView):
             image.read()
         )
 
+        rows = group_rows(result)
 
-        extracted_text = []
+        notes = extract_notes(rows)
 
-        for item in result:
-
-            extracted_text.append(item[1])
-
+        matches = match_students(notes)
 
         return Response({
 
-            'text': extracted_text
+            'matches': matches
+
         })

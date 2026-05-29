@@ -30,6 +30,10 @@ export default function UsersPage() {
 
         username: '',
 
+        first_name: '',
+
+        last_name: '',
+
         email: '',
 
         password: '',
@@ -141,6 +145,10 @@ export default function UsersPage() {
 
                 username: '',
 
+                first_name: '',
+
+                last_name: '',
+
                 email: '',
 
                 password: '',
@@ -181,7 +189,24 @@ export default function UsersPage() {
             setShowModal(false);
 
             setEditingUser(null);
+            setFormData({
 
+                username: '',
+
+                first_name: '',
+
+                last_name: '',
+
+                email: '',
+
+                password: '',
+
+                role: 'student',
+
+                matricule: '',
+
+                filiere: '',
+            });
             setSuccessMessage(
                 "Utilisateur modifié avec succès"
             );
@@ -294,7 +319,10 @@ export default function UsersPage() {
                     setFormData({
 
                         username: '',
+                        
+                        first_name: '',
 
+                        last_name: '',
                         email: '',
 
                         password: '',
@@ -367,7 +395,23 @@ export default function UsersPage() {
                                     className="border p-3 rounded"
                                     required
                                 />
+                                <input
+                                    type="text"
+                                    name="first_name"
+                                    value={formData.first_name}
+                                    onChange={handleChange}
+                                    placeholder="Prénom"
+                                    className="border p-3 rounded"
+                                />
 
+                                <input
+                                    type="text"
+                                    name="last_name"
+                                    value={formData.last_name}
+                                    onChange={handleChange}
+                                    placeholder="Nom"
+                                    className="border p-3 rounded"
+                                />
 
                                 <input
                                     type="email"
@@ -494,7 +538,13 @@ export default function UsersPage() {
                             <th className="p-4 text-left">
                                 Username
                             </th>
+                            <th className="p-4 text-left">
+                                Prénom
+                            </th>
 
+                            <th className="p-4 text-left">
+                                Nom
+                            </th>
                             <th className="p-4 text-left">
                                 Email
                             </th>
@@ -531,7 +581,13 @@ export default function UsersPage() {
                                 <td className="p-4">
                                     {user.username}
                                 </td>
+                                <td className="p-4">
+                                    {user.first_name}
+                                </td>
 
+                                <td className="p-4">
+                                    {user.last_name}
+                                </td>
                                 <td className="p-4">
                                     {user.email}
                                 </td>
@@ -559,6 +615,10 @@ export default function UsersPage() {
 
                                                 username: user.username,
 
+                                                first_name: user.first_name || '',
+
+                                                last_name: user.last_name || '',
+
                                                 email: user.email,
 
                                                 password: '',
@@ -569,7 +629,6 @@ export default function UsersPage() {
 
                                                 filiere: user.filiere || '',
                                             });
-
                                             setShowModal(true);
                                         }}
                                         className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
