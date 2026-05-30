@@ -1,5 +1,7 @@
 from apps.accounts.models import User
 
+import re
+
 
 def group_rows(result):
 
@@ -26,14 +28,69 @@ def group_rows(result):
 
 def normalize_matricule(text):
 
-    text = text.upper()
+    text = str(text).upper().strip()
 
     text = text.replace(
         "1E",
         "IE"
     )
 
+    text = text.replace(
+        "LE",
+        "IE"
+    )
+
+    text = text.replace(
+        " ",
+        ""
+    )
+
     return text
+
+
+def is_matricule(text):
+
+    text = normalize_matricule(text)
+
+    return bool(
+        re.match(
+            r'^IE\d+$',
+            text
+        )
+    )
+
+
+def extract_numbers(row):
+
+    numbers = []
+
+    for value in row:
+
+        value = str(value)
+
+        match = re.search(
+            r'\d+(?:[.,]\d+)?',
+            value
+        )
+
+        if match:
+
+            try:
+
+                numbers.append(
+                    float(
+                        match.group().replace(
+                            ',',
+                            '.'
+                        )
+                    )
+                )
+
+            except ValueError:
+
+                pass
+
+    return numbers
 
 
 def extract_notes(rows):
@@ -42,29 +99,75 @@ def extract_notes(rows):
 
     for row in rows:
 
-        if len(row) < 4:
+        if len(row) < 2:
 
             continue
 
-        if row[0].lower() == "matricule":
+        matricule = None
+
+        for item in row:
+
+            if is_matricule(item):
+
+                matricule = normalize_matricule(
+                    item
+                )
+
+                break
+
+        if not matricule:
 
             continue
+
+        numbers = extract_numbers(row)
+
+        if len(numbers) == 0:
+
+            continue
+
+        cc = None
+        cf = None
+
+        if len(numbers) == 1:
+
+            cc = numbers[0]
+
+        elif len(numbers) >= 2:
+
+            cc = numbers[-2]
+
+            cf = numbers[-1]
+
+        name_parts = []
+
+        for item in row:
+
+            text = str(item)
+
+            if normalize_matricule(text) == matricule:
+
+                continue
+
+            if re.fullmatch(
+                r'\d+(?:[.,]\d+)?',
+                text.strip()
+            ):
+
+                continue
+
+            name_parts.append(text)
+
+        nom = " ".join(name_parts).strip()
 
         notes.append({
 
-            "matricule":
-                normalize_matricule(
-                    row[0]
-                ),
+            "matricule": matricule,
 
-            "nom":
-                row[1],
+            "nom": nom,
 
-            "cc":
-                int(row[2]),
+            "cc": cc,
 
-            "cf":
-                int(row[3]),
+            "cf": cf,
         })
 
     return notes
