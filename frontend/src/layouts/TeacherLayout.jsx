@@ -20,9 +20,9 @@ export default function TeacherLayout({ children }) {
 
     return (
 
-        <div className="flex min-h-screen bg-gray-100">
+        <div className="min-h-screen bg-gray-100">
 
-            <aside className="w-64 bg-black text-white p-6 flex flex-col justify-between">
+            <aside className="fixed left-0 top-0 h-screen w-64 bg-black text-white p-6 flex flex-col justify-between">
 
                 <div>
 
@@ -57,7 +57,7 @@ export default function TeacherLayout({ children }) {
 
                 <button
                     onClick={logout}
-                    className="bg-red-600 hover:bg-red-700 p-3 rounded mt-10"
+                    className="bg-red-600 hover:bg-red-700 p-3 rounded"
                 >
                     Déconnexion
                 </button>
@@ -65,7 +65,7 @@ export default function TeacherLayout({ children }) {
             </aside>
 
 
-            <main className="flex-1 p-8">
+            <main className="ml-64 p-8">
 
                 {children}
 
