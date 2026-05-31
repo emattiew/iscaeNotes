@@ -23,7 +23,11 @@ export default function TeacherCollecteNotesPage() {
 
     const [errorMessage, setErrorMessage] = useState('');
 
+    const [ocrFile, setOcrFile] = useState(null);
 
+    const [ocrMatches, setOcrMatches] = useState([]);
+
+    const [ocrLoading, setOcrLoading] = useState(false);
     useEffect(() => {
 
         fetchCollecte();
@@ -191,7 +195,97 @@ export default function TeacherCollecteNotesPage() {
         }
     };
 
+    const analyzeOCR = async () => {
 
+            if (!ocrFile) {
+
+        setErrorMessage(
+            "Veuillez sélectionner une image"
+        );
+
+        setTimeout(() => {
+
+            setErrorMessage('');
+
+        }, 1500);
+
+        return;
+    }
+
+        try {
+
+            setOcrLoading(true);
+
+            const formData = new FormData();
+
+            formData.append(
+                "image",
+                ocrFile
+            );
+
+            const response = await api.post(
+                "/ocr/upload/",
+                formData,
+                {
+                    headers: {
+                        "Content-Type":
+                            "multipart/form-data"
+                    }
+                }
+            );
+
+            setOcrMatches(
+                response.data.matches
+            );
+
+            setSuccessMessage(
+                "Analyse OCR terminée"
+            );
+
+        } catch (error) {
+
+            console.error(error);
+
+            setErrorMessage(
+                "Erreur OCR"
+            );
+
+        } finally {
+
+            setOcrLoading(false);
+        }
+    };
+    const importOCR = async () => {
+
+        try {
+
+            const response = await api.post(
+                "/ocr/import/",
+                {
+                    collecte_id: parseInt(id),
+                    matches: ocrMatches
+                }
+            );
+
+            setSuccessMessage(
+                `${response.data.imported_notes} notes importées`
+            );
+
+            setErrorMessage('');
+
+            fetchNotes();
+
+            setOcrMatches([]);
+
+        } catch (error) {
+
+            console.error(error);
+
+            setErrorMessage(
+                "Erreur lors de l'import"
+            );
+        }
+    };
     const validateCollecte = async () => {
 
         try {
@@ -341,6 +435,121 @@ export default function TeacherCollecteNotesPage() {
                 </div>
             )}
 
+            {collecte.status === 'prepared' && (
+
+                    <div className="bg-white rounded shadow p-6 mb-6">
+
+                        <h2 className="text-xl font-semibold mb-4">
+
+                            Import OCR
+
+                        </h2>
+
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) =>
+                                setOcrFile(
+                                    e.target.files[0]
+                                )
+                            }
+                            className="mb-4"
+                        />
+
+                        <div>
+
+                            <button
+                                onClick={analyzeOCR}
+                                disabled={ocrLoading}
+                                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                            >
+
+                                {
+                                    ocrLoading
+                                        ? 'Analyse...'
+                                        : 'Analyser OCR'
+                                }
+
+                            </button>
+
+                        </div>
+
+                        {
+                            ocrMatches.length > 0 && (
+
+                                <div className="mt-6">
+
+                                    <h3 className="text-lg font-semibold mb-4">
+
+                                        Résultats OCR
+
+                                    </h3>
+
+                                    {
+                                        ocrMatches.map((match) => (
+
+                                            <div
+                                                key={match.matricule}
+                                                className="border rounded p-3 mb-3"
+                                            >
+
+                                                <p>
+                                                    <strong>Matricule:</strong>
+                                                    {" "}
+                                                    {match.matricule}
+                                                </p>
+
+                                                <p>
+                                                    <strong>Étudiant:</strong>
+                                                    {" "}
+                                                    {match.student_name}
+                                                </p>
+
+                                                <p>
+                                                    <strong>CC:</strong>
+                                                    {" "}
+                                                    {match.cc}
+                                                </p>
+
+                                                <p>
+                                                    <strong>CF:</strong>
+                                                    {" "}
+                                                    {match.cf}
+                                                </p>
+
+                                                <p>
+                                                    <strong>Trouvé:</strong>
+                                                    {" "}
+                                                    {
+                                                        match.found
+                                                            ? "Oui"
+                                                            : "Non"
+                                                    }
+                                                </p>
+
+                                            </div>
+                                        ))
+                                        
+                                    }
+                                    <div className="mt-4">
+
+                                        <button
+                                            onClick={importOCR}
+                                            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                                        >
+
+                                            Importer les notes
+
+                                        </button>
+
+                                    </div>
+                                </div>
+                            )
+                        }
+
+                    </div>
+                )
+            }
 
             {
                 collecte.status !== 'prepared' && (
