@@ -146,7 +146,29 @@ export default function TeacherCollecteNotesPage() {
             },
         }));
     };
+    const handleOCRMatchChange = (
+            index,
+            field,
+            value
+        ) => {
 
+            setOcrMatches((prev) => {
+
+                const updated = [...prev];
+
+                updated[index] = {
+
+                    ...updated[index],
+
+                    [field]:
+                        value === ''
+                            ? null
+                            : Number(value)
+                };
+
+                return updated;
+            });
+        };
 
     const saveNotes = async () => {
 
@@ -445,16 +467,34 @@ export default function TeacherCollecteNotesPage() {
 
                         </h2>
 
-                        <input
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) =>
-                                setOcrFile(
-                                    e.target.files[0]
-                                )
-                            }
-                            className="mb-4"
-                        />
+                        <div className="mb-4">
+
+                            <label
+                                htmlFor="ocr-file"
+                                className="cursor-pointer inline-block bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg px-6 py-4 hover:bg-gray-200"
+                            >
+
+                                {
+                                    ocrFile
+                                        ? `📷 ${ocrFile.name}`
+                                        : "📷 Choisir une image"
+                                }
+
+                            </label>
+
+                            <input
+                                id="ocr-file"
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) =>
+                                    setOcrFile(
+                                        e.target.files[0]
+                                    )
+                                }
+                                className="hidden"
+                            />
+
+                        </div>
 
                         <div>
 
@@ -486,46 +526,86 @@ export default function TeacherCollecteNotesPage() {
                                     </h3>
 
                                     {
-                                        ocrMatches.map((match) => (
+                                        ocrMatches.map((match, index) => (
 
                                             <div
-                                                key={match.matricule}
-                                                className="border rounded p-3 mb-3"
-                                            >
+                                                    key={match.matricule}
+                                                    className="border rounded p-3 mb-3"
+                                                >
 
-                                                <p>
-                                                    <strong>Matricule:</strong>
-                                                    {" "}
-                                                    {match.matricule}
-                                                </p>
+                                                    <p>
+                                                        <strong>Matricule:</strong>
+                                                        {" "}
+                                                        {match.matricule}
+                                                    </p>
 
-                                                <p>
-                                                    <strong>Étudiant:</strong>
-                                                    {" "}
-                                                    {match.student_name}
-                                                </p>
+                                                    <p>
+                                                        <strong>Étudiant:</strong>
+                                                        {" "}
+                                                        {match.student_name}
+                                                    </p>
 
-                                                <p>
-                                                    <strong>CC:</strong>
-                                                    {" "}
-                                                    {match.cc}
-                                                </p>
+                                                    <div className="mb-2">
 
-                                                <p>
-                                                    <strong>CF:</strong>
-                                                    {" "}
-                                                    {match.cf}
-                                                </p>
+                                                <strong>CC:</strong>
 
-                                                <p>
-                                                    <strong>Trouvé:</strong>
-                                                    {" "}
-                                                    {
-                                                        match.found
-                                                            ? "Oui"
-                                                            : "Non"
+                                                <input
+                                                    type="number"
+                                                    value={match.cc ?? ''}
+                                                    onChange={(e) =>
+                                                        handleOCRMatchChange(
+                                                            index,
+                                                            'cc',
+                                                            e.target.value
+                                                        )
                                                     }
-                                                </p>
+                                                    className="border p-1 rounded ml-2 w-24"
+                                                />
+
+                                            </div>
+
+                                                <div className="mb-2">
+
+                                                    <strong>CF:</strong>
+
+                                                    <input
+                                                        type="number"
+                                                        value={match.cf ?? ''}
+                                                        onChange={(e) =>
+                                                            handleOCRMatchChange(
+                                                                index,
+                                                                'cf',
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                        className="border p-1 rounded ml-2 w-24"
+                                                    />
+
+                                                </div>
+
+                                                <div className="mt-2">
+
+                                                    {
+                                                        match.found ? (
+
+                                                            <span className="bg-green-100 text-green-700 px-3 py-1 rounded font-semibold">
+
+                                                                Trouvé
+
+                                                            </span>
+                
+                                                        ) : (
+
+                                                            <span className="bg-red-100 text-red-700 px-3 py-1 rounded font-semibold">
+
+                                                                Introuvable
+
+                                                            </span>
+
+                                                        )
+                                                    }
+
+                                                </div>
 
                                             </div>
                                         ))

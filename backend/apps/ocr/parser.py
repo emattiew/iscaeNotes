@@ -2,28 +2,51 @@ from apps.accounts.models import User
 
 import re
 
-
 def group_rows(result):
 
-    rows = {}
+    result = sorted(
+        result,
+        key=lambda item: item[0][0][1]
+    )
+
+    rows = []
+
+    current_row = []
+
+    current_y = None
+
+    threshold = 20
 
     for item in result:
 
-        box = item[0]
-
+        y = item[0][0][1]
         text = item[1]
 
-        y = box[0][1]
+        if current_y is None:
 
-        row_key = round(y / 50) * 50
+            current_y = y
 
-        if row_key not in rows:
+            current_row.append(text)
 
-            rows[row_key] = []
+            continue
 
-        rows[row_key].append(text)
+        if abs(y - current_y) <= threshold:
 
-    return list(rows.values())
+            current_row.append(text)
+
+        else:
+
+            rows.append(current_row)
+
+            current_row = [text]
+
+            current_y = y
+
+    if current_row:
+
+        rows.append(current_row)
+
+    return rows
 
 
 def normalize_matricule(text):
@@ -169,6 +192,7 @@ def extract_notes(rows):
 
             "cf": cf,
         })
+        
 
     return notes
 
