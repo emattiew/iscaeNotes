@@ -13,6 +13,18 @@ export default function StudentDashboard() {
 
     const [loading, setLoading] = useState(true);
 
+    const [selectedNote, setSelectedNote] = useState(null);
+
+    const [showReclamationModal,setShowReclamationModal] = useState(false);
+
+    const [reclamationMessage, setReclamationMessage] = useState('');
+
+    const [successMessage, setSuccessMessage] = useState('');
+
+    const [errorMessage,
+        setErrorMessage] =
+        useState('');
+
 
     useEffect(() => {
 
@@ -59,7 +71,58 @@ export default function StudentDashboard() {
             setLoading(false);
         }
     };
+    const openReclamationModal = (
+        note
+    ) => {
 
+        setSelectedNote(note);
+
+        setShowReclamationModal(
+            true
+        );
+    };
+
+const createReclamation =
+    async () => {
+
+    try {
+
+        await api.post(
+            "/notes/reclamations/",
+            {
+                student_note:
+                    selectedNote.id,
+
+                message:
+                    reclamationMessage
+            }
+        );
+
+        setSuccessMessage(
+            "Réclamation envoyée avec succès"
+        );
+
+        setErrorMessage('');
+
+        setShowReclamationModal(
+            false
+        );
+
+        setReclamationMessage('');
+        
+        setSelectedNote(null);
+
+    } catch (error) {
+
+        console.error(error);
+
+        setErrorMessage(
+            "Erreur lors de l'envoi"
+        );
+
+        setSuccessMessage('');
+    }
+};
 
     if (loading || !user) {
 
@@ -80,9 +143,31 @@ export default function StudentDashboard() {
 
     return (
 
-        <StudentLayout>
+    <StudentLayout>
 
-            <div className="bg-white rounded-2xl shadow-sm p-8 mb-8">
+        {
+            successMessage && (
+
+                <div className="bg-green-600 text-white p-4 rounded mb-4">
+
+                    {successMessage}
+
+                </div>
+            )
+        }
+
+        {
+            errorMessage && (
+
+                <div className="bg-red-100 text-red-700 p-4 rounded mb-4">
+
+                    {errorMessage}
+
+                </div>
+            )
+        }
+
+        <div className="bg-white rounded-2xl shadow-sm p-8 mb-8">
 
                 <h1 className="text-4xl font-bold mb-2">
 
@@ -284,7 +369,14 @@ export default function StudentDashboard() {
 
                                     </div>
 
-
+                                    <button
+                                        onClick={() =>
+                                            openReclamationModal(note)
+                                        }
+                                        className="mt-6 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+                                    >
+                                        Faire une réclamation
+                                    </button>
                                     <div className="mt-6 text-sm text-gray-500">
 
                                         Année universitaire :
@@ -301,7 +393,59 @@ export default function StudentDashboard() {
                 }
 
             </div>
+            {
+    showReclamationModal && (
 
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+
+            <div className="bg-white p-6 rounded-xl w-full max-w-lg">
+
+                <h2 className="text-2xl font-bold mb-4">
+
+                    Nouvelle réclamation
+
+                </h2>
+
+                <textarea
+                    value={reclamationMessage}
+                    onChange={(e) =>
+                        setReclamationMessage(
+                            e.target.value
+                        )
+                    }
+                    className="border w-full p-3 rounded h-32"
+                    placeholder="Expliquez votre réclamation..."
+                />
+
+                <div className="flex gap-3 mt-4">
+
+                    <button
+                        onClick={createReclamation}
+                        className="bg-green-600 text-white px-4 py-2 rounded"
+                    >
+                        Envoyer
+                    </button>
+
+                    <button
+                        onClick={() =>
+                            setShowReclamationModal(
+                                false
+                            )
+                        }
+                        className="bg-gray-300 px-4 py-2 rounded"
+                    >
+                        Annuler
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+    )
+}
         </StudentLayout>
+        
     );
+    
 }

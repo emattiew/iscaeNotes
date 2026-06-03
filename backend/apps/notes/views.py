@@ -5,9 +5,12 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from rest_framework import status
-
+from rest_framework import serializers
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
 
+from django.utils import timezone
 
 from apps.accounts.permissions import IsAdminRole
 
@@ -17,6 +20,8 @@ from .models import (
     Filiere,
     CollecteNote,
     StudentNote,
+    Reclamation,
+    ReclamationPeriod,
 )
 
 from .serializers import (
@@ -25,6 +30,8 @@ from .serializers import (
     FiliereSerializer,
     CollecteNoteSerializer,
     StudentNoteSerializer,
+    ReclamationSerializer,
+    ReclamationPeriodSerializer,
 )
 
 
@@ -230,3 +237,153 @@ class StudentNoteViewSet(ModelViewSet):
 
 
         return queryset
+    
+class ReclamationViewSet(ModelViewSet):
+
+    serializer_class = ReclamationSerializer
+
+    permission_classes = [
+        IsAuthenticated
+    ]
+
+    def get_queryset(self):
+
+        user = self.request.user
+
+        if user.role == 'admin_staff':
+
+            return Reclamation.objects.all()
+
+        if user.role == 'teacher':
+
+            return Reclamation.objects.filter(
+                student_note__collecte__teacher=user
+            )
+
+        if user.role == 'student':
+
+            return Reclamation.objects.filter(
+                student=user
+            )
+
+        return Reclamation.objects.none()
+
+    def perform_create(self, serializer):
+
+        active_period = (
+            ReclamationPeriod.objects.filter(
+                is_active=True,
+                start_date__lte=timezone.now(),
+                end_date__gte=timezone.now()
+            ).first()
+        )
+
+        if not active_period:
+
+            raise serializers.ValidationError(
+                'Les réclamations sont fermées'
+            )
+
+        student_note = serializer.validated_data[
+            'student_note'
+        ]
+
+        if (
+            self.request.user.role == 'student'
+            and student_note.student != self.request.user
+        ):
+
+            raise serializers.ValidationError(
+                'Cette note ne vous appartient pas'
+            )
+
+        serializer.save(
+            student=self.request.user,
+            period=active_period
+        )
+
+    def update(self, request, *args, **kwargs):
+
+        if request.user.role not in [
+            'teacher',
+            'admin_staff'
+        ]:
+
+            return Response(
+                {
+                    'error':
+                        'Permission refusée'
+                },
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        return super().update(
+            request,
+            *args,
+            **kwargs
+        )
+
+    def partial_update(
+        self,
+        request,
+        *args,
+        **kwargs
+    ):
+
+        if request.user.role not in [
+            'teacher',
+            'admin_staff'
+        ]:
+
+            return Response(
+                {
+                    'error':
+                        'Permission refusée'
+                },
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        return super().partial_update(
+            request,
+            *args,
+            **kwargs
+        )
+
+    def destroy(
+        self,
+        request,
+        *args,
+        **kwargs
+    ):
+
+        if request.user.role != 'admin_staff':
+
+            return Response(
+                {
+                    'error':
+                        'Seule la scolarité peut supprimer une réclamation'
+                },
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        return super().destroy(
+            request,
+            *args,
+            **kwargs
+        )
+    
+class ReclamationPeriodViewSet(
+    ModelViewSet
+):
+
+    queryset = (
+        ReclamationPeriod.objects.all()
+    )
+
+    serializer_class = (
+        ReclamationPeriodSerializer
+    )
+
+    permission_classes = [
+        IsAdminRole
+    ]

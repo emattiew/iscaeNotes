@@ -132,3 +132,90 @@ class StudentNote(models.Model):
     def __str__(self):
 
         return f'{self.student} - {self.collecte}'
+class ReclamationPeriod(models.Model):
+
+    title = models.CharField(
+        max_length=100
+    )
+
+    start_date = models.DateTimeField()
+
+    end_date = models.DateTimeField()
+
+    is_active = models.BooleanField(
+        default=True
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    def __str__(self):
+
+        return self.title
+class Reclamation(models.Model):
+
+    STATUS_CHOICES = [
+
+        ('pending', 'Pending'),
+
+        ('accepted', 'Accepted'),
+
+        ('rejected', 'Rejected'),
+    ]
+
+    period = models.ForeignKey(
+    ReclamationPeriod,
+    on_delete=models.CASCADE,
+    related_name='reclamations',
+    null=True,
+    blank=True
+)
+
+    student_note = models.ForeignKey(
+        'StudentNote',
+        on_delete=models.CASCADE,
+        related_name='reclamations'
+    )
+
+    student = models.ForeignKey(
+        'accounts.User',
+        on_delete=models.CASCADE,
+        related_name='reclamations'
+    )
+
+    message = models.TextField()
+
+    teacher_response = models.TextField(
+        blank=True
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='pending'
+    )
+
+    resolved_by = models.ForeignKey(
+        'accounts.User',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='resolved_reclamations'
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    resolved_at = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+
+    def __str__(self):
+
+        return (
+            f"{self.student.username}"
+            f" - {self.status}"
+        )

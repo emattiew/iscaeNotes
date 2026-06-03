@@ -6,6 +6,8 @@ from .models import (
     Filiere,
     CollecteNote,
     StudentNote,
+    Reclamation,
+    ReclamationPeriod,
 )
 
 
@@ -156,3 +158,51 @@ class StudentNoteSerializer(serializers.ModelSerializer):
         )
 
         return student_note
+class ReclamationSerializer(
+    serializers.ModelSerializer
+):
+
+    class Meta:
+
+        model = Reclamation
+
+        fields = [
+
+            'id',
+
+            'period',
+
+            'student_note',
+
+            'student',
+
+            'message',
+
+            'teacher_response',
+
+            'status',
+
+            'created_at',
+
+            'resolved_at',
+        ]
+
+        read_only_fields = [
+
+            'student',
+
+            'period',
+
+            'created_at',
+
+            'resolved_at',
+        ]
+class ReclamationPeriodSerializer(
+    serializers.ModelSerializer
+):
+
+    class Meta:
+
+        model = ReclamationPeriod
+
+        fields = '__all__'

@@ -1,3 +1,5 @@
+from django.urls import path
+
 from rest_framework.routers import DefaultRouter
 
 from .views import (
@@ -6,8 +8,10 @@ from .views import (
     FiliereViewSet,
     CollecteViewSet,
     StudentNoteViewSet,
+    ReclamationViewSet,
+    ReclamationPeriodViewSet,
+    
 )
-
 
 router = DefaultRouter()
 
@@ -34,9 +38,20 @@ router.register(
     CollecteViewSet,
     basename='collectes'
 )
+
 router.register(
     'student-notes',
     StudentNoteViewSet,
     basename='student-notes'
+)
+router.register(
+    'reclamation-periods',
+    ReclamationPeriodViewSet,
+    basename='reclamation-periods'
+)
+router.register(
+    'reclamations',
+    ReclamationViewSet,
+    basename='reclamations'
 )
 urlpatterns = router.urls
