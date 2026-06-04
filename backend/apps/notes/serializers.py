@@ -162,6 +162,36 @@ class ReclamationSerializer(
     serializers.ModelSerializer
 ):
 
+    student_name = serializers.CharField(
+        source='student.username',
+        read_only=True
+    )
+
+    matricule = serializers.CharField(
+        source='student.matricule',
+        read_only=True
+    )
+
+    matiere_name = serializers.CharField(
+        source='student_note.collecte.matiere.name',
+        read_only=True
+    )
+
+    controle_continu = serializers.FloatField(
+        source='student_note.controle_continu',
+        read_only=True
+    )
+
+    controle_final = serializers.FloatField(
+        source='student_note.controle_final',
+        read_only=True
+    )
+
+    note_finale = serializers.FloatField(
+        source='student_note.note_finale',
+        read_only=True
+    )
+
     class Meta:
 
         model = Reclamation
@@ -175,6 +205,18 @@ class ReclamationSerializer(
             'student_note',
 
             'student',
+
+            'student_name',
+
+            'matricule',
+
+            'matiere_name',
+
+            'controle_continu',
+
+            'controle_final',
+
+            'note_finale',
 
             'message',
 
@@ -197,6 +239,7 @@ class ReclamationSerializer(
 
             'resolved_at',
         ]
+        
 class ReclamationPeriodSerializer(
     serializers.ModelSerializer
 ):

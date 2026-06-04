@@ -50,6 +50,12 @@ export default function TeacherLayout({ children }) {
                             Mes collectes
                         </Link>
 
+                        <Link
+                            to="/teacher/reclamations"
+                            className="hover:text-gray-300"
+                        >
+                            Réclamations
+                        </Link>
                     </nav>
 
                 </div>

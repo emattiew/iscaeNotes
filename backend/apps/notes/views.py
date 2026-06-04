@@ -343,10 +343,73 @@ class ReclamationViewSet(ModelViewSet):
                 status=status.HTTP_403_FORBIDDEN
             )
 
-        return super().partial_update(
-            request,
-            *args,
-            **kwargs
+        reclamation = self.get_object()
+
+        status_value = request.data.get(
+            'status'
+        )
+
+        teacher_response = request.data.get(
+            'teacher_response'
+        )
+
+        reclamation.teacher_response = (
+            teacher_response
+        )
+
+        reclamation.status = (
+            status_value
+        )
+
+        if status_value == 'accepted':
+
+            cc = request.data.get(
+                'controle_continu'
+            )
+
+            cf = request.data.get(
+                'controle_final'
+            )
+
+            note = reclamation.student_note
+
+            if cc is not None:
+
+                note.controle_continu = float(cc)
+
+            if cf is not None:
+
+                note.controle_final = float(cf)
+
+            cc_value = (
+                note.controle_continu or 0
+            )
+
+            cf_value = (
+                note.controle_final or 0
+            )
+
+            note.note_finale = (
+
+                cc_value * 0.4
+
+                +
+
+                cf_value * 0.6
+            )
+
+            note.save()
+
+        reclamation.save()
+
+        serializer = (
+            self.get_serializer(
+                reclamation
+            )
+        )
+
+        return Response(
+            serializer.data
         )
 
     def destroy(

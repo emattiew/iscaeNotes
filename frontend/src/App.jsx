@@ -30,7 +30,7 @@ import TeacherCollectesPage from './pages/teacher/TeacherCollectesPage'
 
 import TeacherCollecteNotesPage from './pages/teacher/TeacherCollecteNotesPage'
 
-
+import TeacherReclamationsPage from './pages/teacher/TeacherReclamationsPage'
 export default function App() {
 
   return (
@@ -120,7 +120,16 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/teacher/reclamations"
+          element={
+            <ProtectedRoute role="teacher">
 
+              <TeacherReclamationsPage />
+
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/admin/users"
           element={
