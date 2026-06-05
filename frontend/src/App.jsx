@@ -31,6 +31,10 @@ import TeacherCollectesPage from './pages/teacher/TeacherCollectesPage'
 import TeacherCollecteNotesPage from './pages/teacher/TeacherCollecteNotesPage'
 
 import TeacherReclamationsPage from './pages/teacher/TeacherReclamationsPage'
+
+import AdminReclamationPeriodsPage from './pages/admin/AdminReclamationPeriodsPage'
+import AdminReclamationsPage from './pages/admin/AdminReclamationsPage'
+
 export default function App() {
 
   return (
@@ -173,8 +177,28 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/admin/reclamation-periods"
+          element={
+            <ProtectedRoute role="admin_staff">
 
-      </Routes>
+              <AdminReclamationPeriodsPage />
+
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/reclamations"
+          element={
+            <ProtectedRoute role="admin_staff">
+
+              <AdminReclamationsPage />
+
+            </ProtectedRoute>
+          }
+        />
+          </Routes>
 
     </BrowserRouter>
   )

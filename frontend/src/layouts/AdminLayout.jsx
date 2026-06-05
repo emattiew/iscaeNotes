@@ -77,6 +77,19 @@ export default function AdminLayout({ children }) {
                             Matières
                         </Link>
 
+                        <Link
+                            to="/admin/reclamation-periods"
+                            className="hover:text-gray-300"
+                        >
+                            Périodes de réclamation
+                        </Link>
+                                                <Link
+                            to="/admin/reclamations"
+                            className="hover:text-gray-300"
+                        >
+                            Réclamations
+                        </Link>
+
                     </nav>
 
                 </div>

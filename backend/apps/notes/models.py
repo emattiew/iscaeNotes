@@ -132,6 +132,7 @@ class StudentNote(models.Model):
     def __str__(self):
 
         return f'{self.student} - {self.collecte}'
+    
 class ReclamationPeriod(models.Model):
 
     title = models.CharField(
