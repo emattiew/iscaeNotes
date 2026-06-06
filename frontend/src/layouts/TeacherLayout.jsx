@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 
+import logo from "../assets/logo-iscae.png";
 
 export default function TeacherLayout({ children }) {
 
@@ -26,11 +27,21 @@ export default function TeacherLayout({ children }) {
 
                 <div>
 
-                    <h1 className="text-2xl font-bold mb-10">
+                    <div className="flex flex-col items-center mb-8">
 
-                        ISCAE Teacher
+                    <img
+                        src={logo}
+                        alt="ISCAE"
+                        className="w-20 h-20 object-contain mb-3"
+                    />
 
+                    <h1 className="text-xl font-bold text-center">
+                        Enseignant
                     </h1>
+
+                </div>
+
+<hr className="border-gray-700 mb-6" />
 
 
                     <nav className="flex flex-col gap-4">

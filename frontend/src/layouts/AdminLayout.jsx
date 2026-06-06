@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 
 
+import logo from "../assets/logo-iscae.png";
 export default function AdminLayout({ children }) {
 
     const navigate = useNavigate();
@@ -26,11 +27,19 @@ export default function AdminLayout({ children }) {
 
                 <div>
 
-                    <h1 className="text-2xl font-bold mb-10">
+                    <div className="flex flex-col items-center mb-10">
 
-                        ISCAE Admin
+                    <img
+                        src={logo}
+                        alt="ISCAE"
+                        className="w-20 h-20 object-contain mb-3"
+                    />
 
+                    <h1 className="text-xl font-bold text-center">
+                        Administration
                     </h1>
+
+                </div>
 
 
                     <nav className="flex flex-col gap-4">

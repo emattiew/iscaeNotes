@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 
 import api from '../../services/api'
-
+import logo from '../../assets/logo-iscae.png'
 
 export default function Login() {
 
@@ -113,11 +113,15 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
 
       <div className="bg-white p-10 rounded-2xl shadow-lg w-full max-w-md">
+        <img
+            src={logo}
+            alt="Logo ISCAE"
+            className="w-24 h-24 mx-auto mb-4 object-contain"
+        />
 
         <h1 className="text-4xl font-bold text-center mb-8">
-          Plateforme ISCAE
+        Connexion
         </h1>
-
 
         {errorMessage && (
 

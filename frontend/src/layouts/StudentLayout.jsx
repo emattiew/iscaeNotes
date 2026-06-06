@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-
+import logo from "../assets/logo-iscae.png";
 
 export default function StudentLayout({ children }) {
 
@@ -26,19 +26,25 @@ export default function StudentLayout({ children }) {
 
                 <div className="max-w-7xl mx-auto px-8 py-5 flex items-center justify-between">
 
-                    <div>
+                    <div className="flex items-center gap-4">
 
-                        <h1 className="text-2xl font-bold text-black">
+                        <img
+                            src={logo}
+                            alt="ISCAE"
+                            className="w-12 h-12 object-contain"
+                        />
 
-                            ISCAE Student Portal
+                        <div>
 
-                        </h1>
+                            <h1 className="text-2xl font-bold text-black">
+                                Espace Étudiant
+                            </h1>
 
-                        <p className="text-gray-500 text-sm mt-1">
+                            <p className="text-gray-500 text-sm mt-1">
+                                Consultation des résultats académiques
+                            </p>
 
-                            Consultation des résultats académiques
-
-                        </p>
+                        </div>
 
                     </div>
 
