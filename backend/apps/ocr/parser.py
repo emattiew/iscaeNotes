@@ -4,9 +4,51 @@ import re
 
 def group_rows(result):
 
-    result = sorted(
-        result,
-        key=lambda item: item[0][0][1]
+    words = []
+
+    for item in result:
+
+        box = item[0]
+        text = item[1]
+
+        center_x = (
+            box[0][0] +
+            box[2][0]
+        ) / 2
+
+        center_y = (
+            box[0][1] +
+            box[2][1]
+        ) / 2
+
+        height = abs(
+            box[2][1] -
+            box[0][1]
+        )
+
+        words.append({
+
+            "text": text,
+
+            "x": center_x,
+
+            "y": center_y,
+
+            "height": height
+        })
+
+    if not words:
+        return []
+
+    avg_height = sum(
+        w["height"]
+        for w in words
+    ) / len(words)
+
+    threshold = avg_height * 0.45
+
+    words.sort(
+        key=lambda x: x["y"]
     )
 
     rows = []
@@ -15,36 +57,47 @@ def group_rows(result):
 
     current_y = None
 
-    threshold = 20
-
-    for item in result:
-
-        y = item[0][0][1]
-        text = item[1]
+    for word in words:
 
         if current_y is None:
 
-            current_y = y
+            current_y = word["y"]
 
-            current_row.append(text)
+            current_row.append(word)
 
             continue
 
-        if abs(y - current_y) <= threshold:
+        if abs(
+            word["y"] - current_y
+        ) <= threshold:
 
-            current_row.append(text)
+            current_row.append(word)
 
         else:
 
-            rows.append(current_row)
+            current_row.sort(
+                key=lambda x: x["x"]
+            )
 
-            current_row = [text]
+            rows.append([
+                w["text"]
+                for w in current_row
+            ])
 
-            current_y = y
+            current_row = [word]
+
+            current_y = word["y"]
 
     if current_row:
 
-        rows.append(current_row)
+        current_row.sort(
+            key=lambda x: x["x"]
+        )
+
+        rows.append([
+            w["text"]
+            for w in current_row
+        ])
 
     return rows
 
@@ -89,28 +142,50 @@ def extract_numbers(row):
 
     for value in row:
 
-        value = str(value)
+        value = str(value).strip()
+            
+        value = value.replace("Co", "60")
+        value = value.replace('"o', "10")
+        value = value.replace("'o", "10")
+        value = value.replace("6o", "60")
+        value = value.replace("o", "0")
+        value = value.replace("O", "0")
+        if is_matricule(value):
+            continue
 
-        match = re.search(
+        if "AB" in value.upper():
+            continue
+
+        if re.fullmatch(
             r'\d+(?:[.,]\d+)?',
             value
-        )
-
-        if match:
+        ):
 
             try:
 
+                if (
+                    value.isdigit()
+                    and len(value) == 3
+                ):
+
+                    value = (
+                        value[:2]
+                        +
+                        "."
+                        +
+                        value[2]
+                    )
+
                 numbers.append(
                     float(
-                        match.group().replace(
-                            ',',
-                            '.'
+                        value.replace(
+                            ",",
+                            "."
                         )
                     )
                 )
 
             except ValueError:
-
                 pass
 
     return numbers
@@ -144,6 +219,9 @@ def extract_notes(rows):
 
         numbers = extract_numbers(row)
 
+        print("ROW:", row)
+        print("NUMBERS:", numbers)
+        print("-" * 50)
         if len(numbers) == 0:
 
             continue
@@ -153,13 +231,28 @@ def extract_notes(rows):
 
         if len(numbers) == 1:
 
+            if numbers[0] > 20:
+
+                continue
+
             cc = numbers[0]
 
         elif len(numbers) >= 2:
 
-            cc = numbers[-2]
+            valid_numbers = [
+                n for n in numbers
+                if 0 <= n <= 20
+            ]
 
-            cf = numbers[-1]
+            if len(valid_numbers) >= 2:
+
+                cc = valid_numbers[-2]
+
+                cf = valid_numbers[-1]
+
+            elif len(valid_numbers) == 1:
+
+                cc = valid_numbers[0]
 
         name_parts = []
 
@@ -192,7 +285,7 @@ def extract_notes(rows):
 
             "cf": cf,
         })
-        
+
 
     return notes
 

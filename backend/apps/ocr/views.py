@@ -45,7 +45,12 @@ class OCRUploadView(APIView):
         result = reader.readtext(
             image.read()
         )
+        print("\n===== OCR RESULT =====")
 
+        for item in result[:50]:
+            print(item)
+
+        print("===== END OCR =====\n")
         rows = group_rows(result)
 
         notes = extract_notes(rows)
