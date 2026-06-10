@@ -18,7 +18,11 @@ export default function MatieresPage() {
     const [successMessage, setSuccessMessage] = useState('');
 
     const [errorMessage, setErrorMessage] = useState('');
+    const [editingId, setEditingId] = useState(null);
 
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+    const [matiereToDelete, setMatiereToDelete] = useState(null);
 
     const [formData, setFormData] = useState({
 
@@ -105,36 +109,97 @@ export default function MatieresPage() {
         });
     };
 
+    const editMatiere = (matiere) => {
 
+    setEditingId(matiere.id);
+
+    setFormData({
+        module: matiere.module,
+        name: matiere.name,
+        coefficient: matiere.coefficient,
+        credit: matiere.credit,
+    });
+
+    setShowModal(true);
+};
+
+const openDeleteModal = (id) => {
+
+    setMatiereToDelete(id);
+
+    setShowDeleteModal(true);
+};
+
+const deleteMatiere = async () => {
+
+    try {
+
+        await api.delete(
+            `/notes/matieres/${matiereToDelete}/`
+        );
+
+        fetchMatieres();
+
+        setSuccessMessage(
+            "Matière supprimée avec succès"
+        );
+
+        setErrorMessage('');
+
+        setShowDeleteModal(false);
+
+        setMatiereToDelete(null);
+
+    } catch (error) {
+
+        console.error(error);
+
+        setErrorMessage(
+            "Erreur lors de la suppression"
+        );
+    }
+};
     const createMatiere = async (e) => {
 
         e.preventDefault();
 
         try {
 
-            await api.post(
-                "/notes/matieres/",
-                formData
-            );
+            if (editingId) {
+
+                await api.put(
+                    `/notes/matieres/${editingId}/`,
+                    formData
+                );
+
+                setSuccessMessage(
+                    "Matière modifiée avec succès"
+                );
+
+            } else {
+
+                await api.post(
+                    "/notes/matieres/",
+                    formData
+                );
+
+                setSuccessMessage(
+                    "Matière créée avec succès"
+                );
+            }
+
+            setErrorMessage('');
 
             fetchMatieres();
 
             setShowModal(false);
 
-            setSuccessMessage(
-                "Matière créée avec succès"
-            );
-
-            setErrorMessage('');
+            setEditingId(null);
 
             setFormData({
-
                 module: '',
-
                 name: '',
-
                 coefficient: '',
-
                 credit: '',
             });
 
@@ -143,10 +208,8 @@ export default function MatieresPage() {
             console.error(error);
 
             setErrorMessage(
-                "Erreur lors de la création"
+                "Erreur lors de l'opération"
             );
-
-            setSuccessMessage('');
         }
     };
 
@@ -200,7 +263,19 @@ export default function MatieresPage() {
 
 
             <button
-                onClick={() => setShowModal(true)}
+                onClick={() => {
+
+                setEditingId(null);
+
+                setFormData({
+                    module: '',
+                    name: '',
+                    coefficient: '',
+                    credit: '',
+                });
+
+                setShowModal(true);
+            }}
                 className="bg-black text-white px-5 py-3 rounded mb-6 hover:bg-gray-800"
             >
 
@@ -217,7 +292,19 @@ export default function MatieresPage() {
                         <div className="bg-white w-full max-w-xl rounded-lg p-8 relative">
 
                             <button
-                                onClick={() => setShowModal(false)}
+                                onClick={() => {
+
+                                    setShowModal(false);
+
+                                    setEditingId(null);
+
+                                    setFormData({
+                                        module: '',
+                                        name: '',
+                                        coefficient: '',
+                                        credit: '',
+                                    });
+                                }}
                                 className="absolute top-4 right-4 text-gray-500 hover:text-black text-xl"
                             >
 
@@ -228,7 +315,11 @@ export default function MatieresPage() {
 
                             <h2 className="text-2xl font-bold mb-6">
 
-                                Créer une matière
+                                {
+                                    editingId
+                                        ? "Modifier la matière"
+                                        : "Créer une matière"
+                                }
 
                             </h2>
 
@@ -307,7 +398,7 @@ export default function MatieresPage() {
                                     className="bg-black text-white p-3 rounded hover:bg-gray-800"
                                 >
 
-                                    Créer
+                                    {editingId ? "Modifier" : "Créer"}
 
                                 </button>
 
@@ -343,7 +434,9 @@ export default function MatieresPage() {
                             <th className="p-4 text-left">
                                 Crédit
                             </th>
-
+                            <th className="p-4 text-left">
+                                Actions
+                            </th>
                         </tr>
 
                     </thead>
@@ -372,7 +465,23 @@ export default function MatieresPage() {
                                 <td className="p-4">
                                     {matiere.credit}
                                 </td>
+                                <td className="p-4 flex gap-2">
 
+                                    <button
+                                        onClick={() => editMatiere(matiere)}
+                                        className="bg-blue-600 text-white px-3 py-1 rounded"
+                                    >
+                                        Modifier
+                                    </button>
+
+                                    <button
+                                        onClick={() => openDeleteModal(matiere.id)}
+                                        className="bg-red-600 text-white px-3 py-1 rounded"
+                                    >
+                                        Supprimer
+                                    </button>
+
+                                </td>
                             </tr>
                         ))}
 
@@ -381,7 +490,57 @@ export default function MatieresPage() {
                 </table>
 
             </div>
+            {
+    showDeleteModal && (
 
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
+
+            <div className="bg-white w-full max-w-md rounded-lg p-8">
+
+                <h2 className="text-2xl font-bold mb-4">
+
+                    Confirmation
+
+                </h2>
+
+                <p className="text-gray-600 mb-6">
+
+                    Voulez-vous vraiment supprimer cette matière ?
+
+                </p>
+
+                <div className="flex justify-end gap-4">
+
+                    <button
+                        onClick={() => {
+
+                            setShowDeleteModal(false);
+
+                            setMatiereToDelete(null);
+                        }}
+                        className="px-5 py-2 rounded border"
+                    >
+
+                        Annuler
+
+                    </button>
+
+                    <button
+                        onClick={deleteMatiere}
+                        className="bg-red-600 text-white px-5 py-2 rounded hover:bg-red-700"
+                    >
+
+                        Supprimer
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+    )
+}            
         </AdminLayout>
     );
 }

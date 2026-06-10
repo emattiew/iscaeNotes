@@ -16,7 +16,11 @@ export default function ModulesPage() {
     const [successMessage, setSuccessMessage] = useState('');
 
     const [errorMessage, setErrorMessage] = useState('');
+    const [editingId, setEditingId] = useState(null);
 
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+    const [moduleToDelete, setModuleToDelete] = useState(null);
 
     const [formData, setFormData] = useState({
 
@@ -79,47 +83,106 @@ export default function ModulesPage() {
             [e.target.name]: e.target.value,
         });
     };
+    const editModule = (module) => {
 
+    setEditingId(module.id);
+
+    setFormData({
+        name: module.name,
+        semestre: module.semestre,
+    });
+
+    setShowModal(true);
+};
+
+const openDeleteModal = (id) => {
+
+    setModuleToDelete(id);
+
+    setShowDeleteModal(true);
+};
+
+const deleteModule = async () => {
+
+    try {
+
+        await api.delete(
+            `/notes/modules/${moduleToDelete}/`
+        );
+
+        fetchModules();
+
+        setSuccessMessage(
+            "Module supprimé avec succès"
+        );
+
+        setErrorMessage('');
+
+        setShowDeleteModal(false);
+
+        setModuleToDelete(null);
+
+    } catch (error) {
+
+        console.error(error);
+
+        setErrorMessage(
+            "Erreur lors de la suppression"
+        );
+    }
+};
 
     const createModule = async (e) => {
 
-        e.preventDefault();
+    e.preventDefault();
 
-        try {
+    try {
+
+        if (editingId) {
+
+            await api.put(
+                `/notes/modules/${editingId}/`,
+                formData
+            );
+
+            setSuccessMessage(
+                "Module modifié avec succès"
+            );
+
+        } else {
 
             await api.post(
                 "/notes/modules/",
                 formData
             );
 
-            fetchModules();
-
-            setShowModal(false);
-
             setSuccessMessage(
                 "Module créé avec succès"
             );
-
-            setErrorMessage('');
-
-            setFormData({
-
-                name: '',
-
-                semestre: '',
-            });
-
-        } catch (error) {
-
-            console.error(error);
-
-            setErrorMessage(
-                "Erreur lors de la création"
-            );
-
-            setSuccessMessage('');
         }
-    };
+
+        setErrorMessage('');
+
+        fetchModules();
+
+        setShowModal(false);
+
+        setEditingId(null);
+
+        setFormData({
+            name: '',
+            semestre: '',
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        setErrorMessage(
+            "Erreur lors de l'opération"
+        );
+    }
+};
 
 
     if (loading) {
@@ -171,7 +234,17 @@ export default function ModulesPage() {
 
 
             <button
-                onClick={() => setShowModal(true)}
+                onClick={() => {
+
+                setEditingId(null);
+
+                setFormData({
+                    name: '',
+                    semestre: '',
+                });
+
+                setShowModal(true);
+            }}
                 className="bg-black text-white px-5 py-3 rounded mb-6 hover:bg-gray-800"
             >
 
@@ -188,7 +261,17 @@ export default function ModulesPage() {
                         <div className="bg-white w-full max-w-lg rounded-lg p-8 relative">
 
                             <button
-                                onClick={() => setShowModal(false)}
+                                onClick={() => {
+
+                                setShowModal(false);
+
+                                setEditingId(null);
+
+                                setFormData({
+                                    name: '',
+                                    semestre: '',
+                                });
+                            }}
                                 className="absolute top-4 right-4 text-gray-500 hover:text-black text-xl"
                             >
 
@@ -199,7 +282,11 @@ export default function ModulesPage() {
 
                             <h2 className="text-2xl font-bold mb-6">
 
-                                Créer un module
+                                {
+                                    editingId
+                                        ? "Modifier le module"
+                                        : "Créer un module"
+                                }
 
                             </h2>
 
@@ -236,7 +323,7 @@ export default function ModulesPage() {
                                     className="bg-black text-white p-3 rounded hover:bg-gray-800"
                                 >
 
-                                    Créer
+                                    {editingId ? "Modifier" : "Créer"}
 
                                 </button>
 
@@ -264,7 +351,9 @@ export default function ModulesPage() {
                             <th className="p-4 text-left">
                                 Semestre
                             </th>
-
+                            <th className="p-4 text-left">
+                                Actions
+                            </th>
                         </tr>
 
                     </thead>
@@ -285,7 +374,23 @@ export default function ModulesPage() {
                                 <td className="p-4">
                                     S{module.semestre}
                                 </td>
+                                <td className="p-4 flex gap-2">
 
+                                    <button
+                                        onClick={() => editModule(module)}
+                                        className="bg-blue-600 text-white px-3 py-1 rounded"
+                                    >
+                                        Modifier
+                                    </button>
+
+                                    <button
+                                        onClick={() => openDeleteModal(module.id)}
+                                        className="bg-red-600 text-white px-3 py-1 rounded"
+                                    >
+                                        Supprimer
+                                    </button>
+
+                                </td>
                             </tr>
                         ))}
 
@@ -294,7 +399,57 @@ export default function ModulesPage() {
                 </table>
 
             </div>
+            {
+    showDeleteModal && (
 
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
+
+            <div className="bg-white w-full max-w-md rounded-lg p-8">
+
+                <h2 className="text-2xl font-bold mb-4">
+
+                    Confirmation
+
+                </h2>
+
+                <p className="text-gray-600 mb-6">
+
+                    Voulez-vous vraiment supprimer ce module ?
+
+                </p>
+
+                <div className="flex justify-end gap-4">
+
+                    <button
+                        onClick={() => {
+
+                            setShowDeleteModal(false);
+
+                            setModuleToDelete(null);
+                        }}
+                        className="px-5 py-2 rounded border"
+                    >
+
+                        Annuler
+
+                    </button>
+
+                    <button
+                        onClick={deleteModule}
+                        className="bg-red-600 text-white px-5 py-2 rounded hover:bg-red-700"
+                    >
+
+                        Supprimer
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+    )
+}                
         </AdminLayout>
     );
 }

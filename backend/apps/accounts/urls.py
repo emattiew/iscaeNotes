@@ -8,6 +8,7 @@ from .views import (
     TeacherListView,
     StudentListView,
     UserViewSet,
+    ImportStudentsView,
 )
 
 
@@ -41,6 +42,10 @@ urlpatterns = [
         'students/',
         StudentListView.as_view(),
     ),
+    path(
+    "students/import/",
+    ImportStudentsView.as_view()
+),
 ]
 
 urlpatterns += router.urls

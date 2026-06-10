@@ -262,7 +262,51 @@ export default function UsersPage() {
         }
     };
 
+    const handleImport = async (e) => {
 
+    const file = e.target.files[0];
+
+    if (!file) return;
+
+    const formData = new FormData();
+
+    formData.append(
+        "file",
+        file
+    );
+
+    try {
+
+        const response = await api.post(
+            "/accounts/students/import/",
+            formData,
+            {
+                headers: {
+                    "Content-Type":
+                        "multipart/form-data"
+                }
+            }
+        );
+
+        fetchUsers();
+
+        e.target.value = '';
+
+        setSuccessMessage(
+            `${response.data.created} étudiants importés, ${response.data.skipped.length} ignorés`
+        );
+
+        setErrorMessage('');
+
+    } catch (error) {
+
+        console.error(error);
+
+        setErrorMessage(
+            "Erreur lors de l'import"
+        );
+    }
+};
     if (loading) {
 
         return (
@@ -311,37 +355,58 @@ export default function UsersPage() {
             )}
 
 
-            <button
-                onClick={() => {
+            <div className="flex gap-3 mb-6">
 
-                    setEditingUser(null);
+                <button
+                    onClick={() => {
 
-                    setFormData({
+                        setEditingUser(null);
 
-                        username: '',
-                        
-                        first_name: '',
+                        setFormData({
 
-                        last_name: '',
-                        email: '',
+                            username: '',
 
-                        password: '',
+                            first_name: '',
 
-                        role: 'student',
+                            last_name: '',
 
-                        matricule: '',
+                            email: '',
 
-                        filiere: '',
-                    });
+                            password: '',
 
-                    setShowModal(true);
-                }}
-                className="bg-black text-white px-5 py-3 rounded mb-6 hover:bg-gray-800"
-            >
+                            role: 'student',
 
-                + Créer un utilisateur
+                            matricule: '',
 
-            </button>
+                            filiere: '',
+                        });
+
+                        setShowModal(true);
+                    }}
+                    className="bg-black text-white px-5 py-3 rounded hover:bg-gray-800"
+                >
+
+                    + Créer un utilisateur
+
+                </button>
+
+
+                <label
+                    className="bg-green-600 text-white px-5 py-3 rounded cursor-pointer hover:bg-green-700"
+                >
+
+                    Importer Excel
+
+                    <input
+                        type="file"
+                        accept=".xlsx,.xls"
+                        hidden
+                        onChange={handleImport}
+                    />
+
+                </label>
+
+            </div>
 
 
             {
