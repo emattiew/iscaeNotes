@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'apps.teachers',
     'apps.administration',
     'apps.ocr',
+    "apps.ai_correction",
 ]
 
 

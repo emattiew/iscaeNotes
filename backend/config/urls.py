@@ -20,6 +20,8 @@ urlpatterns = [
     path('api/notes/', include('apps.notes.urls')),
 
     path(
-    'api/ocr/',include('apps.ocr.urls')
-),
+    'api/ocr/',include('apps.ocr.urls')),
+
+    path(
+    "api/ai-correction/",include("apps.ai_correction.urls")),
 ]
