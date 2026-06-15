@@ -5,7 +5,9 @@ from apps.notes.models import Matiere
 
 
 class Exam(models.Model):
-    title = models.CharField(max_length=255)
+    title = models.CharField(
+        max_length=255
+    )
 
     matiere = models.ForeignKey(
         Matiere,
@@ -19,7 +21,9 @@ class Exam(models.Model):
         related_name="created_exams"
     )
 
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
 
     def __str__(self):
         return self.title
@@ -44,7 +48,10 @@ class ExamQuestion(models.Model):
     )
 
     def __str__(self):
-        return f"Q{self.question_number} - {self.exam.title}"
+        return (
+            f"Q{self.question_number} - "
+            f"{self.exam.title}"
+        )
 
 
 class ExamCopy(models.Model):
@@ -76,3 +83,47 @@ class ExamCopy(models.Model):
 
     def __str__(self):
         return f"Copy #{self.id}"
+
+
+class OCRResult(models.Model):
+    copy = models.OneToOneField(
+        ExamCopy,
+        on_delete=models.CASCADE,
+        related_name="ocr_result"
+    )
+
+    raw_text = models.TextField()
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    def __str__(self):
+        return (
+            f"OCR Result for Copy "
+            f"#{self.copy.id}"
+        )
+    
+class ExtractedAnswer(models.Model):
+    copy = models.ForeignKey(
+        ExamCopy,
+        on_delete=models.CASCADE,
+        related_name="answers"
+    )
+
+    question = models.ForeignKey(
+        ExamQuestion,
+        on_delete=models.CASCADE
+    )
+
+    extracted_text = models.TextField()
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    def __str__(self):
+        return (
+            f"Answer Q{self.question.question_number} "
+            f"for Copy #{self.copy.id}"
+        )

@@ -3,7 +3,8 @@ from rest_framework import serializers
 from .models import (
     Exam,
     ExamQuestion,
-    ExamCopy
+    ExamCopy,
+    OCRResult
 )
 
 
@@ -22,4 +23,10 @@ class ExamQuestionSerializer(serializers.ModelSerializer):
 class ExamCopySerializer(serializers.ModelSerializer):
     class Meta:
         model = ExamCopy
+        fields = "__all__"
+
+
+class OCRResultSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OCRResult
         fields = "__all__"

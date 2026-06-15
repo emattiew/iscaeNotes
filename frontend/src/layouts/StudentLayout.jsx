@@ -49,14 +49,29 @@ export default function StudentLayout({ children }) {
                     </div>
 
 
-                    <button
-                        onClick={logout}
-                        className="bg-black text-white px-5 py-2 rounded-lg hover:bg-gray-800 transition"
-                    >
+                    <div className="flex gap-3">
 
-                        Déconnexion
+                        <button
+                            onClick={() =>
+                                navigate('/student/profile')
+                            }
+                            className="bg-gray-200 px-5 py-2 rounded-lg hover:bg-gray-300 transition"
+                        >
 
-                    </button>
+                            Mon Profil
+
+                        </button>
+
+                        <button
+                            onClick={logout}
+                            className="bg-black text-white px-5 py-2 rounded-lg hover:bg-gray-800 transition"
+                        >
+
+                            Déconnexion
+
+                        </button>
+
+                    </div>
 
                 </div>
 

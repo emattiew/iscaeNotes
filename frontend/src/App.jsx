@@ -34,7 +34,8 @@ import TeacherReclamationsPage from './pages/teacher/TeacherReclamationsPage'
 
 import AdminReclamationPeriodsPage from './pages/admin/AdminReclamationPeriodsPage'
 import AdminReclamationsPage from './pages/admin/AdminReclamationsPage'
-
+import StudentProfilePage
+from './pages/student/StudentProfilePage'
 export default function App() {
 
   return (
@@ -198,6 +199,16 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/student/profile"
+          element={
+              <ProtectedRoute role="student">
+
+                  <StudentProfilePage />
+
+              </ProtectedRoute>
+          }
+      />
           </Routes>
 
     </BrowserRouter>

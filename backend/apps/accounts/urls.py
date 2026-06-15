@@ -9,6 +9,7 @@ from .views import (
     StudentListView,
     UserViewSet,
     ImportStudentsView,
+    ChangePasswordView
 )
 
 
@@ -44,8 +45,12 @@ urlpatterns = [
     ),
     path(
     "students/import/",
-    ImportStudentsView.as_view()
-),
+    ImportStudentsView.as_view(),
+    ),
+    path(
+    'change-password/',
+    ChangePasswordView.as_view(),
+    ),
 ]
 
 urlpatterns += router.urls
