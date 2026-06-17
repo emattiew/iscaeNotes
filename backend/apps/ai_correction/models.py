@@ -127,3 +127,38 @@ class ExtractedAnswer(models.Model):
             f"Answer Q{self.question.question_number} "
             f"for Copy #{self.copy.id}"
         )
+    
+class AICorrection(models.Model):
+    answer = models.OneToOneField(
+        ExtractedAnswer,
+        on_delete=models.CASCADE,
+        related_name="ai_correction"
+    )
+
+    suggested_score = models.DecimalField(
+        max_digits=5,
+        decimal_places=2
+    )
+
+    feedback = models.TextField()
+
+    teacher_score = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        null=True,
+        blank=True
+    )
+
+    validated = models.BooleanField(
+        default=False
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    def __str__(self):
+        return (
+            f"AI Correction for Answer "
+            f"#{self.answer.id}"
+        )

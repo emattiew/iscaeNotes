@@ -18,7 +18,8 @@ from .serializers import (
     ExamCopySerializer,
     
 )
-
+from .gemini_service import test_gemini
+from rest_framework.views import APIView
 
 class ExamViewSet(viewsets.ModelViewSet):
     queryset = Exam.objects.all()
@@ -141,3 +142,24 @@ class ExamCopyViewSet(viewsets.ModelViewSet):
             "answers_processed": len(created_answers),
             "answers": created_answers
         })
+    
+
+class GeminiTestView(APIView):
+
+    def post(self, request):
+
+        try:
+
+            result = test_gemini()
+
+            return Response({
+                "success": True,
+                "response": result
+            })
+
+        except Exception as e:
+
+            return Response({
+                "success": False,
+                "error": str(e)
+            }, status=500)

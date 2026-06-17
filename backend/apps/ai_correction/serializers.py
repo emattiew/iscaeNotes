@@ -4,7 +4,9 @@ from .models import (
     Exam,
     ExamQuestion,
     ExamCopy,
-    OCRResult
+    OCRResult,
+    ExtractedAnswer,
+    AICorrection
 )
 
 
@@ -29,4 +31,10 @@ class ExamCopySerializer(serializers.ModelSerializer):
 class OCRResultSerializer(serializers.ModelSerializer):
     class Meta:
         model = OCRResult
+        fields = "__all__"
+
+
+class AICorrectionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AICorrection
         fields = "__all__"
