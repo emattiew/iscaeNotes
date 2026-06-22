@@ -162,3 +162,44 @@ class AICorrection(models.Model):
             f"AI Correction for Answer "
             f"#{self.answer.id}"
         )
+    
+class CorrectionSheet(models.Model):
+
+    exam = models.ForeignKey(
+        Exam,
+        on_delete=models.CASCADE,
+        related_name="correction_sheets"
+    )
+
+    image = models.ImageField(
+        upload_to="correction_sheets/"
+    )
+
+    uploaded_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    def __str__(self):
+        return (
+            f"Correction Sheet #{self.id}"
+        )
+
+class CorrectionOCRResult(models.Model):
+
+    correction_sheet = models.OneToOneField(
+        CorrectionSheet,
+        on_delete=models.CASCADE,
+        related_name="ocr_result"
+    )
+
+    raw_text = models.TextField()
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    def __str__(self):
+        return (
+            f"OCR Result for Correction "
+            f"#{self.correction_sheet.id}"
+        )
