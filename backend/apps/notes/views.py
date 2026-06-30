@@ -44,13 +44,35 @@ class ModuleViewSet(ModelViewSet):
     permission_classes = [IsAdminRole]
 
 
+
 class MatiereViewSet(ModelViewSet):
 
     queryset = Matiere.objects.all()
 
     serializer_class = MatiereSerializer
 
-    permission_classes = [IsAdminRole]
+    permission_classes = [
+        IsAuthenticated
+    ]
+
+    def get_queryset(self):
+
+        return Matiere.objects.all()
+
+    def get_permissions(self):
+
+        if self.action in [
+            "list",
+            "retrieve"
+        ]:
+
+            return [
+                IsAuthenticated()
+            ]
+
+        return [
+            IsAdminRole()
+        ]
 
 
 class FiliereViewSet(ModelViewSet):

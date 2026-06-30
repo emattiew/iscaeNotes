@@ -3,7 +3,8 @@ import easyocr
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import PermissionDenied
 from .models import (
     Exam,
     ExamQuestion,
@@ -12,18 +13,23 @@ from .models import (
     ExtractedAnswer,
     AICorrection,
     CorrectionSheet,
-    CorrectionOCRResult
+    CorrectionOCRResult,
+    ExamSheet,
+    ExamOCRResult
 )
 from .parser import (
     split_answers,
-    split_expected_answers
+    split_expected_answers,
+    split_questions
 )
 from .serializers import (
     ExamSerializer,
     ExamQuestionSerializer,
     ExamCopySerializer,
     CorrectionSheetSerializer,
-    CorrectionOCRResultSerializer
+    CorrectionOCRResultSerializer,
+    ExamSheetSerializer,
+    ExamOCRResultSerializer
     
 )
 from .gemini_service import (
@@ -33,18 +39,74 @@ from .gemini_service import (
 from rest_framework.views import APIView
 
 class ExamViewSet(viewsets.ModelViewSet):
+
     queryset = Exam.objects.all()
+
     serializer_class = ExamSerializer
 
+    permission_classes = [
+        IsAuthenticated
+    ]
 
+    def get_queryset(self):
+
+        return Exam.objects.filter(
+            teacher=self.request.user
+        ).order_by("-created_at")
+
+    def perform_create(self, serializer):
+
+        serializer.save(
+            teacher=self.request.user
+        )
 class ExamQuestionViewSet(viewsets.ModelViewSet):
+
     queryset = ExamQuestion.objects.all()
+
     serializer_class = ExamQuestionSerializer
+
+    permission_classes = [
+        IsAuthenticated
+    ]
+
+    def get_queryset(self):
+
+        return ExamQuestion.objects.filter(
+            exam__teacher=self.request.user
+        ).order_by(
+            "question_number"
+        )
 
 
 class ExamCopyViewSet(viewsets.ModelViewSet):
+
     queryset = ExamCopy.objects.all()
+
     serializer_class = ExamCopySerializer
+
+    permission_classes = [
+        IsAuthenticated
+    ]
+
+    def get_queryset(self):
+
+        return ExamCopy.objects.filter(
+            exam__teacher=self.request.user
+        ).order_by(
+            "-uploaded_at"
+        )
+
+    def perform_create(self, serializer):
+
+        exam = serializer.validated_data["exam"]
+
+        if exam.teacher != self.request.user:
+
+            raise PermissionDenied(
+                "You cannot upload a copy for this exam."
+            )
+
+        serializer.save()
 
     @action(
         detail=True,
@@ -238,17 +300,33 @@ class ExamCopyViewSet(viewsets.ModelViewSet):
                 evaluated
         })
     
-class CorrectionSheetViewSet(
-    viewsets.ModelViewSet
-):
+class CorrectionSheetViewSet(viewsets.ModelViewSet):
 
-    queryset = (
-        CorrectionSheet.objects.all()
-    )
+    queryset = CorrectionSheet.objects.all()
 
-    serializer_class = (
-        CorrectionSheetSerializer
-    )
+    serializer_class = CorrectionSheetSerializer
+
+    permission_classes = [
+        IsAuthenticated
+    ]
+
+    def get_queryset(self):
+
+        return CorrectionSheet.objects.filter(
+            exam__teacher=self.request.user
+        )
+
+    def perform_create(self, serializer):
+
+        exam = serializer.validated_data["exam"]
+
+        if exam.teacher != self.request.user:
+
+            raise PermissionDenied(
+                "You cannot upload a correction sheet for this exam."
+            )
+
+        serializer.save()
 
     @action(
         detail=True,
@@ -410,7 +488,9 @@ class CorrectionSheetViewSet(
                 updated
         })
 class GeminiTestView(APIView):
-
+    permission_classes = [
+        IsAuthenticated
+    ]
     def post(self, request):
 
         try:
@@ -430,7 +510,9 @@ class GeminiTestView(APIView):
             }, status=500)
         
 class EvaluateAnswerView(APIView):
-
+    permission_classes = [
+        IsAuthenticated
+    ]
     def post(self, request, answer_id):
 
         try:
@@ -440,7 +522,7 @@ class EvaluateAnswerView(APIView):
                 .select_related("question")
                 .get(id=answer_id)
             )
-
+        
         except ExtractedAnswer.DoesNotExist:
 
             return Response(
@@ -449,7 +531,14 @@ class EvaluateAnswerView(APIView):
                 },
                 status=404
             )
+        if answer.copy.exam.teacher != request.user:
 
+            return Response(
+                {
+                    "error": "Permission denied."
+                },
+                status=403
+            )
         result = evaluate_answer(
 
             question=
@@ -490,4 +579,195 @@ class EvaluateAnswerView(APIView):
 
             "created":
                 created
+        })
+    
+class ExamSheetViewSet(viewsets.ModelViewSet):
+
+    queryset = ExamSheet.objects.all()
+
+    serializer_class = ExamSheetSerializer
+
+    permission_classes = [
+        IsAuthenticated
+    ]
+
+    def get_queryset(self):
+
+        return ExamSheet.objects.filter(
+            exam__teacher=self.request.user
+        )
+
+    def perform_create(self, serializer):
+
+        exam = serializer.validated_data["exam"]
+
+        if exam.teacher != self.request.user:
+
+            raise PermissionDenied(
+                "You cannot upload an exam sheet for this exam."
+            )
+
+        serializer.save()
+
+    @action(
+        detail=True,
+        methods=["post"]
+    )
+    def process_ocr(
+        self,
+        request,
+        pk=None
+    ):
+
+        exam_sheet = (
+            self.get_object()
+        )
+
+        reader = easyocr.Reader(
+            ['fr']
+        )
+
+        result = reader.readtext(
+            exam_sheet.image.path
+        )
+
+        raw_text = "\n".join(
+            item[1]
+            for item in result
+        )
+
+        ExamOCRResult.objects.update_or_create(
+            exam_sheet=exam_sheet,
+            defaults={
+                "raw_text": raw_text
+            }
+        )
+        
+        return Response({
+
+            "exam_sheet_id":
+                exam_sheet.id,
+
+            "processed":
+                True,
+
+            "raw_text":
+                raw_text
+        })
+
+    @action(
+    detail=True,
+    methods=["post"]
+    )
+    def extract_questions(
+        self,
+        request,
+        pk=None
+    ):
+
+        exam_sheet = (
+            self.get_object()
+        )
+
+        try:
+
+            ocr_result = (
+                exam_sheet.ocr_result
+            )
+
+        except ExamOCRResult.DoesNotExist:
+
+            return Response(
+                {
+                    "error":
+                        "OCR result not found"
+                },
+                status=400
+            )
+
+        parts = split_questions(
+            ocr_result.raw_text
+        )
+
+        questions = []
+
+        for i, question_text in enumerate(
+            parts,
+            start=1
+        ):
+
+            questions.append({
+
+                "question_number":
+                    i,
+
+                "question_text":
+                    question_text,
+
+                "max_score":
+                    None
+            })
+
+        return Response({
+
+            "success":
+                True,
+
+            "questions_detected":
+                len(questions),
+
+            "questions":
+                questions
+        })
+
+    @action(
+    detail=True,
+    methods=["post"]
+    )
+    def validate_questions(
+        self,
+        request,
+        pk=None
+    ):
+
+        exam_sheet = (
+            self.get_object()
+        )
+
+        questions = request.data.get(
+            "questions",
+            []
+        )
+
+        ExamQuestion.objects.filter(
+            exam=exam_sheet.exam
+        ).delete()
+
+        for question in questions:
+
+            ExamQuestion.objects.create(
+
+                exam=exam_sheet.exam,
+
+                question_number=question[
+                    "question_number"
+                ],
+
+                question_text=question[
+                    "question_text"
+                ],
+
+                expected_answer="",
+
+                max_score=question[
+                    "max_score"
+                ]
+            )
+
+        return Response({
+
+            "success": True,
+
+            "questions_saved":
+                len(questions)
         })

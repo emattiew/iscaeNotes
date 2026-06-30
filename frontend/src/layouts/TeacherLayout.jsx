@@ -67,6 +67,12 @@ export default function TeacherLayout({ children }) {
                         >
                             Réclamations
                         </Link>
+                        <Link
+                            to="/teacher/ai-correction"
+                            className="hover:text-gray-300"
+                        >
+                            Correction IA
+                        </Link>
                     </nav>
 
                 </div>

@@ -6,6 +6,7 @@ from .views import (
     ExamQuestionViewSet,
     ExamCopyViewSet,
     CorrectionSheetViewSet,
+    ExamSheetViewSet,
     GeminiTestView,
     EvaluateAnswerView
 )
@@ -16,7 +17,7 @@ router.register("exams", ExamViewSet)
 router.register("questions", ExamQuestionViewSet)
 router.register("copies", ExamCopyViewSet)
 router.register("correction-sheets", CorrectionSheetViewSet)
-
+router.register("exam-sheets", ExamSheetViewSet)
 urlpatterns = router.urls + [
     path(
         "test-gemini/",
@@ -26,4 +27,5 @@ urlpatterns = router.urls + [
         "answers/<int:answer_id>/evaluate/",
         EvaluateAnswerView.as_view()
     ),
+    
 ]

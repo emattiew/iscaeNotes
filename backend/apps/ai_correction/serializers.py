@@ -8,14 +8,29 @@ from .models import (
     ExtractedAnswer,
     AICorrection,
     CorrectionSheet,
-    CorrectionOCRResult
+    CorrectionOCRResult,
+    ExamSheet,
+    ExamOCRResult
 )
 
 
 class ExamSerializer(serializers.ModelSerializer):
+
+    matiere_name = serializers.CharField(
+        source="matiere.name",
+        read_only=True
+    )
+
     class Meta:
+
         model = Exam
+
         fields = "__all__"
+
+        read_only_fields = [
+            "teacher",
+            "created_at"
+        ]
 
 
 class ExamQuestionSerializer(serializers.ModelSerializer):
@@ -52,4 +67,24 @@ class CorrectionOCRResultSerializer(
 
     class Meta:
         model = CorrectionOCRResult
+        fields = "__all__"
+
+class ExamSheetSerializer(
+    serializers.ModelSerializer
+):
+
+    class Meta:
+
+        model = ExamSheet
+
+        fields = "__all__"
+
+class ExamOCRResultSerializer(
+    serializers.ModelSerializer
+):
+
+    class Meta:
+
+        model = ExamOCRResult
+
         fields = "__all__"

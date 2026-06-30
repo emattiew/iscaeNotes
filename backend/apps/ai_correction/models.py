@@ -203,3 +203,47 @@ class CorrectionOCRResult(models.Model):
             f"OCR Result for Correction "
             f"#{self.correction_sheet.id}"
         )
+    
+
+class ExamSheet(models.Model):
+
+    exam = models.ForeignKey(
+        Exam,
+        on_delete=models.CASCADE,
+        related_name="exam_sheets"
+    )
+
+    image = models.ImageField(
+        upload_to="exam_sheets/"
+    )
+
+    uploaded_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    def __str__(self):
+
+        return (
+            f"Exam Sheet #{self.id}"
+        )
+    
+
+class ExamOCRResult(models.Model):
+
+    exam_sheet = models.OneToOneField(
+        ExamSheet,
+        on_delete=models.CASCADE,
+        related_name="ocr_result"
+    )
+
+    raw_text = models.TextField()
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    def __str__(self):
+
+        return (
+            f"OCR Result for Exam Sheet #{self.exam_sheet.id}"
+        )

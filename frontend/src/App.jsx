@@ -34,8 +34,8 @@ import TeacherReclamationsPage from './pages/teacher/TeacherReclamationsPage'
 
 import AdminReclamationPeriodsPage from './pages/admin/AdminReclamationPeriodsPage'
 import AdminReclamationsPage from './pages/admin/AdminReclamationsPage'
-import StudentProfilePage
-from './pages/student/StudentProfilePage'
+import StudentProfilePage from './pages/student/StudentProfilePage'
+import TeacherAICorrectionPage from "./pages/teacher/TeacherAICorrectionPage";
 export default function App() {
 
   return (
@@ -205,6 +205,16 @@ export default function App() {
               <ProtectedRoute role="student">
 
                   <StudentProfilePage />
+
+              </ProtectedRoute>
+          }
+      />
+        <Route
+          path="/teacher/ai-correction"
+          element={
+              <ProtectedRoute role="teacher">
+
+                  <TeacherAICorrectionPage />
 
               </ProtectedRoute>
           }
