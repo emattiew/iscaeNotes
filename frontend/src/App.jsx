@@ -36,6 +36,8 @@ import AdminReclamationPeriodsPage from './pages/admin/AdminReclamationPeriodsPa
 import AdminReclamationsPage from './pages/admin/AdminReclamationsPage'
 import StudentProfilePage from './pages/student/StudentProfilePage'
 import TeacherAICorrectionPage from "./pages/teacher/TeacherAICorrectionPage";
+import TeacherEvaluationPage from "./pages/teacher/TeacherEvaluationPage";
+import TeacherPreparationPage from "./pages/teacher/TeacherPreparationPage";
 export default function App() {
 
   return (
@@ -215,6 +217,26 @@ export default function App() {
               <ProtectedRoute role="teacher">
 
                   <TeacherAICorrectionPage />
+
+              </ProtectedRoute>
+          }
+      />
+        <Route
+          path="/teacher/exams/:id/preparation"
+          element={
+              <ProtectedRoute role="teacher">
+
+                  <TeacherPreparationPage />
+
+              </ProtectedRoute>
+          }
+      />
+       <Route
+          path="/teacher/exams/:id/evaluation"
+          element={
+              <ProtectedRoute role="teacher">
+
+                  <TeacherEvaluationPage />
 
               </ProtectedRoute>
           }

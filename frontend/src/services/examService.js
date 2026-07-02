@@ -24,3 +24,41 @@ export const getMatieres = () => {
     );
 
 };
+export const uploadExamSheet = (data) => {
+
+    return api.post(
+        "/ai-correction/exam-sheets/",
+        data,
+        {
+            headers: {
+                "Content-Type": "multipart/form-data"
+            }
+        }
+    );
+
+};
+
+export const processExamOCR = (id) => {
+
+    return api.post(
+        `/ai-correction/exam-sheets/${id}/process_ocr/`
+    );
+
+};
+
+export const extractQuestions = (id) => {
+
+    return api.post(
+        `/ai-correction/exam-sheets/${id}/extract_questions/`
+    );
+
+};
+
+export const validateQuestions = (id, data) => {
+
+    return api.post(
+        `/ai-correction/exam-sheets/${id}/validate_questions/`,
+        data
+    );
+
+};
