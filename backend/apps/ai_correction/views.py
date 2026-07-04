@@ -456,22 +456,23 @@ class CorrectionSheetViewSet(viewsets.ModelViewSet):
                 status=400
             )
 
-        updated = []
+        
+
+        expected_answers = []
 
         for question, answer_text in zip(
             questions,
             parts
         ):
 
-            question.expected_answer = (
-                answer_text
-            )
+            expected_answers.append({
 
-            question.save()
-
-            updated.append({
                 "question_number":
-                    question.question_number
+                    question.question_number,
+
+                "expected_answer":
+                    answer_text
+
             })
 
         return Response({
@@ -484,8 +485,71 @@ class CorrectionSheetViewSet(viewsets.ModelViewSet):
             "expected_answers_detected":
                 len(parts),
 
+            "expected_answers": expected_answers
+        })
+    @action(
+    detail=True,
+    methods=["post"]
+)
+    def validate_expected_answers(
+        self,
+        request,
+        pk=None
+    ):
+
+        correction_sheet = (
+            self.get_object()
+        )
+
+        expected_answers = request.data.get(
+            "expected_answers",
+            []
+        )
+
+        questions = (
+            ExamQuestion.objects.filter(
+                exam=correction_sheet.exam
+            )
+        )
+
+        updated = []
+
+        for answer in expected_answers:
+
+            question = questions.filter(
+                question_number=answer[
+                    "question_number"
+                ]
+            ).first()
+
+            if question:
+                print("\n========================")
+                print(answer["question_number"])
+                print(answer["expected_answer"])
+                print("========================\n")
+                question.expected_answer = answer[
+                    "expected_answer"
+                ]
+
+                question.save()
+
+                updated.append({
+
+                    "question_number":
+                        question.question_number
+
+                })
+
+        return Response({
+
+            "success": True,
+
+            "answers_saved":
+                len(updated),
+
             "updated_questions":
                 updated
+
         })
 class GeminiTestView(APIView):
     permission_classes = [

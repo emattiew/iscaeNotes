@@ -7,7 +7,13 @@ import {
     uploadExamSheet,
     processExamOCR,
     extractQuestions,
-    validateQuestions
+    validateQuestions,
+
+    uploadCorrectionSheet,
+    processCorrectionOCR,
+    extractExpectedAnswers,
+    validateExpectedAnswers
+
 } from "../../services/examService";
 
 export default function TeacherPreparationPage() {
@@ -18,13 +24,21 @@ export default function TeacherPreparationPage() {
 
     const [questions, setQuestions] = useState([]);
 
-    const [loading, setLoading] = useState(false);
+    const [examLoading, setExamLoading] = useState(false);
+
+    const [correctionLoading, setCorrectionLoading] = useState(false);
 
     const [successMessage, setSuccessMessage] = useState("");
 
     const [errorMessage, setErrorMessage] = useState("");
 
     const [examSheetId, setExamSheetId] = useState(null);
+
+    const [correctionImage, setCorrectionImage] = useState(null);
+
+    const [correctionSheetId, setCorrectionSheetId] = useState(null);
+
+    const [expectedAnswers, setExpectedAnswers] = useState([]);
 
     const handleUpload = async () => {
 
@@ -40,7 +54,7 @@ export default function TeacherPreparationPage() {
 
         try {
 
-            setLoading(true);
+            setExamLoading(true);
 
             setSuccessMessage("");
 
@@ -99,7 +113,7 @@ export default function TeacherPreparationPage() {
 
         finally {
 
-            setLoading(false);
+            setExamLoading(false);
 
         }
 
@@ -125,9 +139,144 @@ export default function TeacherPreparationPage() {
             "Questions enregistrées avec succès."
 
         );
+        window.scrollTo({
+
+            top: 0,
+
+            behavior: "smooth"
+
+        });
+        setErrorMessage("");
+        
+        
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        setErrorMessage(
+
+            "Erreur lors de l'enregistrement."
+
+        );
+
+        setSuccessMessage("");
+
+    }
+
+};
+const handleCorrectionUpload = async () => {
+
+    if (!correctionImage) {
+
+        setErrorMessage(
+            "Veuillez choisir une correction."
+        );
+
+        return;
+
+    }
+
+    try {
+
+        setCorrectionLoading(true);
+
+        setSuccessMessage("");
 
         setErrorMessage("");
 
+        const formData = new FormData();
+
+        formData.append(
+            "exam",
+            id
+        );
+
+        formData.append(
+            "image",
+            correctionImage
+        );
+
+        const uploadResponse =
+            await uploadCorrectionSheet(formData);
+
+        const uploadedCorrectionSheetId =
+            uploadResponse.data.id;
+
+        setCorrectionSheetId(
+            uploadedCorrectionSheetId
+        );
+
+        await processCorrectionOCR(
+            uploadedCorrectionSheetId
+        );
+
+        const response =
+            await extractExpectedAnswers(
+                uploadedCorrectionSheetId
+            );
+
+        setExpectedAnswers(
+            response.data.expected_answers
+        );
+
+        setSuccessMessage(
+            "Réponses attendues détectées avec succès."
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        setErrorMessage(
+            "Erreur pendant le traitement de la correction."
+        );
+
+    }
+
+    finally {
+
+        setCorrectionLoading(false);
+
+    }
+
+};
+const handleValidateExpectedAnswers = async () => {
+
+    try {
+
+        await validateExpectedAnswers(
+
+            correctionSheetId,
+
+            {
+
+                expected_answers:
+                    expectedAnswers
+
+            }
+
+        );
+
+        setSuccessMessage(
+
+            "Réponses attendues enregistrées avec succès."
+
+        );
+        window.scrollTo({
+
+            top: 0,
+
+            behavior: "smooth"
+
+        })
+        setErrorMessage("");
+        
+        
+        
     }
 
     catch (error) {
@@ -206,7 +355,7 @@ export default function TeacherPreparationPage() {
 
                     onClick={handleUpload}
 
-                    disabled={loading}
+                    disabled={examLoading}
 
                     className="bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700"
 
@@ -214,7 +363,7 @@ export default function TeacherPreparationPage() {
 
                     {
 
-                        loading
+                        examLoading
 
                         ?
 
@@ -355,6 +504,163 @@ export default function TeacherPreparationPage() {
                 </button>
 
             </div>
+            <div className="bg-white rounded-2xl shadow-sm p-8 mt-10">
+
+                <h2 className="text-2xl font-semibold mb-6">
+
+                    Correction officielle
+
+                </h2>
+
+                <input
+
+                    type="file"
+
+                    accept="image/*"
+
+                    onChange={(e) =>
+                        setCorrectionImage(
+                            e.target.files[0]
+                        )
+                    }
+
+                    className="mb-6"
+
+                />
+
+                <br />
+
+                <button
+
+                    onClick={handleCorrectionUpload}
+
+                    disabled={correctionLoading}
+
+                    className="bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700"
+
+                >
+
+                    {
+
+                        correctionLoading
+
+                        ?
+
+                        "Traitement..."
+
+                        :
+
+                        "Uploader et détecter"
+
+                    }
+
+                </button>
+
+            </div>
+            <div className="bg-white rounded-2xl shadow-sm p-8 mt-8">
+
+                <h2 className="text-2xl font-semibold mb-6">
+
+                    Réponses attendues
+
+                </h2>
+
+                {
+
+                    expectedAnswers.length === 0
+
+                    ?
+
+                    (
+
+                        <p className="text-gray-500">
+
+                            Aucune réponse détectée.
+
+                        </p>
+
+                    )
+                    :
+
+                    (
+
+                        <>
+
+                            {
+
+                                expectedAnswers.map((answer, index) => (
+
+                                    <div
+
+                                        key={answer.question_number}
+
+                                        className="border rounded-xl p-5 mb-5"
+
+                                    >
+
+                                        <h3 className="text-xl font-semibold mb-4">
+
+                                            Question {answer.question_number}
+
+                                        </h3>
+
+                                        <label className="block font-medium mb-2">
+
+                                            Réponse attendue
+
+                                        </label>
+
+                                        <textarea
+
+                                            rows={6}
+
+                                            value={answer.expected_answer}
+
+                                            onChange={(e) => {
+
+                                                const updated = [...expectedAnswers];
+
+                                                updated[index].expected_answer =
+                                                    e.target.value;
+
+                                                setExpectedAnswers(updated);
+
+                                            }}
+
+                                            className="w-full border rounded-lg p-3"
+
+                                        />
+
+                                    </div>
+
+                                ))
+
+                            }
+
+                            <div className="flex justify-end mt-8">
+
+                                <button
+
+                                    onClick={handleValidateExpectedAnswers}
+
+                                    className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700"
+
+                                >
+
+                                    Valider les réponses attendues
+
+                                </button>
+
+                            </div>
+
+                        </>
+
+                    )
+
+                }
+
+            </div>
+
         </TeacherLayout>
 
     );

@@ -62,3 +62,56 @@ export const validateQuestions = (id, data) => {
     );
 
 };
+export const uploadCorrectionSheet = (data) => {
+
+    return api.post(
+
+        "/ai-correction/correction-sheets/",
+
+        data,
+
+        {
+
+            headers: {
+
+                "Content-Type": "multipart/form-data"
+
+            }
+
+        }
+
+    );
+
+};
+
+export const processCorrectionOCR = (id) => {
+
+    return api.post(
+
+        `/ai-correction/correction-sheets/${id}/process_ocr/`
+
+    );
+
+};
+
+export const extractExpectedAnswers = (id) => {
+
+    return api.post(
+
+        `/ai-correction/correction-sheets/${id}/extract_expected_answers/`
+
+    );
+
+};
+
+export const validateExpectedAnswers = (id, data) => {
+
+    return api.post(
+
+        `/ai-correction/correction-sheets/${id}/validate_expected_answers/`,
+
+        data
+
+    );
+
+};
