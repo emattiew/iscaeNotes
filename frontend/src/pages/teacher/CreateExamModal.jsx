@@ -5,13 +5,15 @@ export default function CreateExamModal({
     show,
     onClose,
     onCreate,
-    matieres
+    matieres,
+    filieres
 
 }) {
 
     const [title, setTitle] = useState("");
 
     const [matiere, setMatiere] = useState("");
+    const [filiere, setFiliere] = useState("");
 
     if (!show) {
 
@@ -36,18 +38,29 @@ export default function CreateExamModal({
             return;
 
         }
+        if (!filiere) {
 
+            alert("Veuillez choisir une filière.");
+
+            return;
+
+        }
         onCreate({
 
             title,
 
-            matiere
+            matiere,
+
+            filiere
+
 
         });
 
         setTitle("");
 
         setMatiere("");
+
+        setFiliere("");
 
     };
 
@@ -140,7 +153,57 @@ export default function CreateExamModal({
                         </select>
 
                     </div>
+                    <div>
 
+                        <label className="block mb-2 font-medium">
+
+                            Filière
+
+                        </label>
+
+                        <select
+
+                            value={filiere}
+
+                            onChange={(e) =>
+
+                                setFiliere(e.target.value)
+
+                            }
+
+                            className="w-full border rounded-lg px-4 py-3"
+
+                        >
+
+                            <option value="">
+
+                                Choisir une filière
+
+                            </option>
+
+                            {
+
+                                filieres.map((f) => (
+
+                                    <option
+
+                                        key={f.id}
+
+                                        value={f.id}
+
+                                    >
+
+                                        {f.code}
+
+                                    </option>
+
+                                ))
+
+                            }
+
+                        </select>
+
+                    </div>
                 </div>
 
                 <div className="flex justify-end gap-3 mt-8">

@@ -7,7 +7,8 @@ import CreateExamModal from "./CreateExamModal";
 import {
     getExams,
     createExam,
-    getMatieres
+    getMatieres,
+    getFilieres
 } from "../../services/examService";
 
 export default function TeacherAICorrectionPage() {
@@ -21,6 +22,7 @@ export default function TeacherAICorrectionPage() {
     const [showModal, setShowModal] = useState(false);
 
     const [matieres, setMatieres] = useState([]);
+    const [filieres, setFilieres] = useState([]);
     const [successMessage, setSuccessMessage] = useState("");
 
     const [errorMessage, setErrorMessage] = useState("");
@@ -85,25 +87,41 @@ export default function TeacherAICorrectionPage() {
 
     const openModal = async () => {
 
-        try {
+    try {
 
-            const response = await getMatieres();
+        const [
 
-            setMatieres(
-                response.data
-            );
+            matieresResponse,
 
-            setShowModal(true);
+            filieresResponse
 
-        }
+        ] = await Promise.all([
 
-        catch (error) {
+            getMatieres(),
 
-            console.error(error);
+            getFilieres()
 
-        }
+        ]);
 
-    };
+        setMatieres(
+            matieresResponse.data
+        );
+
+        setFilieres(
+            filieresResponse.data
+        );
+
+        setShowModal(true);
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+    }
+
+};
 
    const handleCreateExam = async (data) => {
 
@@ -259,7 +277,7 @@ export default function TeacherAICorrectionPage() {
 
                                             <p className="text-gray-500">
 
-                                                {exam.matiere_name || `Matière #${exam.matiere}`}
+                                                {exam.matiere_name} • {exam.filiere_name}
 
                                             </p>
 
@@ -326,6 +344,8 @@ export default function TeacherAICorrectionPage() {
                 onCreate={handleCreateExam}
 
                 matieres={matieres}
+
+                filieres={filieres}
 
             />
 

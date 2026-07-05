@@ -8,7 +8,7 @@ from .views import (
     CorrectionSheetViewSet,
     ExamSheetViewSet,
     GeminiTestView,
-    EvaluateAnswerView
+    EvaluateAnswerView,AICorrectionViewSet
 )
 
 router = DefaultRouter()
@@ -18,6 +18,11 @@ router.register("questions", ExamQuestionViewSet)
 router.register("copies", ExamCopyViewSet)
 router.register("correction-sheets", CorrectionSheetViewSet)
 router.register("exam-sheets", ExamSheetViewSet)
+router.register(
+    "corrections",
+    AICorrectionViewSet,
+    basename="correction"
+)
 urlpatterns = router.urls + [
     path(
         "test-gemini/",

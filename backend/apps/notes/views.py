@@ -81,7 +81,28 @@ class FiliereViewSet(ModelViewSet):
 
     serializer_class = FiliereSerializer
 
-    permission_classes = [IsAdminRole]
+    permission_classes = [
+        IsAuthenticated
+    ]
+
+    def get_queryset(self):
+
+        return Filiere.objects.all()
+
+    def get_permissions(self):
+
+        if self.action in [
+            "list",
+            "retrieve"
+        ]:
+
+            return [
+                IsAuthenticated()
+            ]
+
+        return [
+            IsAdminRole()
+        ]
 
 
 class CollecteViewSet(ModelViewSet):

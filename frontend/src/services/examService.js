@@ -115,3 +115,10 @@ export const validateExpectedAnswers = (id, data) => {
     );
 
 };
+export const getFilieres = () => {
+
+    return api.get(
+        "/notes/filieres/"
+    );
+
+};

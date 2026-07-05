@@ -1,7 +1,10 @@
 from django.db import models
 
 from apps.accounts.models import User
-from apps.notes.models import Matiere
+from apps.notes.models import (
+    Matiere,
+    Filiere
+)
 
 
 class Exam(models.Model):
@@ -15,6 +18,11 @@ class Exam(models.Model):
         related_name="exams"
     )
 
+    filiere = models.ForeignKey(
+    Filiere,
+    on_delete=models.CASCADE,
+    related_name="exams"
+    )
     teacher = models.ForeignKey(
         User,
         on_delete=models.CASCADE,

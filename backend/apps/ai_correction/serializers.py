@@ -20,7 +20,10 @@ class ExamSerializer(serializers.ModelSerializer):
         source="matiere.name",
         read_only=True
     )
-
+    filiere_name = serializers.CharField(
+    source="filiere.code",
+    read_only=True
+    )
     class Meta:
 
         model = Exam
@@ -52,9 +55,40 @@ class OCRResultSerializer(serializers.ModelSerializer):
 
 
 class AICorrectionSerializer(serializers.ModelSerializer):
+
+    question_number = serializers.IntegerField(
+        source="answer.question.question_number",
+        read_only=True
+    )
+
+    question_text = serializers.CharField(
+        source="answer.question.question_text",
+        read_only=True
+    )
+
+    max_score = serializers.DecimalField(
+        source="answer.question.max_score",
+        max_digits=5,
+        decimal_places=2,
+        read_only=True
+    )
+
     class Meta:
+
         model = AICorrection
-        fields = "__all__"
+
+        fields = [
+            "id",
+            "answer",
+            "question_number",
+            "question_text",
+            "max_score",
+            "suggested_score",
+            "teacher_score",
+            "feedback",
+            "validated",
+            "created_at"
+        ]
 
 class CorrectionSheetSerializer(serializers.ModelSerializer):
     class Meta:

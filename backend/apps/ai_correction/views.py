@@ -29,7 +29,8 @@ from .serializers import (
     CorrectionSheetSerializer,
     CorrectionOCRResultSerializer,
     ExamSheetSerializer,
-    ExamOCRResultSerializer
+    ExamOCRResultSerializer,
+    AICorrectionSerializer
     
 )
 from .gemini_service import (
@@ -551,6 +552,42 @@ class CorrectionSheetViewSet(viewsets.ModelViewSet):
                 updated
 
         })
+class AICorrectionViewSet(viewsets.ReadOnlyModelViewSet):
+
+    serializer_class = AICorrectionSerializer
+
+    permission_classes = [
+        IsAuthenticated
+    ]
+
+    def get_queryset(self):
+
+        queryset = (
+            AICorrection.objects
+            .select_related(
+                "answer",
+                "answer__question",
+                "answer__copy",
+                "answer__copy__exam"
+            )
+            .filter(
+                answer__copy__exam__teacher=self.request.user
+            )
+        )
+
+        copy_id = self.request.query_params.get(
+            "copy"
+        )
+
+        if copy_id:
+
+            queryset = queryset.filter(
+                answer__copy_id=copy_id
+            )
+
+        return queryset.order_by(
+            "answer__question__question_number"
+        )
 class GeminiTestView(APIView):
     permission_classes = [
         IsAuthenticated
