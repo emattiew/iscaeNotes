@@ -122,3 +122,72 @@ export const getFilieres = () => {
     );
 
 };
+export const getExamStudents = (id) => {
+
+    return api.get(
+
+        `/ai-correction/exams/${id}/students/`
+
+    );
+
+};
+export const uploadExamCopy = (data) => {
+
+    return api.post(
+
+        "/ai-correction/copies/",
+
+        data,
+
+        {
+
+            headers: {
+
+                "Content-Type": "multipart/form-data"
+
+            }
+
+        }
+
+    );
+
+};
+
+export const processExamCopyOCR = (id) => {
+
+    return api.post(
+
+        `/ai-correction/copies/${id}/process_ocr/`
+
+    );
+
+};
+
+export const extractAnswers = (id) => {
+
+    return api.post(
+
+        `/ai-correction/copies/${id}/extract_answers/`
+
+    );
+
+};
+
+export const evaluateExamCopy = (id) => {
+
+    return api.post(
+
+        `/ai-correction/copies/${id}/evaluate/`
+
+    );
+
+};
+export const getCorrections = (copyId) => {
+
+    return api.get(
+
+        `/ai-correction/corrections/?copy=${copyId}`
+
+    );
+
+};

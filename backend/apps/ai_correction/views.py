@@ -5,6 +5,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import PermissionDenied
+from apps.accounts.models import User
 from .models import (
     Exam,
     ExamQuestion,
@@ -60,6 +61,51 @@ class ExamViewSet(viewsets.ModelViewSet):
         serializer.save(
             teacher=self.request.user
         )
+
+    @action(
+        detail=True,
+        methods=["get"]
+    )
+    def students(
+        self,
+        request,
+        pk=None
+    ):
+
+        exam = self.get_object()
+
+        students = User.objects.filter(
+
+            role="student",
+
+            filiere=exam.filiere
+
+        ).order_by(
+
+            "last_name",
+
+            "first_name"
+
+        )
+
+        data = []
+
+        for student in students:
+
+            data.append({
+
+                "id": student.id,
+
+                "matricule": student.matricule,
+
+                "first_name": student.first_name,
+
+                "last_name": student.last_name
+
+            })
+
+        return Response(data)
+    
 class ExamQuestionViewSet(viewsets.ModelViewSet):
 
     queryset = ExamQuestion.objects.all()
@@ -108,7 +154,7 @@ class ExamCopyViewSet(viewsets.ModelViewSet):
             )
 
         serializer.save()
-
+    
     @action(
         detail=True,
         methods=["post"]
@@ -328,7 +374,7 @@ class CorrectionSheetViewSet(viewsets.ModelViewSet):
             )
 
         serializer.save()
-
+    
     @action(
         detail=True,
         methods=["post"]

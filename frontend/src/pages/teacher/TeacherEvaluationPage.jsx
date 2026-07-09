@@ -1,16 +1,152 @@
-import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import {
 
+    useParams,
+
+    useNavigate
+
+} from "react-router-dom";
+import {
+
+    getExamStudents,
+
+    uploadExamCopy,
+
+    processExamCopyOCR,
+
+    extractAnswers,
+
+    evaluateExamCopy
+
+} from "../../services/examService";
 import TeacherLayout from "../../layouts/TeacherLayout";
 
 export default function TeacherEvaluationPage() {
 
     const { id } = useParams();
-
+    const navigate = useNavigate();
     const [selectedStudent, setSelectedStudent] = useState("");
 
     const [image, setImage] = useState(null);
+    const [students, setStudents] = useState([]);
+    const [loading, setLoading] = useState(false);
 
+const [successMessage, setSuccessMessage] = useState("");
+
+const [errorMessage, setErrorMessage] = useState("");
+    useEffect(() => {
+
+    loadStudents();
+
+}, []);
+
+const loadStudents = async () => {
+
+    try {
+
+        const response = await getExamStudents(id);
+
+        setStudents(response.data);
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+    }
+
+};
+const handleCorrection = async () => {
+
+    if (!selectedStudent || !image) {
+
+        return;
+
+    }
+
+    try {
+
+        setLoading(true);
+
+        setSuccessMessage("");
+
+        setErrorMessage("");
+
+        const formData = new FormData();
+
+        formData.append(
+
+            "exam",
+
+            id
+
+        );
+
+        formData.append(
+
+            "student",
+
+            selectedStudent
+
+        );
+
+        formData.append(
+
+            "image",
+
+            image
+
+        );
+
+        const uploadResponse = await uploadExamCopy(
+
+            formData
+
+        );
+
+        const copyId = uploadResponse.data.id;
+
+        await processExamCopyOCR(
+
+            copyId
+
+        );
+
+        await extractAnswers(
+
+            copyId
+
+        );
+        await evaluateExamCopy(
+            copyId
+        );
+
+        navigate(
+            `/teacher/copies/${copyId}/review`
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        setErrorMessage(
+
+            "Erreur pendant la correction."
+
+        );
+
+    }
+
+    finally {
+
+        setLoading(false);
+
+    }
+
+};
     return (
 
         <TeacherLayout>
@@ -20,7 +156,33 @@ export default function TeacherEvaluationPage() {
                 Correction assistée par IA
 
             </h1>
+            {
 
+                successMessage && (
+
+                    <div className="bg-green-600 text-white p-4 rounded mb-5">
+
+                        {successMessage}
+
+                    </div>
+
+                )
+
+            }
+
+            {
+
+                errorMessage && (
+
+                    <div className="bg-red-100 text-red-700 p-4 rounded mb-5">
+
+                        {errorMessage}
+
+                    </div>
+
+                )
+
+            }
             <div className="bg-white rounded-2xl shadow-sm p-8">
 
                 <div className="mb-8">
@@ -52,6 +214,26 @@ export default function TeacherEvaluationPage() {
                             Sélectionner un étudiant
 
                         </option>
+
+                        {
+
+                            students.map((student) => (
+
+                                <option
+
+                                    key={student.id}
+
+                                    value={student.id}
+
+                                >
+
+                                    {student.matricule} - {student.first_name} {student.last_name}
+
+                                </option>
+
+                            ))
+
+                        }
 
                     </select>
 
@@ -87,6 +269,8 @@ export default function TeacherEvaluationPage() {
 
                     <button
 
+                        onClick={handleCorrection}
+
                         disabled={
 
                             !selectedStudent ||
@@ -103,7 +287,19 @@ export default function TeacherEvaluationPage() {
 
                     >
 
-                        Lancer la correction
+                        {
+
+                            loading
+
+                                ?
+
+                                "Correction..."
+
+                                :
+
+                                "Lancer la correction"
+
+                        }
 
                     </button>
 
