@@ -7,8 +7,7 @@ import CreateExamModal from "./CreateExamModal";
 import {
     getExams,
     createExam,
-    getMatieres,
-    getFilieres
+    getCollectes
 } from "../../services/examService";
 
 export default function TeacherAICorrectionPage() {
@@ -21,8 +20,7 @@ export default function TeacherAICorrectionPage() {
 
     const [showModal, setShowModal] = useState(false);
 
-    const [matieres, setMatieres] = useState([]);
-    const [filieres, setFilieres] = useState([]);
+    const [collectes, setCollectes] = useState([]);
     const [successMessage, setSuccessMessage] = useState("");
 
     const [errorMessage, setErrorMessage] = useState("");
@@ -89,27 +87,9 @@ export default function TeacherAICorrectionPage() {
 
     try {
 
-        const [
+        const response = await getCollectes();
 
-            matieresResponse,
-
-            filieresResponse
-
-        ] = await Promise.all([
-
-            getMatieres(),
-
-            getFilieres()
-
-        ]);
-
-        setMatieres(
-            matieresResponse.data
-        );
-
-        setFilieres(
-            filieresResponse.data
-        );
+        setCollectes(response.data);
 
         setShowModal(true);
 
@@ -277,7 +257,7 @@ export default function TeacherAICorrectionPage() {
 
                                             <p className="text-gray-500">
 
-                                                {exam.matiere_name} • {exam.filiere_name}
+                                                {exam.collecte_name}
 
                                             </p>
 
@@ -343,9 +323,7 @@ export default function TeacherAICorrectionPage() {
 
                 onCreate={handleCreateExam}
 
-                matieres={matieres}
-
-                filieres={filieres}
+                collectes={collectes}
 
             />
 

@@ -2,8 +2,7 @@ from django.db import models
 
 from apps.accounts.models import User
 from apps.notes.models import (
-    Matiere,
-    Filiere
+    CollecteNote
 )
 
 
@@ -12,16 +11,11 @@ class Exam(models.Model):
         max_length=255
     )
 
-    matiere = models.ForeignKey(
-        Matiere,
-        on_delete=models.CASCADE,
-        related_name="exams"
-    )
 
-    filiere = models.ForeignKey(
-    Filiere,
-    on_delete=models.CASCADE,
-    related_name="exams"
+    collecte = models.ForeignKey(
+        CollecteNote,
+        on_delete=models.CASCADE,
+        related_name="ai_exams"
     )
     teacher = models.ForeignKey(
         User,

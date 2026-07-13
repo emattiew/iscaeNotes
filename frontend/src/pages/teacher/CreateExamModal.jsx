@@ -5,15 +5,13 @@ export default function CreateExamModal({
     show,
     onClose,
     onCreate,
-    matieres,
-    filieres
+    collectes
 
 }) {
 
     const [title, setTitle] = useState("");
 
-    const [matiere, setMatiere] = useState("");
-    const [filiere, setFiliere] = useState("");
+    const [collecte, setCollecte] = useState("");
 
     if (!show) {
 
@@ -31,36 +29,25 @@ export default function CreateExamModal({
 
         }
 
-        if (!matiere) {
+        if (!collecte) {
 
-            alert("Veuillez choisir une matière.");
-
-            return;
-
-        }
-        if (!filiere) {
-
-            alert("Veuillez choisir une filière.");
+            alert("Veuillez choisir une collecte.");
 
             return;
 
         }
+
         onCreate({
 
             title,
 
-            matiere,
-
-            filiere
-
+            collecte
 
         });
 
         setTitle("");
 
-        setMatiere("");
-
-        setFiliere("");
+        setCollecte("");
 
     };
 
@@ -110,17 +97,17 @@ export default function CreateExamModal({
 
                         <label className="block mb-2 font-medium">
 
-                            Matière
+                            Collecte
 
                         </label>
 
                         <select
 
-                            value={matiere}
+                            value={collecte}
 
                             onChange={(e) =>
 
-                                setMatiere(e.target.value)
+                                setCollecte(e.target.value)
 
                             }
 
@@ -130,70 +117,23 @@ export default function CreateExamModal({
 
                             <option value="">
 
-                                Choisir une matière
-
-                            </option>
-
-                            {matieres.map((m) => (
-
-                                <option
-
-                                    key={m.id}
-
-                                    value={m.id}
-
-                                >
-
-                                    {m.name}
-
-                                </option>
-
-                            ))}
-
-                        </select>
-
-                    </div>
-                    <div>
-
-                        <label className="block mb-2 font-medium">
-
-                            Filière
-
-                        </label>
-
-                        <select
-
-                            value={filiere}
-
-                            onChange={(e) =>
-
-                                setFiliere(e.target.value)
-
-                            }
-
-                            className="w-full border rounded-lg px-4 py-3"
-
-                        >
-
-                            <option value="">
-
-                                Choisir une filière
+                                Choisir une collecte
 
                             </option>
 
                             {
 
-                                filieres.map((f) => (
+                                collectes.map((collecte) => (
 
                                     <option
 
-                                        key={f.id}
+                                        key={collecte.id}
 
-                                        value={f.id}
+                                        value={collecte.id}
 
                                     >
 
-                                        {f.code}
+                                        {collecte.matiere_name} - {collecte.filiere_name} - {collecte.academic_year}
 
                                     </option>
 
@@ -204,6 +144,7 @@ export default function CreateExamModal({
                         </select>
 
                     </div>
+
                 </div>
 
                 <div className="flex justify-end gap-3 mt-8">

@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import PermissionDenied
 from apps.accounts.models import User
+from apps.notes.models import StudentNote
 from .models import (
     Exam,
     ExamQuestion,
@@ -58,6 +59,14 @@ class ExamViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
 
+        collecte = serializer.validated_data["collecte"]
+
+        if collecte.teacher != self.request.user:
+
+            raise PermissionDenied(
+                "You cannot use this collecte."
+            )
+
         serializer.save(
             teacher=self.request.user
         )
@@ -78,7 +87,7 @@ class ExamViewSet(viewsets.ModelViewSet):
 
             role="student",
 
-            filiere=exam.filiere
+            filiere=exam.collecte.filiere
 
         ).order_by(
 
@@ -598,8 +607,9 @@ class CorrectionSheetViewSet(viewsets.ModelViewSet):
                 updated
 
         })
-class AICorrectionViewSet(viewsets.ReadOnlyModelViewSet):
+class AICorrectionViewSet(viewsets.ModelViewSet):
 
+    queryset = AICorrection.objects.all()
     serializer_class = AICorrectionSerializer
 
     permission_classes = [
@@ -634,6 +644,116 @@ class AICorrectionViewSet(viewsets.ReadOnlyModelViewSet):
         return queryset.order_by(
             "answer__question__question_number"
         )
+    @action(
+    detail=False,
+    methods=["post"]
+    )
+    def validate(
+        self,
+        request
+    ):
+
+        corrections = request.data.get(
+            "corrections",
+            []
+        )
+
+        updated = []
+
+        total_score = 0
+
+        for item in corrections:
+
+            try:
+
+                correction = (
+                    AICorrection.objects
+                    .select_related(
+                        "answer",
+                        "answer__copy",
+                        "answer__copy__student",
+                        "answer__copy__exam",
+                        "answer__copy__exam__collecte"
+                    )
+                    .get(id=item["id"])
+                )
+
+            except AICorrection.DoesNotExist:
+
+                continue
+
+            if (
+                correction.answer.copy.exam.teacher
+                != request.user
+            ):
+
+                continue
+
+            correction.teacher_score = item[
+                "teacher_score"
+            ]
+
+            correction.validated = True
+
+            correction.save()
+
+            total_score += float(
+                correction.teacher_score
+            )
+
+            updated.append(
+                correction.id
+            )
+        if updated:
+
+                first_correction = AICorrection.objects.select_related(
+
+                    "answer__copy__student",
+
+                    "answer__copy__exam__collecte"
+
+                ).get(
+
+                    id=updated[0]
+
+                )
+
+                copy = first_correction.answer.copy
+
+                student_note, created = (
+
+                    StudentNote.objects.get_or_create(
+
+                        collecte=copy.exam.collecte,
+
+                        student=copy.student
+
+                    )
+
+                )
+
+                student_note.controle_final = total_score
+
+                student_note.note_finale = (
+
+                    (student_note.controle_continu * 0.4)
+
+                    +
+
+                    (student_note.controle_final * 0.6)
+
+                )
+
+                student_note.save()
+        return Response({
+
+            "success": True,
+
+            "validated": len(updated),
+
+            "total_score": total_score
+
+        })
 class GeminiTestView(APIView):
     permission_classes = [
         IsAuthenticated

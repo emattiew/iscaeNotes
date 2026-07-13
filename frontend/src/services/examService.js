@@ -17,10 +17,12 @@ export const createExam = (data) => {
 
 };
 
-export const getMatieres = () => {
+export const getCollectes = () => {
 
     return api.get(
-        "/notes/matieres/"
+
+        "/notes/collectes/"
+
     );
 
 };
@@ -115,13 +117,7 @@ export const validateExpectedAnswers = (id, data) => {
     );
 
 };
-export const getFilieres = () => {
 
-    return api.get(
-        "/notes/filieres/"
-    );
-
-};
 export const getExamStudents = (id) => {
 
     return api.get(
@@ -187,6 +183,18 @@ export const getCorrections = (copyId) => {
     return api.get(
 
         `/ai-correction/corrections/?copy=${copyId}`
+
+    );
+
+};
+
+export const validateCorrections = (data) => {
+
+    return api.post(
+
+        "/ai-correction/corrections/validate/",
+
+        data
 
     );
 

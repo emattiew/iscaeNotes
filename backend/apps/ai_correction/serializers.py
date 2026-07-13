@@ -16,14 +16,8 @@ from .models import (
 
 class ExamSerializer(serializers.ModelSerializer):
 
-    matiere_name = serializers.CharField(
-        source="matiere.name",
-        read_only=True
-    )
-    filiere_name = serializers.CharField(
-    source="filiere.code",
-    read_only=True
-    )
+    collecte_name = serializers.SerializerMethodField()
+
     class Meta:
 
         model = Exam
@@ -35,6 +29,24 @@ class ExamSerializer(serializers.ModelSerializer):
             "created_at"
         ]
 
+    def get_collecte_name(
+        self,
+        obj
+    ):
+
+        return (
+
+            f"{obj.collecte.matiere.name}"
+
+            f" - "
+
+            f"{obj.collecte.filiere.code}"
+
+            f" - "
+
+            f"{obj.collecte.academic_year}"
+
+        )
 
 class ExamQuestionSerializer(serializers.ModelSerializer):
     class Meta:

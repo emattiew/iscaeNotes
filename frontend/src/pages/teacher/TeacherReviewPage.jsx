@@ -16,7 +16,9 @@ import TeacherLayout from "../../layouts/TeacherLayout";
 
 import {
 
-    getCorrections
+    getCorrections,
+
+    validateCorrections
 
 } from "../../services/examService";
 
@@ -58,7 +60,17 @@ export default function TeacherReviewPage() {
             console.log(response.data);
             setCorrections(
 
-                response.data
+                response.data.map((correction) => ({
+
+                    ...correction,
+
+                    teacher_score:
+
+                        correction.teacher_score ??
+
+                        correction.suggested_score
+
+                }))
 
             );
 
@@ -77,7 +89,44 @@ export default function TeacherReviewPage() {
         }
 
     };
+    const handleValidation = async () => {
 
+    try {
+
+        await validateCorrections({
+
+            corrections: corrections.map((correction) => ({
+
+                id: correction.id,
+
+                teacher_score: correction.teacher_score
+
+            }))
+
+        });
+
+        alert(
+
+            "Correction validée avec succès."
+
+        );
+        loadCorrections();
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        alert(
+
+            "Erreur lors de la validation."
+
+        );
+
+    }
+
+};
     if (loading) {
 
         return (
@@ -146,15 +195,66 @@ export default function TeacherReviewPage() {
 
                                 <strong>
 
-                                    Note IA
+                                    Note 
 
                                 </strong>
 
-                                <p>
+                                <div className="flex items-center gap-3">
 
-                                    {correction.suggested_score} / {correction.max_score}
+                                    <input
 
-                                </p>
+                                        type="number"
+
+                                        step="0.25"
+
+                                        min="0"
+
+                                        max={correction.max_score}
+
+                                        value={correction.teacher_score}
+
+                                        onChange={(e) => {
+
+                                            const value =
+
+                                                e.target.value === ""
+
+                                                    ? ""
+
+                                                     : parseFloat(e.target.value);
+
+                                            setCorrections((previous) =>
+
+                                                previous.map((c) =>
+
+                                                    c.id === correction.id
+
+                                                        ? {
+
+                                                            ...c,
+
+                                                            teacher_score: value
+
+                                                        }
+
+                                                        : c
+
+                                                )
+
+                                            );
+
+                                        }}
+                                        className="border rounded-lg px-3 py-2 w-24"
+
+                                    />
+
+                                    <span>
+
+                                        / {correction.max_score}
+
+                                    </span>
+
+                                </div>
 
                             </div>
 
@@ -181,7 +281,21 @@ export default function TeacherReviewPage() {
                 }
 
             </div>
+                <div className="flex justify-end mt-8">
 
+                    <button
+
+                        onClick={handleValidation}
+
+                        className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700"
+
+                    >
+
+                        Valider la correction
+
+                    </button>
+
+                </div>
         </TeacherLayout>
 
     );
