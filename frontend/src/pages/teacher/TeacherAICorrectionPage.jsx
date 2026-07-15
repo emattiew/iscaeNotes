@@ -235,77 +235,129 @@ export default function TeacherAICorrectionPage() {
 
                         <div className="space-y-4">
 
-                            {
+    {
 
-                                exams.map((exam) => (
+        exams.map((exam) => {
 
-                                    <div
+            const isLocked =
 
-                                        key={exam.id}
+                exam.collecte_status === "validated" ||
 
-                                        className="border rounded-xl p-5 flex justify-between items-center"
+                exam.collecte_status === "published";
 
-                                    >
+            return (
 
-                                        <div>
+                <div
 
-                                            <h3 className="text-lg font-semibold">
+                    key={exam.id}
 
-                                                {exam.title}
+                    className="border rounded-xl p-5 flex justify-between items-center"
 
-                                            </h3>
+                >
 
-                                            <p className="text-gray-500">
+                    <div>
 
-                                                {exam.collecte_name}
+                        <h3 className="text-lg font-semibold">
 
-                                            </p>
+                            {exam.title}
 
-                                        </div>
+                        </h3>
 
-                                        <div className="flex gap-3">
+                        <p className="text-gray-500">
 
-                                            <button
+                            {exam.collecte_name}
 
-                                                onClick={() =>
-                                                    navigate(
-                                                        `/teacher/exams/${exam.id}/preparation`
-                                                    )
-                                                }
+                        </p>
 
-                                                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                        {
 
-                                            >
+                            isLocked && (
 
-                                                Préparer
+                                <span className="inline-block mt-2 bg-red-100 text-red-700 text-sm px-3 py-1 rounded-full">
 
-                                            </button>
+                                    🔒 Collecte validée
 
-                                            <button
+                                </span>
 
-                                                onClick={() =>
-                                                    navigate(
-                                                        `/teacher/exams/${exam.id}/evaluation`
-                                                    )
-                                                }
+                            )
 
-                                                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-
-                                            >
-
-                                                Corriger
-
-                                            </button>
-
-                                        </div>
-
-                                    </div>
-
-                                ))
-
-                            }
+                        }
 
                         </div>
+
+                        <div className="flex gap-3">
+
+                            <button
+
+                                disabled={isLocked}
+
+                                onClick={() =>
+
+                                    navigate(
+
+                                        `/teacher/exams/${exam.id}/preparation`
+
+                                    )
+
+                                }
+
+                                className={`px-4 py-2 rounded text-white ${
+
+                                    isLocked
+
+                                        ? "bg-gray-400 cursor-not-allowed"
+
+                                        : "bg-blue-600 hover:bg-blue-700"
+
+                                }`}
+
+                            >
+
+                                Préparer
+
+                            </button>
+
+                            <button
+
+                                disabled={isLocked}
+
+                                onClick={() =>
+
+                                    navigate(
+
+                                        `/teacher/exams/${exam.id}/evaluation`
+
+                                    )
+
+                                }
+
+                                className={`px-4 py-2 rounded text-white ${
+
+                                    isLocked
+
+                                        ? "bg-gray-400 cursor-not-allowed"
+
+                                        : "bg-green-600 hover:bg-green-700"
+
+                                }`}
+
+                            >
+
+                                Corriger
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                );
+
+            })
+
+        }
+
+    </div>
 
                     )
 

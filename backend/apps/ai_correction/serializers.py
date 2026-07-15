@@ -17,7 +17,11 @@ from .models import (
 class ExamSerializer(serializers.ModelSerializer):
 
     collecte_name = serializers.SerializerMethodField()
-
+    
+    collecte_status = serializers.CharField(
+    source="collecte.status",
+    read_only=True
+    )
     class Meta:
 
         model = Exam

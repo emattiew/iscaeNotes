@@ -40,7 +40,22 @@ from .gemini_service import (
     evaluate_answer
 )
 from rest_framework.views import APIView
+def check_collecte_status(exam):
 
+    if exam.collecte.status in [
+
+        "validated",
+
+        "published"
+
+    ]:
+
+        raise PermissionDenied(
+
+            "This collecte has already been validated."
+
+        )
+    
 class ExamViewSet(viewsets.ModelViewSet):
 
     queryset = Exam.objects.all()
@@ -155,7 +170,7 @@ class ExamCopyViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
 
         exam = serializer.validated_data["exam"]
-
+        check_collecte_status(exam)
         if exam.teacher != self.request.user:
 
             raise PermissionDenied(
@@ -171,7 +186,9 @@ class ExamCopyViewSet(viewsets.ModelViewSet):
     def process_ocr(self, request, pk=None):
 
         copy = self.get_object()
-
+        check_collecte_status(
+            copy.exam
+        )
         reader = easyocr.Reader(['fr'])
 
         result = reader.readtext(
@@ -279,7 +296,11 @@ class ExamCopyViewSet(viewsets.ModelViewSet):
     def evaluate(self, request, pk=None):
 
         copy = self.get_object()
+        check_collecte_status(
 
+            copy.exam
+
+        )
         answers = (
             copy.answers
             .select_related("question")
@@ -375,7 +396,7 @@ class CorrectionSheetViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
 
         exam = serializer.validated_data["exam"]
-
+        check_collecte_status(exam)
         if exam.teacher != self.request.user:
 
             raise PermissionDenied(
@@ -397,7 +418,9 @@ class CorrectionSheetViewSet(viewsets.ModelViewSet):
         correction_sheet = (
             self.get_object()
         )
-
+        check_collecte_status(
+            correction_sheet.exam
+        )
         reader = easyocr.Reader(
             ['fr']
         )
@@ -556,7 +579,11 @@ class CorrectionSheetViewSet(viewsets.ModelViewSet):
         correction_sheet = (
             self.get_object()
         )
+        check_collecte_status(
 
+            correction_sheet.exam
+
+        )
         expected_answers = request.data.get(
             "expected_answers",
             []
@@ -661,9 +688,33 @@ class AICorrectionViewSet(viewsets.ModelViewSet):
         updated = []
 
         total_score = 0
+        if corrections:
 
+            first = (
+
+                AICorrection.objects
+
+                .select_related(
+
+                    "answer__copy__exam__collecte"
+
+                )
+
+                .get(
+
+                    id=corrections[0]["id"]
+
+                )
+
+            )
+
+            check_collecte_status(
+
+                first.answer.copy.exam
+
+            )
         for item in corrections:
-
+            
             try:
 
                 correction = (
@@ -789,6 +840,11 @@ class EvaluateAnswerView(APIView):
                 .select_related("question")
                 .get(id=answer_id)
             )
+            check_collecte_status(
+
+                answer.copy.exam
+
+            )
         
         except ExtractedAnswer.DoesNotExist:
 
@@ -867,7 +923,7 @@ class ExamSheetViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
 
         exam = serializer.validated_data["exam"]
-
+        check_collecte_status(exam)
         if exam.teacher != self.request.user:
 
             raise PermissionDenied(
@@ -889,7 +945,9 @@ class ExamSheetViewSet(viewsets.ModelViewSet):
         exam_sheet = (
             self.get_object()
         )
-
+        check_collecte_status(
+            exam_sheet.exam
+        )
         reader = easyocr.Reader(
             ['fr']
         )
@@ -1000,7 +1058,10 @@ class ExamSheetViewSet(viewsets.ModelViewSet):
         exam_sheet = (
             self.get_object()
         )
+        check_collecte_status(
 
+            exam_sheet.exam)
+        
         questions = request.data.get(
             "questions",
             []
