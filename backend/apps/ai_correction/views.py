@@ -129,7 +129,84 @@ class ExamViewSet(viewsets.ModelViewSet):
             })
 
         return Response(data)
-    
+    @action(
+        detail=True,
+        methods=["get"]
+    )
+    def preparation(
+        self,
+        request,
+        pk=None
+    ):
+
+        exam = self.get_object()
+
+        exam_sheet = (
+            ExamSheet.objects
+            .filter(exam=exam)
+            .first()
+        )
+
+        correction_sheet = (
+            CorrectionSheet.objects
+            .filter(exam=exam)
+            .first()
+        )
+
+        questions = (
+            ExamQuestion.objects
+            .filter(exam=exam)
+            .order_by("question_number")
+        )
+
+        return Response({
+
+            "exam_sheet": (
+
+                ExamSheetSerializer(
+                    exam_sheet
+                ).data
+
+                if exam_sheet
+
+                else None
+
+            ),
+
+            "correction_sheet": (
+
+                CorrectionSheetSerializer(
+                    correction_sheet
+                ).data
+
+                if correction_sheet
+
+                else None
+
+            ),
+
+            "questions":
+
+                ExamQuestionSerializer(
+                    questions,
+                    many=True
+                ).data,
+
+            "expected_answers": [
+
+                {
+
+                    "question_number": question.question_number,
+
+                    "expected_answer": question.expected_answer
+
+                }
+
+                for question in questions
+
+            ]
+
+        })
 class ExamQuestionViewSet(viewsets.ModelViewSet):
 
     queryset = ExamQuestion.objects.all()

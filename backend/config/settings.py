@@ -166,3 +166,6 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
 
 }
+MEDIA_URL = "/media/"
+
+MEDIA_ROOT = BASE_DIR 

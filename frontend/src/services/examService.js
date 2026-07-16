@@ -199,3 +199,13 @@ export const validateCorrections = (data) => {
     );
 
 };
+
+export const getPreparationData = (id) => {
+
+    return api.get(
+
+        `/ai-correction/exams/${id}/preparation/`
+
+    );
+
+};

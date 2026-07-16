@@ -1,9 +1,18 @@
-import { useState } from "react";
+import {
+
+    useEffect,
+
+    useState
+
+} from "react";
 import { useParams } from "react-router-dom";
 
 import TeacherLayout from "../../layouts/TeacherLayout";
 
 import {
+
+    getPreparationData,
+
     uploadExamSheet,
     processExamOCR,
     extractQuestions,
@@ -33,13 +42,86 @@ export default function TeacherPreparationPage() {
     const [errorMessage, setErrorMessage] = useState("");
 
     const [examSheetId, setExamSheetId] = useState(null);
+    const [examSheet, setExamSheet] = useState(null);
 
     const [correctionImage, setCorrectionImage] = useState(null);
 
     const [correctionSheetId, setCorrectionSheetId] = useState(null);
+    const [correctionSheet, setCorrectionSheet] = useState(null);
 
     const [expectedAnswers, setExpectedAnswers] = useState([]);
+    useEffect(() => {
 
+    loadPreparation();
+
+    }, []);
+    const loadPreparation = async () => {
+    try {
+
+        const response = await getPreparationData(id);
+
+        const data = response.data;
+
+        if (data.exam_sheet) {
+
+            setExamSheetId(
+
+                data.exam_sheet.id
+
+            );
+
+            setExamSheet(
+
+                data.exam_sheet
+
+            );
+
+        }
+
+        if (data.correction_sheet) {
+
+            setCorrectionSheetId(
+
+                data.correction_sheet.id
+
+            );
+
+            setCorrectionSheet(
+
+                data.correction_sheet
+
+            );
+
+        }
+        if (data.questions.length > 0) {
+
+            setQuestions(
+
+                data.questions
+
+            );
+
+        }
+
+        if (data.expected_answers.length > 0) {
+
+            setExpectedAnswers(
+
+                data.expected_answers
+
+            );
+
+        }
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+    }
+
+};
     const handleUpload = async () => {
 
         if (!image) {
@@ -294,6 +376,7 @@ const handleValidateExpectedAnswers = async () => {
     }
 
 };
+console.log(examSheet);
 
     return (
 
@@ -333,49 +416,137 @@ const handleValidateExpectedAnswers = async () => {
 
                 </h2>
 
-                <input
+                {
 
-                    type="file"
+                    examSheet ? (
 
-                    accept="image/*"
+                        <>
 
-                    onChange={(e) =>
-                        setImage(
-                            e.target.files[0]
-                        )
-                    }
+                            <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
 
-                    className="mb-6"
+                                <p className="text-green-700 font-medium">
 
-                />
+                                     Sujet déjà importé
 
-                <br />
+                                </p>
 
-                <button
+                                <a
 
-                    onClick={handleUpload}
+                                    href={`http://127.0.0.1:8000${examSheet.image}`}
 
-                    disabled={examLoading}
+                                    target="_blank"
 
-                    className="bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700"
+                                    rel="noreferrer"
 
-                >
+                                    className="text-blue-600 underline"
 
-                    {
+                                >
 
-                        examLoading
+                                    Voir le sujet
 
-                        ?
+                                </a>
 
-                        "Traitement..."
+                            </div>
 
-                        :
+                            <input
 
-                        "Uploader et détecter"
+                                type="file"
 
-                    }
+                                accept="image/*"
 
-                </button>
+                                onChange={(e) =>
+                                    setImage(
+                                        e.target.files[0]
+                                    )
+                                }
+
+                                className="mb-6"
+
+                            />
+
+                            <br />
+
+                            <button
+
+                                onClick={handleUpload}
+
+                                disabled={examLoading}
+
+                                className="bg-yellow-600 text-white px-6 py-3 rounded hover:bg-yellow-700"
+
+                            >
+
+                                {
+
+                                    examLoading
+
+                                    ?
+
+                                    "Remplacement..."
+
+                                    :
+
+                                    "Remplacer le sujet"
+
+                                }
+
+                            </button>
+
+                        </>
+
+                    ) : (
+
+                        <>
+
+                            <input
+
+                                type="file"
+
+                                accept="image/*"
+
+                                onChange={(e) =>
+                                    setImage(
+                                        e.target.files[0]
+                                    )
+                                }
+
+                                className="mb-6"
+
+                            />
+
+                            <br />
+
+                            <button
+
+                                onClick={handleUpload}
+
+                                disabled={examLoading}
+
+                                className="bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700"
+
+                            >
+
+                                {
+
+                                    examLoading
+
+                                    ?
+
+                                    "Traitement..."
+
+                                    :
+
+                                    "Uploader et détecter"
+
+                                }
+
+                            </button>
+
+                        </>
+
+                    )
+
+                }
 
             </div>
 
@@ -512,49 +683,145 @@ const handleValidateExpectedAnswers = async () => {
 
                 </h2>
 
-                <input
+                {
 
-                    type="file"
+                    correctionSheet ? (
 
-                    accept="image/*"
+                        <>
 
-                    onChange={(e) =>
-                        setCorrectionImage(
-                            e.target.files[0]
-                        )
-                    }
+                            <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
 
-                    className="mb-6"
+                                <p className="text-green-700 font-medium">
 
-                />
+                                    Correction déjà importée
 
-                <br />
+                                </p>
 
-                <button
+                                <a
 
-                    onClick={handleCorrectionUpload}
+                                    href={`http://127.0.0.1:8000${correctionSheet.image}`}
 
-                    disabled={correctionLoading}
+                                    target="_blank"
 
-                    className="bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700"
+                                    rel="noreferrer"
 
-                >
+                                    className="text-blue-600 underline"
 
-                    {
+                                >
 
-                        correctionLoading
+                                    Voir la correction
 
-                        ?
+                                </a>
 
-                        "Traitement..."
+                            </div>
 
-                        :
+                            <input
 
-                        "Uploader et détecter"
+                                type="file"
 
-                    }
+                                accept="image/*"
 
-                </button>
+                                onChange={(e) =>
+
+                                    setCorrectionImage(
+
+                                        e.target.files[0]
+
+                                    )
+
+                                }
+
+                                className="mb-6"
+
+                            />
+
+                            <br />
+
+                            <button
+
+                                onClick={handleCorrectionUpload}
+
+                                disabled={correctionLoading}
+
+                                className="bg-yellow-600 text-white px-6 py-3 rounded hover:bg-yellow-700"
+
+                            >
+
+                                {
+
+                                    correctionLoading
+
+                                    ?
+
+                                    "Remplacement..."
+
+                                    :
+
+                                    "Remplacer la correction"
+
+                                }
+
+                            </button>
+
+                        </>
+
+                    ) : (
+
+                        <>
+
+                            <input
+
+                                type="file"
+
+                                accept="image/*"
+
+                                onChange={(e) =>
+
+                                    setCorrectionImage(
+
+                                        e.target.files[0]
+
+                                    )
+
+                                }
+
+                                className="mb-6"
+
+                            />
+
+                            <br />
+
+                            <button
+
+                                onClick={handleCorrectionUpload}
+
+                                disabled={correctionLoading}
+
+                                className="bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700"
+
+                            >
+
+                                {
+
+                                    correctionLoading
+
+                                    ?
+
+                                    "Traitement..."
+
+                                    :
+
+                                    "Uploader et détecter"
+
+                                }
+
+                            </button>
+
+                        </>
+
+                    )
+
+                }
 
             </div>
             <div className="bg-white rounded-2xl shadow-sm p-8 mt-8">
