@@ -16,7 +16,8 @@ import {
 
     extractAnswers,
 
-    evaluateExamCopy
+    evaluateExamCopy,
+    getStudentCopy
 
 } from "../../services/examService";
 import TeacherLayout from "../../layouts/TeacherLayout";
@@ -31,16 +32,39 @@ export default function TeacherEvaluationPage() {
     const [students, setStudents] = useState([]);
     const [loading, setLoading] = useState(false);
 
-const [successMessage, setSuccessMessage] = useState("");
+    const [successMessage, setSuccessMessage] = useState("");
+    const [examCopy, setExamCopy] = useState(null);
 
-const [errorMessage, setErrorMessage] = useState("");
+    const [copyProcessed, setCopyProcessed] = useState(false);
+
+    const [answersExtracted, setAnswersExtracted] = useState(false);
+
+    const [aiDone, setAiDone] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
     useEffect(() => {
 
     loadStudents();
 
-}, []);
+    }, []);
+    useEffect(() => {
 
-const loadStudents = async () => {
+    if (!selectedStudent) {
+
+    setExamCopy(null);
+
+    setCopyProcessed(false);
+
+    setAnswersExtracted(false);
+
+    setAiDone(false);
+
+    return;
+
+}
+    loadStudentCopy();
+
+    }, [selectedStudent]);
+    const loadStudents = async () => {
 
     try {
 
@@ -57,9 +81,77 @@ const loadStudents = async () => {
     }
 
 };
+const loadStudentCopy = async () => {
+
+    try {
+
+        const response = await getStudentCopy(
+
+            id,
+
+            selectedStudent
+
+        );
+
+        const data = response.data;
+
+        setExamCopy(
+
+            data.copy
+
+        );
+
+        setCopyProcessed(
+
+            data.ocr_done
+
+        );
+
+        setAnswersExtracted(
+
+            data.answers_extracted
+
+        );
+
+        setAiDone(
+
+            data.ai_done
+
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+    }
+
+};
 const handleCorrection = async () => {
 
-    if (!selectedStudent || !image) {
+    if (!selectedStudent) {
+
+        return;
+
+    }
+
+    // If this student's copy has already been evaluated,
+    // simply reopen the review page.
+    if (examCopy && aiDone) {
+
+        navigate(
+
+            `/teacher/copies/${examCopy.id}/review`
+
+        );
+
+        return;
+
+    }
+
+    // No image selected for a new upload
+    if (!image) {
 
         return;
 
@@ -118,12 +210,17 @@ const handleCorrection = async () => {
             copyId
 
         );
+
         await evaluateExamCopy(
+
             copyId
+
         );
 
         navigate(
+
             `/teacher/copies/${copyId}/review`
+
         );
 
     }
@@ -247,21 +344,81 @@ const handleCorrection = async () => {
 
                     </label>
 
-                    <input
+                    {
 
-                        type="file"
+                        examCopy ? (
 
-                        accept="image/*"
+                            <>
 
-                        onChange={(e) =>
+                                <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
 
-                            setImage(
-                                e.target.files[0]
-                            )
+                                    <p className="text-green-700 font-medium">
 
-                        }
+                                        ✓ Copie déjà importée
 
-                    />
+                                    </p>
+
+                                    <a
+
+                                        href={`http://127.0.0.1:8000${examCopy.image}`}
+
+                                        target="_blank"
+
+                                        rel="noreferrer"
+
+                                        className="text-blue-600 underline"
+
+                                    >
+
+                                        Voir la copie
+
+                                    </a>
+
+                                </div>
+
+                                <input
+
+                                    type="file"
+
+                                    accept="image/*"
+
+                                    onChange={(e) =>
+
+                                        setImage(
+
+                                            e.target.files[0]
+
+                                        )
+
+                                    }
+
+                                />
+
+                            </>
+
+                        ) : (
+
+                            <input
+
+                                type="file"
+
+                                accept="image/*"
+
+                                onChange={(e) =>
+
+                                    setImage(
+
+                                        e.target.files[0]
+
+                                    )
+
+                                }
+
+                            />
+
+                        )
+
+                    }
 
                 </div>
 
@@ -269,39 +426,36 @@ const handleCorrection = async () => {
 
                     <button
 
-                        onClick={handleCorrection}
+                    onClick={handleCorrection}
 
-                        disabled={
+                    disabled={
+                        !selectedStudent ||
+                        (!image && !aiDone)
+                    }
 
-                            !selectedStudent ||
+                    className={`px-6 py-3 rounded-lg text-white ${
+                        !selectedStudent || (!image && !aiDone)
+                            ? "bg-gray-400 cursor-not-allowed"
+                            : aiDone
+                                ? "bg-blue-600 hover:bg-blue-700"
+                                : examCopy
+                                    ? "bg-yellow-600 hover:bg-yellow-700"
+                                    : "bg-green-600 hover:bg-green-700"
+                    }`}
 
-                            !image
+                >
 
-                        }
+                    {
+                        loading
+                            ? "Correction..."
+                            : aiDone
+                                ? "Reprendre la correction"
+                                : examCopy
+                                    ? "Remplacer la copie"
+                                    : "Lancer la correction"
+                    }
 
-                        className={`px-6 py-3 rounded-lg text-white ${
-                            !selectedStudent || !image
-                                ? "bg-gray-400 cursor-not-allowed"
-                                : "bg-green-600 hover:bg-green-700"
-                        }`}
-
-                    >
-
-                        {
-
-                            loading
-
-                                ?
-
-                                "Correction..."
-
-                                :
-
-                                "Lancer la correction"
-
-                        }
-
-                    </button>
+                </button>
 
                 </div>
 

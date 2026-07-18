@@ -209,3 +209,12 @@ export const getPreparationData = (id) => {
     );
 
 };
+export const getStudentCopy = (examId, studentId) => {
+
+    return api.get(
+
+        `/ai-correction/exams/${examId}/student-copy/${studentId}/`
+
+    );
+
+};

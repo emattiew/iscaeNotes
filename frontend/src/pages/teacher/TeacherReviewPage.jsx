@@ -25,7 +25,9 @@ import {
 export default function TeacherReviewPage() {
 
     const { copyId } = useParams();
-
+    const [successMessage, setSuccessMessage] = useState("");
+    
+const [errorMessage, setErrorMessage] = useState("");
     const [
 
         corrections,
@@ -90,7 +92,20 @@ export default function TeacherReviewPage() {
 
     };
     const handleValidation = async () => {
+        
+            setSuccessMessage(
+        "La correction a été validée avec succès."
+    );
 
+    setTimeout(() => {
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+    }, 100);
+
+    loadCorrections();
+        setErrorMessage("");
     try {
 
         await validateCorrections({
@@ -105,28 +120,35 @@ export default function TeacherReviewPage() {
 
         });
 
-        alert(
+        setSuccessMessage(
+        "La correction a été validée avec succès."
+    );
 
-            "Correction validée avec succès."
+    setErrorMessage("");
 
-        );
-        loadCorrections();
+    loadCorrections();
 
-    }
+        }
 
-    catch (error) {
+        catch (error) {
 
-        console.error(error);
+            console.error(error);
 
-        alert(
+            setErrorMessage(
 
-            "Erreur lors de la validation."
+                error.response?.data?.detail ||
 
-        );
+                error.response?.data?.non_field_errors?.[0] ||
 
-    }
+                "Erreur lors de la validation."
 
-};
+            );
+
+            setSuccessMessage("");
+
+        }
+
+    };
     if (loading) {
 
         return (
@@ -154,7 +176,33 @@ export default function TeacherReviewPage() {
                 Révision de la correction
 
             </h1>
+            {
 
+                successMessage && (
+
+                    <div className="bg-green-600 text-white p-4 rounded mb-5">
+
+                        {successMessage}
+
+                    </div>
+
+                )
+
+            }
+
+            {
+
+                errorMessage && (
+
+                    <div className="bg-red-100 text-red-700 p-4 rounded mb-5">
+
+                        {errorMessage}
+
+                    </div>
+
+                )
+
+            }
             <div className="space-y-6">
 
                 {
@@ -215,13 +263,28 @@ export default function TeacherReviewPage() {
 
                                         onChange={(e) => {
 
-                                            const value =
-
+                                            let value =
                                                 e.target.value === ""
-
                                                     ? ""
+                                                    : parseFloat(e.target.value);
 
-                                                     : parseFloat(e.target.value);
+                                            if (value !== "") {
+
+                                                value = Math.max(
+
+                                                    0,
+
+                                                    Math.min(
+
+                                                        value,
+
+                                                        Number(correction.max_score)
+
+                                                    )
+
+                                                );
+
+                                            }
 
                                             setCorrections((previous) =>
 

@@ -7,6 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import PermissionDenied
 from apps.accounts.models import User
 from apps.notes.models import StudentNote
+from rest_framework.exceptions import ValidationError
 from .models import (
     Exam,
     ExamQuestion,
@@ -205,6 +206,71 @@ class ExamViewSet(viewsets.ModelViewSet):
                 for question in questions
 
             ]
+
+        })
+    @action(
+    detail=True,
+    methods=["get"],
+    url_path="student-copy/(?P<student_id>[^/.]+)"
+    )
+    def student_copy(
+        self,
+        request,
+        pk=None,
+        student_id=None
+    ):
+
+        exam = self.get_object()
+
+        copy = (
+
+            ExamCopy.objects
+
+            .filter(
+
+                exam=exam,
+
+                student_id=student_id
+
+            )
+
+            .order_by("-uploaded_at")
+
+            .first()
+
+        )
+
+        if not copy:
+
+            return Response({
+
+                "copy": None
+
+            })
+
+        return Response({
+
+            "copy": ExamCopySerializer(copy).data,
+
+            "ocr_done": hasattr(
+
+                copy,
+
+                "ocr_result"
+
+            ),
+
+            "answers_extracted":
+
+                copy.answers.exists(),
+
+            "ai_done":
+
+                AICorrection.objects.filter(
+
+                    answer__copy=copy
+
+                ).exists()
 
         })
 class ExamQuestionViewSet(viewsets.ModelViewSet):
@@ -817,9 +883,22 @@ class AICorrectionViewSet(viewsets.ModelViewSet):
 
                 continue
 
-            correction.teacher_score = item[
-                "teacher_score"
-            ]
+            teacher_score = float(item["teacher_score"])
+
+            max_score = float(
+                correction.answer.question.max_score
+            )
+
+            if teacher_score < 0 or teacher_score > max_score:
+
+                raise ValidationError(
+
+                    f"Question {correction.answer.question.question_number}: "
+                    f"the score must be between 0 and {max_score}."
+
+                )
+
+            correction.teacher_score = teacher_score
 
             correction.validated = True
 
