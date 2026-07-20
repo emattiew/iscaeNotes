@@ -28,7 +28,7 @@ export default function TeacherEvaluationPage() {
     const navigate = useNavigate();
     const [selectedStudent, setSelectedStudent] = useState("");
 
-    const [image, setImage] = useState(null);
+    const [images, setImages] = useState([]);
     const [students, setStudents] = useState([]);
     const [loading, setLoading] = useState(false);
 
@@ -47,7 +47,9 @@ export default function TeacherEvaluationPage() {
 
     }, []);
     useEffect(() => {
-
+    setImages([]);
+    setSuccessMessage("");
+    setErrorMessage("");
     if (!selectedStudent) {
 
     setExamCopy(null);
@@ -57,7 +59,7 @@ export default function TeacherEvaluationPage() {
     setAnswersExtracted(false);
 
     setAiDone(false);
-
+    
     return;
 
 }
@@ -123,9 +125,42 @@ const loadStudentCopy = async () => {
 
     catch (error) {
 
-        console.error(error);
+    console.error(error);
 
-    }
+    setExamCopy(null);
+
+    setCopyProcessed(false);
+
+    setAnswersExtracted(false);
+
+    setAiDone(false);
+
+}
+
+};
+const addImages = (e) => {
+
+    const files = Array.from(e.target.files);
+
+    setImages((previous) => [
+
+        ...previous,
+
+        ...files
+
+    ]);
+
+    e.target.value = "";
+
+};
+
+const removeImage = (index) => {
+
+    setImages(
+
+        images.filter((_, i) => i !== index)
+
+    );
 
 };
 const handleCorrection = async () => {
@@ -136,8 +171,7 @@ const handleCorrection = async () => {
 
     }
 
-    // If this student's copy has already been evaluated,
-    // simply reopen the review page.
+
     if (examCopy && aiDone) {
 
         navigate(
@@ -150,8 +184,8 @@ const handleCorrection = async () => {
 
     }
 
-    // No image selected for a new upload
-    if (!image) {
+    
+    if (images.length === 0) {
 
         return;
 
@@ -183,13 +217,14 @@ const handleCorrection = async () => {
 
         );
 
-        formData.append(
+        images.forEach((image) => {
 
-            "image",
+            formData.append(
+                "images",
+                image
+            );
 
-            image
-
-        );
+        });
 
         const uploadResponse = await uploadExamCopy(
 
@@ -381,19 +416,12 @@ const handleCorrection = async () => {
                                     type="file"
 
                                     accept="image/*"
+                                    multiple
 
-                                    onChange={(e) =>
-
-                                        setImage(
-
-                                            e.target.files[0]
-
-                                        )
-
-                                    }
+                                    onChange={addImages}
 
                                 />
-
+                                
                             </>
 
                         ) : (
@@ -403,23 +431,66 @@ const handleCorrection = async () => {
                                 type="file"
 
                                 accept="image/*"
-
-                                onChange={(e) =>
-
-                                    setImage(
-
-                                        e.target.files[0]
-
-                                    )
-
-                                }
-
+                                multiple
+                                onChange={addImages}
                             />
 
                         )
-
+                        
                     }
+                    {
+                        images.length > 0 && (
 
+                            <div className="mt-4">
+
+                                <p className="font-medium mb-2">
+
+                                    Pages sélectionnées
+
+                                </p>
+
+                                {
+
+                                    images.map((image, index) => (
+
+                                        <div
+
+                                            key={index}
+
+                                            className="flex justify-between items-center border rounded-lg p-3 mb-2"
+
+                                        >
+
+                                            <span>
+
+                                                Page {index + 1} — {image.name}
+
+                                            </span>
+
+                                            <button
+
+                                                type="button"
+
+                                                onClick={() => removeImage(index)}
+
+                                                className="text-red-600 hover:text-red-800"
+
+                                            >
+
+                                                Supprimer
+
+                                            </button>
+
+                                        </div>
+
+                                    ))
+
+                                }
+
+                            </div>
+
+                        )
+                    }
                 </div>
 
                 <div className="flex justify-end">
@@ -430,11 +501,11 @@ const handleCorrection = async () => {
 
                     disabled={
                         !selectedStudent ||
-                        (!image && !aiDone)
+                        (images.length === 0 && !aiDone)
                     }
 
                     className={`px-6 py-3 rounded-lg text-white ${
-                        !selectedStudent || (!image && !aiDone)
+                        !selectedStudent || (images.length === 0 && !aiDone)
                             ? "bg-gray-400 cursor-not-allowed"
                             : aiDone
                                 ? "bg-blue-600 hover:bg-blue-700"

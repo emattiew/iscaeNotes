@@ -2,11 +2,13 @@ import easyocr
 
 from rest_framework import viewsets
 from rest_framework.decorators import action
+from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import PermissionDenied
 from apps.accounts.models import User
 from apps.notes.models import StudentNote
+from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from .models import (
     Exam,
@@ -18,7 +20,8 @@ from .models import (
     CorrectionSheet,
     CorrectionOCRResult,
     ExamSheet,
-    ExamOCRResult
+    ExamOCRResult,
+    ExamCopyPage
 )
 from .parser import (
     split_answers,
@@ -310,17 +313,77 @@ class ExamCopyViewSet(viewsets.ModelViewSet):
             "-uploaded_at"
         )
 
-    def perform_create(self, serializer):
+    def create(self, request, *args, **kwargs):
 
-        exam = serializer.validated_data["exam"]
+        exam = get_object_or_404(
+            Exam,
+            pk=request.data.get("exam")
+        )
+
         check_collecte_status(exam)
-        if exam.teacher != self.request.user:
+
+        if exam.teacher != request.user:
 
             raise PermissionDenied(
                 "You cannot upload a copy for this exam."
             )
 
-        serializer.save()
+        copy = ExamCopy.objects.create(
+
+            exam=exam,
+
+            student_id=request.data.get("student"),
+
+            image=""
+
+        )
+
+        images = request.FILES.getlist("images")
+
+        if not images:
+
+            image = request.FILES.get("image")
+
+            if image:
+
+                copy.image = image
+                copy.save()
+
+                ExamCopyPage.objects.create(
+
+                    copy=copy,
+
+                    image=image,
+
+                    page_number=1
+
+                )
+
+        else:
+
+            first_image = images[0]
+
+            copy.image = first_image
+            copy.save()
+
+            for index, image in enumerate(images, start=1):
+
+                ExamCopyPage.objects.create(
+
+                    copy=copy,
+
+                    image=image,
+
+                    page_number=index
+
+                )
+
+        serializer = self.get_serializer(copy)
+
+        return Response(
+            serializer.data,
+            status=status.HTTP_201_CREATED
+        )
     
     @action(
         detail=True,
@@ -334,14 +397,35 @@ class ExamCopyViewSet(viewsets.ModelViewSet):
         )
         reader = easyocr.Reader(['fr'])
 
-        result = reader.readtext(
-            copy.image.path
-        )
+        raw_text = ""
 
-        raw_text = "\n".join(
-            item[1]
-            for item in result
-        )
+        pages = copy.pages.all()
+
+        if pages.exists():
+
+            for page in pages:
+
+                result = reader.readtext(
+                    page.image.path
+                )
+
+                page_text = "\n".join(
+                    item[1]
+                    for item in result
+                )
+
+                raw_text += page_text + "\n"
+
+        else:
+
+            result = reader.readtext(
+                copy.image.path
+            )
+
+            raw_text = "\n".join(
+                item[1]
+                for item in result
+            )
 
         OCRResult.objects.update_or_create(
             copy=copy,

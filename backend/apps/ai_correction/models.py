@@ -86,7 +86,28 @@ class ExamCopy(models.Model):
     def __str__(self):
         return f"Copy #{self.id}"
 
+class ExamCopyPage(models.Model):
 
+    copy = models.ForeignKey(
+        ExamCopy,
+        on_delete=models.CASCADE,
+        related_name="pages"
+    )
+
+    image = models.ImageField(
+        upload_to="exam_copies/"
+    )
+
+    page_number = models.PositiveIntegerField()
+
+    class Meta:
+        ordering = ["page_number"]
+
+    def __str__(self):
+        return (
+            f"Copy {self.copy.id} - Page {self.page_number}"
+        )
+    
 class OCRResult(models.Model):
     copy = models.OneToOneField(
         ExamCopy,

@@ -453,7 +453,7 @@ console.log(examSheet);
                                 type="file"
 
                                 accept="image/*"
-
+                                multiple
                                 onChange={(e) =>
                                     setImage(
                                         e.target.files[0]

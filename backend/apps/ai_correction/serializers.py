@@ -10,7 +10,8 @@ from .models import (
     CorrectionSheet,
     CorrectionOCRResult,
     ExamSheet,
-    ExamOCRResult
+    ExamOCRResult,
+    ExamCopyPage
 )
 
 
@@ -137,4 +138,10 @@ class ExamOCRResultSerializer(
 
         model = ExamOCRResult
 
+        fields = "__all__"
+
+class ExamCopyPageSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ExamCopyPage
         fields = "__all__"
