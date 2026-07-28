@@ -21,7 +21,9 @@ from .models import (
     CorrectionOCRResult,
     ExamSheet,
     ExamOCRResult,
-    ExamCopyPage
+    ExamCopyPage,
+    ExamSheetPage,
+    CorrectionSheetPage
 )
 from .parser import (
     split_answers,
@@ -620,17 +622,80 @@ class CorrectionSheetViewSet(viewsets.ModelViewSet):
             exam__teacher=self.request.user
         )
 
-    def perform_create(self, serializer):
+    def create(self, request, *args, **kwargs):
 
-        exam = serializer.validated_data["exam"]
+        exam = get_object_or_404(
+            Exam,
+            pk=request.data.get("exam")
+        )
+
         check_collecte_status(exam)
-        if exam.teacher != self.request.user:
+
+        if exam.teacher != request.user:
 
             raise PermissionDenied(
                 "You cannot upload a correction sheet for this exam."
             )
 
-        serializer.save()
+        correction_sheet = CorrectionSheet.objects.create(
+
+            exam=exam,
+
+            image=""
+
+        )
+
+        images = request.FILES.getlist("images")
+
+        if not images:
+
+            image = request.FILES.get("image")
+
+            if image:
+
+                correction_sheet.image = image
+
+                correction_sheet.save()
+
+                CorrectionSheetPage.objects.create(
+
+                    correction_sheet=correction_sheet,
+
+                    image=image,
+
+                    page_number=1
+
+                )
+
+        else:
+
+            first_image = images[0]
+
+            correction_sheet.image = first_image
+
+            correction_sheet.save()
+
+            for index, image in enumerate(images, start=1):
+
+                CorrectionSheetPage.objects.create(
+
+                    correction_sheet=correction_sheet,
+
+                    image=image,
+
+                    page_number=index
+
+                )
+
+        serializer = self.get_serializer(correction_sheet)
+
+        return Response(
+
+            serializer.data,
+
+            status=status.HTTP_201_CREATED
+
+        )
     
     @action(
         detail=True,
@@ -652,14 +717,35 @@ class CorrectionSheetViewSet(viewsets.ModelViewSet):
             ['fr']
         )
 
-        result = reader.readtext(
-            correction_sheet.image.path
-        )
+        raw_text = ""
 
-        raw_text = "\n".join(
-            item[1]
-            for item in result
-        )
+        pages = correction_sheet.pages.all()
+
+        if pages.exists():
+
+            for page in pages:
+
+                result = reader.readtext(
+                    page.image.path
+                )
+
+                page_text = "\n".join(
+                    item[1]
+                    for item in result
+                )
+
+                raw_text += page_text + "\n"
+
+        else:
+
+            result = reader.readtext(
+                correction_sheet.image.path
+            )
+
+            raw_text = "\n".join(
+                item[1]
+                for item in result
+            )
 
         CorrectionOCRResult.objects.update_or_create(
             correction_sheet=correction_sheet,
@@ -1160,17 +1246,80 @@ class ExamSheetViewSet(viewsets.ModelViewSet):
             exam__teacher=self.request.user
         )
 
-    def perform_create(self, serializer):
+    def create(self, request, *args, **kwargs):
 
-        exam = serializer.validated_data["exam"]
+        exam = get_object_or_404(
+            Exam,
+            pk=request.data.get("exam")
+        )
+
         check_collecte_status(exam)
-        if exam.teacher != self.request.user:
+
+        if exam.teacher != request.user:
 
             raise PermissionDenied(
                 "You cannot upload an exam sheet for this exam."
             )
 
-        serializer.save()
+        exam_sheet = ExamSheet.objects.create(
+
+            exam=exam,
+
+            image=""
+
+        )
+
+        images = request.FILES.getlist("images")
+
+        if not images:
+
+            image = request.FILES.get("image")
+
+            if image:
+
+                exam_sheet.image = image
+
+                exam_sheet.save()
+
+                ExamSheetPage.objects.create(
+
+                    exam_sheet=exam_sheet,
+
+                    image=image,
+
+                    page_number=1
+
+                )
+
+        else:
+
+            first_image = images[0]
+
+            exam_sheet.image = first_image
+
+            exam_sheet.save()
+
+            for index, image in enumerate(images, start=1):
+
+                ExamSheetPage.objects.create(
+
+                    exam_sheet=exam_sheet,
+
+                    image=image,
+
+                    page_number=index
+
+                )
+
+        serializer = self.get_serializer(exam_sheet)
+
+        return Response(
+
+            serializer.data,
+
+            status=status.HTTP_201_CREATED
+
+        )
 
     @action(
         detail=True,
@@ -1192,14 +1341,35 @@ class ExamSheetViewSet(viewsets.ModelViewSet):
             ['fr']
         )
 
-        result = reader.readtext(
-            exam_sheet.image.path
-        )
+        raw_text = ""
 
-        raw_text = "\n".join(
-            item[1]
-            for item in result
-        )
+        pages = exam_sheet.pages.all()
+
+        if pages.exists():
+
+            for page in pages:
+
+                result = reader.readtext(
+                    page.image.path
+                )
+
+                page_text = "\n".join(
+                    item[1]
+                    for item in result
+                )
+
+                raw_text += page_text + "\n"
+
+        else:
+
+            result = reader.readtext(
+                exam_sheet.image.path
+            )
+
+            raw_text = "\n".join(
+                item[1]
+                for item in result
+            )
 
         ExamOCRResult.objects.update_or_create(
             exam_sheet=exam_sheet,

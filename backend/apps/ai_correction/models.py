@@ -206,7 +206,29 @@ class CorrectionSheet(models.Model):
         return (
             f"Correction Sheet #{self.id}"
         )
+class CorrectionSheetPage(models.Model):
 
+    correction_sheet = models.ForeignKey(
+        CorrectionSheet,
+        on_delete=models.CASCADE,
+        related_name="pages"
+    )
+
+    image = models.ImageField(
+        upload_to="correction_sheets/"
+    )
+
+    page_number = models.PositiveIntegerField()
+
+    class Meta:
+        ordering = ["page_number"]
+
+    def __str__(self):
+
+        return (
+            f"Correction Sheet {self.correction_sheet.id} - "
+            f"Page {self.page_number}"
+        )
 class CorrectionOCRResult(models.Model):
 
     correction_sheet = models.OneToOneField(
@@ -249,7 +271,30 @@ class ExamSheet(models.Model):
         return (
             f"Exam Sheet #{self.id}"
         )
-    
+
+class ExamSheetPage(models.Model):
+
+    exam_sheet = models.ForeignKey(
+        ExamSheet,
+        on_delete=models.CASCADE,
+        related_name="pages"
+    )
+
+    image = models.ImageField(
+        upload_to="exam_sheets/"
+    )
+
+    page_number = models.PositiveIntegerField()
+
+    class Meta:
+        ordering = ["page_number"]
+
+    def __str__(self):
+
+        return (
+            f"Exam Sheet {self.exam_sheet.id} - "
+            f"Page {self.page_number}"
+        )  
 
 class ExamOCRResult(models.Model):
 

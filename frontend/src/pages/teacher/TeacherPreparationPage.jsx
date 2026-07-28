@@ -29,7 +29,7 @@ export default function TeacherPreparationPage() {
 
     const { id } = useParams();
 
-    const [image, setImage] = useState(null);
+    
 
     const [questions, setQuestions] = useState([]);
 
@@ -44,7 +44,9 @@ export default function TeacherPreparationPage() {
     const [examSheetId, setExamSheetId] = useState(null);
     const [examSheet, setExamSheet] = useState(null);
 
-    const [correctionImage, setCorrectionImage] = useState(null);
+    const [examImages, setExamImages] = useState([]);
+
+    const [correctionImages, setCorrectionImages] = useState([]);
 
     const [correctionSheetId, setCorrectionSheetId] = useState(null);
     const [correctionSheet, setCorrectionSheet] = useState(null);
@@ -122,9 +124,60 @@ export default function TeacherPreparationPage() {
     }
 
 };
+    const addExamImages = (e) => {
+
+        const files = Array.from(e.target.files);
+
+        setExamImages((previous) => [
+
+            ...previous,
+
+            ...files
+
+        ]);
+
+        e.target.value = "";
+
+    };
+
+    const removeExamImage = (index) => {
+
+        setExamImages(
+
+            examImages.filter((_, i) => i !== index)
+
+        );
+
+    };
+
+    const addCorrectionImages = (e) => {
+
+        const files = Array.from(e.target.files);
+
+        setCorrectionImages((previous) => [
+
+            ...previous,
+
+            ...files
+
+        ]);
+
+        e.target.value = "";
+
+    };
+
+    const removeCorrectionImage = (index) => {
+
+        setCorrectionImages(
+
+            correctionImages.filter((_, i) => i !== index)
+
+        );
+
+    };
     const handleUpload = async () => {
 
-        if (!image) {
+        if (examImages.length === 0) {
 
             setErrorMessage(
                 "Veuillez choisir une image."
@@ -149,10 +202,14 @@ export default function TeacherPreparationPage() {
                 id
             );
 
-            formData.append(
-                "image",
-                image
-            );
+            examImages.forEach((image) => {
+
+                formData.append(
+                    "images",
+                    image
+                );
+
+            });
 
             const uploadResponse =
                 await uploadExamSheet(formData);
@@ -180,7 +237,9 @@ export default function TeacherPreparationPage() {
             setSuccessMessage(
                 "Questions détectées avec succès."
             );
-
+            setExamImages([]);
+            
+            await loadPreparation();
         }
 
         catch (error) {
@@ -250,7 +309,7 @@ export default function TeacherPreparationPage() {
 };
 const handleCorrectionUpload = async () => {
 
-    if (!correctionImage) {
+    if (correctionImages.length === 0) {
 
         setErrorMessage(
             "Veuillez choisir une correction."
@@ -275,10 +334,14 @@ const handleCorrectionUpload = async () => {
             id
         );
 
-        formData.append(
-            "image",
-            correctionImage
-        );
+        correctionImages.forEach((image) => {
+
+            formData.append(
+                "images",
+                image
+            );
+
+        });
 
         const uploadResponse =
             await uploadCorrectionSheet(formData);
@@ -306,7 +369,9 @@ const handleCorrectionUpload = async () => {
         setSuccessMessage(
             "Réponses attendues détectées avec succès."
         );
+        setCorrectionImages([]);
 
+        await loadPreparation();
     }
 
     catch (error) {
@@ -449,23 +514,58 @@ console.log(examSheet);
                             </div>
 
                             <input
-
                                 type="file"
-
                                 accept="image/*"
-                                multiple
-                                onChange={(e) =>
-                                    setImage(
-                                        e.target.files[0]
-                                    )
-                                }
-
-                                className="mb-6"
-
+                                onChange={addExamImages}
                             />
 
-                            <br />
+                            {
+                                examImages.length > 0 && (
 
+                                    <div className="mt-4">
+
+                                        <p className="font-medium mb-2">
+
+                                            Pages sélectionnées
+
+                                        </p>
+
+                                        {
+
+                                            examImages.map((image, index) => (
+
+                                                <div
+                                                    key={index}
+                                                    className="flex justify-between items-center border rounded-lg p-3 mb-2"
+                                                >
+
+                                                    <span>
+
+                                                        Page {index + 1} — {image.name}
+
+                                                    </span>
+
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => removeExamImage(index)}
+                                                        className="text-red-600 hover:text-red-800"
+                                                    >
+
+                                                        Supprimer
+
+                                                    </button>
+
+                                                </div>
+
+                                            ))
+
+                                        }
+
+                                    </div>
+
+                                )
+                            }
+                            <br />
                             <button
 
                                 onClick={handleUpload}
@@ -499,20 +599,58 @@ console.log(examSheet);
                         <>
 
                             <input
-
                                 type="file"
-
                                 accept="image/*"
-
-                                onChange={(e) =>
-                                    setImage(
-                                        e.target.files[0]
-                                    )
-                                }
-
+                                onChange={addExamImages}
                                 className="mb-6"
-
                             />
+
+                            {
+                                examImages.length > 0 && (
+
+                                    <div className="mt-4">
+
+                                        <p className="font-medium mb-2">
+
+                                            Pages sélectionnées
+
+                                        </p>
+
+                                        {
+
+                                            examImages.map((image, index) => (
+
+                                                <div
+                                                    key={index}
+                                                    className="flex justify-between items-center border rounded-lg p-3 mb-2"
+                                                >
+
+                                                    <span>
+
+                                                        Page {index + 1} — {image.name}
+
+                                                    </span>
+
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => removeExamImage(index)}
+                                                        className="text-red-600 hover:text-red-800"
+                                                    >
+
+                                                        Supprimer
+
+                                                    </button>
+
+                                                </div>
+
+                                            ))
+
+                                        }
+
+                                    </div>
+
+                                )
+                            }
 
                             <br />
 
@@ -716,24 +854,57 @@ console.log(examSheet);
                             </div>
 
                             <input
-
                                 type="file"
-
                                 accept="image/*"
-
-                                onChange={(e) =>
-
-                                    setCorrectionImage(
-
-                                        e.target.files[0]
-
-                                    )
-
-                                }
-
-                                className="mb-6"
-
+                                onChange={addCorrectionImages}
                             />
+
+                            {
+                                correctionImages.length > 0 && (
+
+                                    <div className="mt-4">
+
+                                        <p className="font-medium mb-2">
+
+                                            Pages sélectionnées
+
+                                        </p>
+
+                                        {
+
+                                            correctionImages.map((image, index) => (
+
+                                                <div
+                                                    key={index}
+                                                    className="flex justify-between items-center border rounded-lg p-3 mb-2"
+                                                >
+
+                                                    <span>
+
+                                                        Page {index + 1} — {image.name}
+
+                                                    </span>
+
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => removeCorrectionImage(index)}
+                                                        className="text-red-600 hover:text-red-800"
+                                                    >
+
+                                                        Supprimer
+
+                                                    </button>
+
+                                                </div>
+
+                                            ))
+
+                                        }
+
+                                    </div>
+
+                                )
+                            }
 
                             <br />
 
@@ -770,25 +941,58 @@ console.log(examSheet);
                         <>
 
                             <input
-
                                 type="file"
-
                                 accept="image/*"
-
-                                onChange={(e) =>
-
-                                    setCorrectionImage(
-
-                                        e.target.files[0]
-
-                                    )
-
-                                }
-
+                                onChange={addCorrectionImages}
                                 className="mb-6"
-
                             />
 
+                            {
+                                correctionImages.length > 0 && (
+
+                                    <div className="mt-4">
+
+                                        <p className="font-medium mb-2">
+
+                                            Pages sélectionnées
+
+                                        </p>
+
+                                        {
+
+                                            correctionImages.map((image, index) => (
+
+                                                <div
+                                                    key={index}
+                                                    className="flex justify-between items-center border rounded-lg p-3 mb-2"
+                                                >
+
+                                                    <span>
+
+                                                        Page {index + 1} — {image.name}
+
+                                                    </span>
+
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => removeCorrectionImage(index)}
+                                                        className="text-red-600 hover:text-red-800"
+                                                    >
+
+                                                        Supprimer
+
+                                                    </button>
+
+                                                </div>
+
+                                            ))
+
+                                        }
+
+                                    </div>
+
+                                )
+                            }
                             <br />
 
                             <button
