@@ -637,13 +637,25 @@ class CorrectionSheetViewSet(viewsets.ModelViewSet):
                 "You cannot upload a correction sheet for this exam."
             )
 
-        correction_sheet = CorrectionSheet.objects.create(
+        correction_sheet, created = CorrectionSheet.objects.get_or_create(
 
             exam=exam,
 
-            image=""
+            defaults={
+
+                "image": ""
+
+            }
 
         )
+
+        correction_sheet.pages.all().delete()
+
+        CorrectionOCRResult.objects.filter(
+
+            correction_sheet=correction_sheet
+
+        ).delete()
 
         images = request.FILES.getlist("images")
 
@@ -1261,14 +1273,24 @@ class ExamSheetViewSet(viewsets.ModelViewSet):
                 "You cannot upload an exam sheet for this exam."
             )
 
-        exam_sheet = ExamSheet.objects.create(
+        exam_sheet, created = ExamSheet.objects.get_or_create(
 
             exam=exam,
 
-            image=""
+            defaults={
+
+                "image": ""
+
+            }
 
         )
+        exam_sheet.pages.all().delete()
 
+        ExamOCRResult.objects.filter(
+
+            exam_sheet=exam_sheet
+
+        ).delete()
         images = request.FILES.getlist("images")
 
         if not images:
