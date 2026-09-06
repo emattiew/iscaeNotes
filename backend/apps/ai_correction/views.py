@@ -840,9 +840,10 @@ class CorrectionSheetViewSet(viewsets.ModelViewSet):
 
                 parts[0] = parts[0][position:]
 
-        print("\n===== CLEANED PART 1 =====\n")
-        print(parts[0])
-        print("\n===== END =====\n")
+        if parts:
+            print("\n===== CLEANED PART 1 =====\n")
+            print(parts[0])
+            print("\n===== END =====\n")
 
         if len(parts) != questions.count():
 
@@ -868,6 +869,9 @@ class CorrectionSheetViewSet(viewsets.ModelViewSet):
             questions,
             parts
         ):
+
+            question.expected_answer = answer_text
+            question.save(update_fields=["expected_answer"])
 
             expected_answers.append({
 
