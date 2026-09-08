@@ -172,16 +172,12 @@ const handleCorrection = async () => {
     }
 
 
-    if (examCopy && aiDone) {
+    if (examCopy && aiDone && images.length === 0) {
+    navigate(
+        `/teacher/copies/${examCopy.id}/review`
+    );
 
-        navigate(
-
-            `/teacher/copies/${examCopy.id}/review`
-
-        );
-
-        return;
-
+    return;
     }
 
     
@@ -507,24 +503,27 @@ const handleCorrection = async () => {
                     className={`px-6 py-3 rounded-lg text-white ${
                         !selectedStudent || (images.length === 0 && !aiDone)
                             ? "bg-gray-400 cursor-not-allowed"
-                            : aiDone
-                                ? "bg-blue-600 hover:bg-blue-700"
-                                : examCopy
-                                    ? "bg-yellow-600 hover:bg-yellow-700"
-                                    : "bg-green-600 hover:bg-green-700"
+                            : images.length > 0
+                                ? "bg-yellow-600 hover:bg-yellow-700"
+                                : aiDone
+                                    ? "bg-blue-600 hover:bg-blue-700"
+                                    : examCopy
+                                        ? "bg-yellow-600 hover:bg-yellow-700"
+                                        : "bg-green-600 hover:bg-green-700"
                     }`}
 
                 >
-
-                    {
-                        loading
-                            ? "Correction..."
+                {
+                    loading
+                        ? "Correction..."
+                        : images.length > 0
+                            ? "Remplacer la copie"
                             : aiDone
                                 ? "Reprendre la correction"
                                 : examCopy
                                     ? "Remplacer la copie"
                                     : "Lancer la correction"
-                    }
+                }
 
                 </button>
 
