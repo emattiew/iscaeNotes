@@ -1098,46 +1098,32 @@ class AICorrectionViewSet(viewsets.ModelViewSet):
                 correction.id
             )
         if updated:
+            first_correction = AICorrection.objects.select_related(
+                "answer__copy__student",
+                "answer__copy__exam__collecte"
+            ).get(id=updated[0])
 
-                first_correction = AICorrection.objects.select_related(
+            copy = first_correction.answer.copy
+            exam = copy.exam
 
-                    "answer__copy__student",
+            student_note, created = StudentNote.objects.get_or_create(
+                collecte=exam.collecte,
+                student=copy.student
+            )
 
-                    "answer__copy__exam__collecte"
+            if exam.evaluation_type == "CC":
+                student_note.controle_continu = total_score
 
-                ).get(
-
-                    id=updated[0]
-
-                )
-
-                copy = first_correction.answer.copy
-
-                student_note, created = (
-
-                    StudentNote.objects.get_or_create(
-
-                        collecte=copy.exam.collecte,
-
-                        student=copy.student
-
-                    )
-
-                )
-
+            elif exam.evaluation_type == "CF":
                 student_note.controle_final = total_score
 
-                student_note.note_finale = (
+            student_note.note_finale = (
+                (student_note.controle_continu * 0.4)
+                +
+                (student_note.controle_final * 0.6)
+            )
 
-                    (student_note.controle_continu * 0.4)
-
-                    +
-
-                    (student_note.controle_final * 0.6)
-
-                )
-
-                student_note.save()
+            student_note.save()
         return Response({
 
             "success": True,

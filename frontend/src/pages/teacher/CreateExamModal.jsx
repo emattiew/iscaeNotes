@@ -10,7 +10,7 @@ export default function CreateExamModal({
 }) {
 
     const [title, setTitle] = useState("");
-
+    const [evaluationType, setEvaluationType] = useState("CF");
     const [collecte, setCollecte] = useState("");
 
     if (!show) {
@@ -38,15 +38,13 @@ export default function CreateExamModal({
         }
 
         onCreate({
-
             title,
-
-            collecte
-
+            collecte,
+            evaluation_type: evaluationType
         });
 
         setTitle("");
-
+        setEvaluationType("CF");
         setCollecte("");
 
     };
@@ -92,7 +90,25 @@ export default function CreateExamModal({
                         />
 
                     </div>
+                        <div>
+                            <label className="block mb-2 font-medium">
+                                Type d'évaluation
+                            </label>
 
+                            <select
+                                value={evaluationType}
+                                onChange={(e) => setEvaluationType(e.target.value)}
+                                className="w-full border rounded-lg px-4 py-3"
+                            >
+                                <option value="CC">
+                                    Contrôle continu / Devoir
+                                </option>
+
+                                <option value="CF">
+                                    Contrôle final / Examen
+                                </option>
+                            </select>
+                        </div>
                     <div>
 
                         <label className="block mb-2 font-medium">

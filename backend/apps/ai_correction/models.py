@@ -7,28 +7,33 @@ from apps.notes.models import (
 
 
 class Exam(models.Model):
-    title = models.CharField(
-        max_length=255
-    )
 
+    EVALUATION_TYPE_CHOICES = [
+        ("CC", "Contrôle continu / Devoir"),
+        ("CF", "Contrôle final / Examen"),
+    ]
+
+    title = models.CharField(max_length=255)
+
+    evaluation_type = models.CharField(
+        max_length=2,
+        choices=EVALUATION_TYPE_CHOICES,
+        default="CF"
+    )
 
     collecte = models.ForeignKey(
         CollecteNote,
         on_delete=models.CASCADE,
         related_name="ai_exams"
     )
+
     teacher = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name="created_exams"
     )
 
-    created_at = models.DateTimeField(
-        auto_now_add=True
-    )
-
-    def __str__(self):
-        return self.title
+    created_at = models.DateTimeField(auto_now_add=True)
 
 
 class ExamQuestion(models.Model):
