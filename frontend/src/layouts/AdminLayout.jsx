@@ -57,7 +57,13 @@ export default function AdminLayout({ children }) {
                         >
                             Collectes
                         </Link>
+                       <Link to="/admin/documents" className="hover:text-gray-300">
+                            Résultats semestriels
+                        </Link>
 
+                        <Link to="/admin/annual-results" className="hover:text-gray-300">
+                            Résultats annuels
+                        </Link>
                         <Link
                             to="/admin/users"
                             className="hover:text-gray-300"

@@ -50,7 +50,16 @@ export default function StudentLayout({ children }) {
 
 
                     <div className="flex gap-3">
+                         <button
+                            onClick={() =>
+                                navigate('/student/results')
+                            }
+                            className="bg-gray-200 px-5 py-2 rounded-lg hover:bg-gray-300 transition"
+                        >
 
+                            Résultats
+
+                        </button>
                         <button
                             onClick={() =>
                                 navigate('/student/profile')

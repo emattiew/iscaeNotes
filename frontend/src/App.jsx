@@ -39,6 +39,9 @@ import TeacherAICorrectionPage from "./pages/teacher/TeacherAICorrectionPage";
 import TeacherEvaluationPage from "./pages/teacher/TeacherEvaluationPage";
 import TeacherPreparationPage from "./pages/teacher/TeacherPreparationPage";
 import TeacherReviewPage from "./pages/teacher/TeacherReviewPage";
+import DocumentsPage from "./pages/admin/DocumentsPage";
+import AnnualResultsPage from "./pages/admin/AnnualResultsPage";
+import StudentResultsPage from "./pages/student/StudentResultsPage";
 export default function App() {
 
   return (
@@ -249,6 +252,31 @@ export default function App() {
               </ProtectedRoute>
           }
       />
+      <Route
+        path="/admin/documents"
+        element={
+            <ProtectedRoute role="admin_staff">
+
+                <DocumentsPage />
+
+            </ProtectedRoute>
+        }
+    />
+    <Route
+    path="/admin/annual-results"
+    element={
+        <ProtectedRoute role="admin_staff">
+            <AnnualResultsPage />
+        </ProtectedRoute>
+    }
+/><Route
+    path="/student/results"
+    element={
+        <ProtectedRoute role="student">
+            <StudentResultsPage />
+        </ProtectedRoute>
+    }
+/>
           </Routes>
 
     </BrowserRouter>
