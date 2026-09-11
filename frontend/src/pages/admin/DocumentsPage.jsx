@@ -4,7 +4,8 @@ import api from "../../services/api";
 
 import AdminLayout from "../../layouts/AdminLayout";
 
-
+import { PDFViewer } from "@react-pdf/renderer";
+import AcademicResultPDF from "../../components/AcademicResultPDF";
 export default function DocumentsPage() {
 
     const [filieres, setFilieres] = useState([]);
@@ -27,6 +28,7 @@ export default function DocumentsPage() {
 
     const [resultsLoading, setResultsLoading] = useState(false);
     const [students, setStudents] = useState([]);
+    const [selectedStudent, setSelectedStudent] = useState(null);
 
     useEffect(() => {
 
@@ -294,7 +296,150 @@ const fetchModules = async () => {
             return true;
         }
     );
+    const subjects = [];
 
+filteredCollectes.forEach((collecte) => {
+    if (
+        !subjects.some(
+            (subject) =>
+                String(subject.id) ===
+                String(collecte.matiere)
+        )
+    ) {
+        subjects.push({
+            id: collecte.matiere,
+            name: collecte.matiere_name
+        });
+    }
+});
+
+const studentsResults = students.map((student) => {
+    const studentNotes = results.filter(
+        (result) =>
+            String(result.student) ===
+            String(student.id)
+    );
+
+    return {
+        ...student,
+        notes: studentNotes
+    };
+});
+const getStudentPDFData = (student) => {
+    const studentNotes = results.filter(
+        (result) =>
+            String(result.student) === String(student.id)
+    );
+
+    const semesterSubjects = filteredCollectes
+        .map((collecte) => {
+
+            const note = studentNotes.find(
+                (result) =>
+                    String(result.collecte) ===
+                    String(collecte.id)
+            );
+
+            if (!note) {
+                return null;
+            }
+
+            const matiere = matieres.find(
+                (m) =>
+                    String(m.id) ===
+                    String(collecte.matiere)
+            );
+
+            const noteFinale = Number(note.note_finale);
+
+            return {
+                id: note.id,
+                name: collecte.matiere_name,
+
+                controle_continu:
+                    note.controle_continu ?? "-",
+
+                controle_final:
+                    note.controle_final ?? "-",
+
+                note:
+                    Number.isNaN(noteFinale)
+                        ? "-"
+                        : noteFinale.toFixed(2),
+
+                credit:
+                    matiere?.credit ?? "-",
+
+                coefficient:
+                    matiere?.coefficient ?? 1,
+
+                decision:
+                    !Number.isNaN(noteFinale)
+                        ? noteFinale >= 10
+                            ? "Validé"
+                            : "Rattrapage"
+                        : "-",
+            };
+        })
+        .filter(Boolean);
+
+    // Calcul de la moyenne du semestre
+    let totalWeighted = 0;
+    let totalCoefficients = 0;
+
+    semesterSubjects.forEach((subject) => {
+
+        if (subject.note !== "-") {
+
+            const coefficient =
+                Number(subject.coefficient) || 1;
+
+            totalWeighted +=
+                Number(subject.note) * coefficient;
+
+            totalCoefficients += coefficient;
+        }
+    });
+
+    const average =
+        totalCoefficients > 0
+            ? totalWeighted / totalCoefficients
+            : null;
+
+    const semesterAverage =
+        average !== null
+            ? average.toFixed(2)
+            : "-";
+
+    const semesterDecision =
+        average !== null
+            ? average >= 10
+                ? "Validé"
+                : "Rattrapage"
+            : "-";
+
+    return {
+        student: {
+            ...student,
+            filiere_name:
+                student.filiere_name || ""
+        },
+
+        academicYear: selectedYear,
+
+        semesters: [
+            {
+                semester: selectedSemester,
+
+                subjects: semesterSubjects,
+
+                average: semesterAverage,
+
+                decision: semesterDecision,
+            }
+        ]
+    };
+};
     if (loading) {
 
         return (
@@ -433,7 +578,7 @@ const fetchModules = async () => {
             </div>
 
 
-            <div className="bg-white rounded shadow overflow-hidden">
+            <div className="bg-white rounded shadow overflow-x-auto">
 
     <table className="w-full">
 
@@ -449,22 +594,17 @@ const fetchModules = async () => {
                     Étudiant
                 </th>
 
+                {subjects.map((subject) => (
+                    <th
+                        key={subject.id}
+                        className="p-4 text-left"
+                    >
+                        {subject.name}
+                    </th>
+                ))}
                 <th className="p-4 text-left">
-                    Matière
+                    Action
                 </th>
-
-                <th className="p-4 text-left">
-                    CC
-                </th>
-
-                <th className="p-4 text-left">
-                    CF
-                </th>
-
-                <th className="p-4 text-left">
-                    Note finale
-                </th>
-
             </tr>
 
         </thead>
@@ -472,43 +612,79 @@ const fetchModules = async () => {
 
         <tbody>
 
-            {results.map((result, index) => (
+            {studentsResults.map((student) => (
 
                 <tr
-                    key={`${result.id}-${index}`}
+                    key={student.id}
                     className="border-t"
                 >
 
                     <td className="p-4">
-                    {
-                        students.find(
-                            (student) =>
-                                String(student.id) ===
-                                String(result.student)
-                        )?.matricule || "-"
-                    }
-                </td>
+                        {student.matricule || "-"}
+                    </td>
+
 
                     <td className="p-4">
-                        {result.student_name}
+                        {student.first_name}{" "}
+                        {student.last_name}
                     </td>
 
+
+                    {subjects.map((subject) => {
+
+                        const collecte =
+                            filteredCollectes.find(
+                                (collecte) =>
+                                    String(
+                                        collecte.matiere
+                                    ) ===
+                                    String(
+                                        subject.id
+                                    )
+                            );
+
+                        const note =
+                            student.notes.find(
+                                (result) =>
+                                    collecte &&
+                                    String(
+                                        result.collecte
+                                    ) ===
+                                        String(
+                                            collecte.id
+                                        )
+                            );
+
+                        return (
+
+                            <td
+                                key={subject.id}
+                                className="p-4 font-semibold"
+                            >
+
+                                {note
+                                    ? Number(
+                                          note.note_finale
+                                      ).toFixed(2)
+                                    : "-"}
+
+                            </td>
+
+                        );
+
+                    })}
                     <td className="p-4">
-                        {result.matiere_name}
+                        <button
+                            onClick={() =>
+                                setSelectedStudent(
+                                    getStudentPDFData(student)
+                                )
+                            }
+                            className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition"
+                        >
+                            Voir PDF
+                        </button>
                     </td>
-
-                    <td className="p-4">
-                        {result.controle_continu}
-                    </td>
-
-                    <td className="p-4">
-                        {result.controle_final}
-                    </td>
-
-                    <td className="p-4 font-semibold">
-                        {result.note_finale}
-                    </td>
-
                 </tr>
 
             ))}
@@ -518,7 +694,33 @@ const fetchModules = async () => {
     </table>
 
 </div>
+            {selectedStudent && (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
 
+        <div className="bg-white w-[90%] h-[90%] rounded-lg shadow-lg relative">
+
+            <button
+                onClick={() => setSelectedStudent(null)}
+                className="absolute top-3 right-3 bg-black text-white px-4 py-2 rounded-lg z-10"
+            >
+                Fermer
+            </button>
+
+            <PDFViewer
+                width="100%"
+                height="100%"
+            >
+                <AcademicResultPDF
+                    student={selectedStudent.student}
+                    academicYear={selectedStudent.academicYear}
+                    semesters={selectedStudent.semesters}
+                />
+            </PDFViewer>
+
+        </div>
+
+    </div>
+)}
         </AdminLayout>
     );
 }

@@ -93,6 +93,15 @@ class StudentNoteSerializer(serializers.ModelSerializer):
         source='collecte.status',
         read_only=True
     )
+    semester = serializers.IntegerField(
+        source='collecte.matiere.module.semestre',
+        read_only=True
+    )
+
+    credit = serializers.FloatField(
+        source='collecte.matiere.credit',
+        read_only=True
+    )
 
     class Meta:
 
