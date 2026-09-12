@@ -249,7 +249,57 @@ export default function CollectesPage() {
         }
     };
 
+    const openRattrapage = async (collecteId) => {
+    try {
+        await api.post(
+            `/notes/collectes/${collecteId}/open_rattrapage/`
+        );
 
+        setSuccessMessage(
+            "Rattrapage ouvert avec succès"
+        );
+
+        setErrorMessage('');
+
+        fetchCollectes();
+
+    } catch (error) {
+        console.error(error);
+
+        setErrorMessage(
+            error.response?.data?.error ||
+            "Erreur lors de l'ouverture du rattrapage"
+        );
+
+        setSuccessMessage('');
+    }
+};
+const publishRattrapage = async (collecteId) => {
+    try {
+        await api.post(
+            `/notes/collectes/${collecteId}/publish_rattrapage/`
+        );
+
+        setSuccessMessage(
+            "Rattrapage publié avec succès"
+        );
+
+        setErrorMessage('');
+
+        fetchCollectes();
+
+    } catch (error) {
+
+        console.error(error);
+
+        setErrorMessage(
+            error.response?.data?.error ||
+            "Erreur lors de la publication du rattrapage"
+        );
+
+        setSuccessMessage('');
+    }
+};
     if (loading) {
 
         return (
@@ -595,7 +645,31 @@ export default function CollectesPage() {
                                             </button>
                                         )
                                     }
+                                    {
+                                    collecte.status === 'published' &&
+                                    collecte.rattrapage_status === 'closed' && (
 
+                                        <button
+                                            onClick={() =>
+                                                openRattrapage(collecte.id)
+                                            }
+                                            className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
+                                        >
+                                            Ouvrir Rattrapage
+                                        </button>
+
+                                    )
+                                }
+                                {collecte.rattrapage_status === 'validated' && (
+                                    <button
+                                        onClick={() =>
+                                            publishRattrapage(collecte.id)
+                                        }
+                                        className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
+                                    >
+                                        Publier Rattrapage
+                                    </button>
+                                )}
                                 </td>
 
                             </tr>

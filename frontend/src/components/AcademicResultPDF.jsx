@@ -9,7 +9,9 @@ import {
 
 import logo from "../assets/logo-iscae.png";
 
+
 const styles = StyleSheet.create({
+
     page: {
         padding: 40,
         fontSize: 9,
@@ -86,6 +88,9 @@ const styles = StyleSheet.create({
         borderRightColor: "#000",
     },
 
+
+    /* Normal layout */
+
     subject: {
         width: "32%",
     },
@@ -110,6 +115,38 @@ const styles = StyleSheet.create({
         textAlign: "center",
     },
 
+
+    /* Layout when Rattrapage is displayed */
+    subjectWithRattrapage: {
+        width: "27%",
+    },
+
+    gradeWithRattrapage: {
+        width: "12%",
+        textAlign: "center",
+    },
+
+    finalGradeWithRattrapage: {
+        width: "14%",
+        textAlign: "center",
+    },
+
+    rattrapage: {
+        width: "13%",
+        textAlign: "center",
+    },
+
+    creditWithRattrapage: {
+        width: "10%",
+        textAlign: "center",
+    },
+
+    decisionWithRattrapage: {
+        width: "12%",
+        textAlign: "center",
+    },
+
+
     annualSummary: {
         marginTop: 20,
         marginBottom: 20,
@@ -125,7 +162,9 @@ const styles = StyleSheet.create({
         marginTop: 30,
         textAlign: "right",
     },
+
 });
+
 
 export default function AcademicResultPDF({
     student,
@@ -134,7 +173,18 @@ export default function AcademicResultPDF({
     annualAverage,
     annualDecision,
 }) {
+
+    const hasRattrapage = semesters.some(
+        (semester) =>
+            semester.subjects?.some(
+                (subject) =>
+                    Number(subject.rattrapage || 0) > 0
+            )
+    );
+
+
     return (
+
         <Document>
 
             <Page
@@ -235,28 +285,21 @@ export default function AcademicResultPDF({
                     (semester) => (
 
                         <View
-                            key={
-                                semester.semester
-                            }
+                            key={semester.semester}
                         >
 
                             <Text
-                                style={
-                                    styles.sectionTitle
-                                }
+                                style={styles.sectionTitle}
                             >
                                 Semestre{" "}
-                                {
-                                    semester.semester
-                                }
+                                {semester.semester}
                             </Text>
 
 
                             <View
-                                style={
-                                    styles.table
-                                }
+                                style={styles.table}
                             >
+
 
                                 {/* TABLE HEADER */}
 
@@ -270,7 +313,9 @@ export default function AcademicResultPDF({
                                     <Text
                                         style={[
                                             styles.cell,
-                                            styles.subject
+                                            hasRattrapage
+                                                ? styles.subjectWithRattrapage
+                                                : styles.subject
                                         ]}
                                     >
                                         Matière
@@ -280,7 +325,9 @@ export default function AcademicResultPDF({
                                     <Text
                                         style={[
                                             styles.cell,
-                                            styles.grade
+                                            hasRattrapage
+                                                ? styles.gradeWithRattrapage
+                                                : styles.grade
                                         ]}
                                     >
                                         CC
@@ -290,17 +337,37 @@ export default function AcademicResultPDF({
                                     <Text
                                         style={[
                                             styles.cell,
-                                            styles.grade
+                                            hasRattrapage
+                                                ? styles.gradeWithRattrapage
+                                                : styles.grade
                                         ]}
                                     >
                                         CF
                                     </Text>
 
 
+                                    {/* RATTRAPAGE */}
+
+                                    {hasRattrapage && (
+
+                                        <Text
+                                            style={[
+                                                styles.cell,
+                                                styles.rattrapage
+                                            ]}
+                                        >
+                                            Rattrapage
+                                        </Text>
+
+                                    )}
+
+
                                     <Text
                                         style={[
                                             styles.cell,
-                                            styles.finalGrade
+                                            hasRattrapage
+                                                ? styles.finalGradeWithRattrapage
+                                                : styles.finalGrade
                                         ]}
                                     >
                                         Note finale
@@ -310,7 +377,9 @@ export default function AcademicResultPDF({
                                     <Text
                                         style={[
                                             styles.cell,
-                                            styles.credit
+                                            hasRattrapage
+                                                ? styles.creditWithRattrapage
+                                                : styles.credit
                                         ]}
                                     >
                                         Crédit
@@ -320,7 +389,9 @@ export default function AcademicResultPDF({
                                     <Text
                                         style={[
                                             styles.cell,
-                                            styles.decision
+                                            hasRattrapage
+                                                ? styles.decisionWithRattrapage
+                                                : styles.decision
                                         ]}
                                     >
                                         Décision
@@ -335,18 +406,16 @@ export default function AcademicResultPDF({
                                     (subject) => (
 
                                         <View
-                                            key={
-                                                subject.id
-                                            }
-                                            style={
-                                                styles.tableRow
-                                            }
+                                            key={subject.id}
+                                            style={styles.tableRow}
                                         >
 
                                             <Text
                                                 style={[
                                                     styles.cell,
-                                                    styles.subject
+                                                    hasRattrapage
+                                                        ? styles.subjectWithRattrapage
+                                                        : styles.subject
                                                 ]}
                                             >
                                                 {
@@ -358,7 +427,9 @@ export default function AcademicResultPDF({
                                             <Text
                                                 style={[
                                                     styles.cell,
-                                                    styles.grade
+                                                    hasRattrapage
+                                                        ? styles.gradeWithRattrapage
+                                                        : styles.grade
                                                 ]}
                                             >
                                                 {
@@ -371,7 +442,9 @@ export default function AcademicResultPDF({
                                             <Text
                                                 style={[
                                                     styles.cell,
-                                                    styles.grade
+                                                    hasRattrapage
+                                                        ? styles.gradeWithRattrapage
+                                                        : styles.grade
                                                 ]}
                                             >
                                                 {
@@ -381,10 +454,38 @@ export default function AcademicResultPDF({
                                             </Text>
 
 
+                                            {/* RATTRAPAGE */}
+
+                                            {hasRattrapage && (
+
+                                                <Text
+                                                    style={[
+                                                        styles.cell,
+                                                        styles.rattrapage
+                                                    ]}
+                                                >
+                                                    {
+                                                        Number(
+                                                            subject.rattrapage || 0
+                                                        ) > 0
+
+                                                            ? Number(
+                                                                subject.rattrapage
+                                                            ).toFixed(2)
+
+                                                            : "-"
+                                                    }
+                                                </Text>
+
+                                            )}
+
+
                                             <Text
                                                 style={[
                                                     styles.cell,
-                                                    styles.finalGrade
+                                                    hasRattrapage
+                                                        ? styles.finalGradeWithRattrapage
+                                                        : styles.finalGrade
                                                 ]}
                                             >
                                                 {
@@ -397,7 +498,9 @@ export default function AcademicResultPDF({
                                             <Text
                                                 style={[
                                                     styles.cell,
-                                                    styles.credit
+                                                    hasRattrapage
+                                                        ? styles.creditWithRattrapage
+                                                        : styles.credit
                                                 ]}
                                             >
                                                 {
@@ -410,7 +513,9 @@ export default function AcademicResultPDF({
                                             <Text
                                                 style={[
                                                     styles.cell,
-                                                    styles.decision
+                                                    hasRattrapage
+                                                        ? styles.decisionWithRattrapage
+                                                        : styles.decision
                                                 ]}
                                             >
                                                 {
@@ -428,15 +533,15 @@ export default function AcademicResultPDF({
                                 {/* SEMESTER AVERAGE */}
 
                                 <View
-                                    style={
-                                        styles.tableRow
-                                    }
+                                    style={styles.tableRow}
                                 >
 
                                     <Text
                                         style={[
                                             styles.cell,
-                                            styles.subject
+                                            hasRattrapage
+                                                ? styles.subjectWithRattrapage
+                                                : styles.subject
                                         ]}
                                     >
                                         Moyenne du semestre
@@ -446,7 +551,9 @@ export default function AcademicResultPDF({
                                     <Text
                                         style={[
                                             styles.cell,
-                                            styles.grade
+                                            hasRattrapage
+                                                ? styles.gradeWithRattrapage
+                                                : styles.grade
                                         ]}
                                     >
                                         -
@@ -456,17 +563,37 @@ export default function AcademicResultPDF({
                                     <Text
                                         style={[
                                             styles.cell,
-                                            styles.grade
+                                            hasRattrapage
+                                                ? styles.gradeWithRattrapage
+                                                : styles.grade
                                         ]}
                                     >
                                         -
                                     </Text>
 
 
+                                    {/* RATTRAPAGE EMPTY CELL */}
+
+                                    {hasRattrapage && (
+
+                                        <Text
+                                            style={[
+                                                styles.cell,
+                                                styles.rattrapage
+                                            ]}
+                                        >
+                                            -
+                                        </Text>
+
+                                    )}
+
+
                                     <Text
                                         style={[
                                             styles.cell,
-                                            styles.finalGrade
+                                            hasRattrapage
+                                                ? styles.finalGradeWithRattrapage
+                                                : styles.finalGrade
                                         ]}
                                     >
                                         {
@@ -479,7 +606,9 @@ export default function AcademicResultPDF({
                                     <Text
                                         style={[
                                             styles.cell,
-                                            styles.credit
+                                            hasRattrapage
+                                                ? styles.creditWithRattrapage
+                                                : styles.credit
                                         ]}
                                     >
                                         -
@@ -489,7 +618,9 @@ export default function AcademicResultPDF({
                                     <Text
                                         style={[
                                             styles.cell,
-                                            styles.decision
+                                            hasRattrapage
+                                                ? styles.decisionWithRattrapage
+                                                : styles.decision
                                         ]}
                                     >
                                         -
@@ -501,15 +632,15 @@ export default function AcademicResultPDF({
                                 {/* SEMESTER DECISION */}
 
                                 <View
-                                    style={
-                                        styles.tableRow
-                                    }
+                                    style={styles.tableRow}
                                 >
 
                                     <Text
                                         style={[
                                             styles.cell,
-                                            styles.subject
+                                            hasRattrapage
+                                                ? styles.subjectWithRattrapage
+                                                : styles.subject
                                         ]}
                                     >
                                         Décision du semestre
@@ -519,7 +650,9 @@ export default function AcademicResultPDF({
                                     <Text
                                         style={[
                                             styles.cell,
-                                            styles.grade
+                                            hasRattrapage
+                                                ? styles.gradeWithRattrapage
+                                                : styles.grade
                                         ]}
                                     >
                                         -
@@ -529,7 +662,37 @@ export default function AcademicResultPDF({
                                     <Text
                                         style={[
                                             styles.cell,
-                                            styles.grade
+                                            hasRattrapage
+                                                ? styles.gradeWithRattrapage
+                                                : styles.grade
+                                        ]}
+                                    >
+                                        -
+                                    </Text>
+
+
+                                    {/* RATTRAPAGE EMPTY CELL */}
+
+                                    {hasRattrapage && (
+
+                                        <Text
+                                            style={[
+                                                styles.cell,
+                                                styles.rattrapage
+                                            ]}
+                                        >
+                                            -
+                                        </Text>
+
+                                    )}
+
+
+                                    <Text
+                                        style={[
+                                            styles.cell,
+                                            hasRattrapage
+                                                ? styles.finalGradeWithRattrapage
+                                                : styles.finalGrade
                                         ]}
                                     >
                                         -
@@ -539,7 +702,9 @@ export default function AcademicResultPDF({
                                     <Text
                                         style={[
                                             styles.cell,
-                                            styles.finalGrade
+                                            hasRattrapage
+                                                ? styles.creditWithRattrapage
+                                                : styles.credit
                                         ]}
                                     >
                                         -
@@ -549,17 +714,9 @@ export default function AcademicResultPDF({
                                     <Text
                                         style={[
                                             styles.cell,
-                                            styles.credit
-                                        ]}
-                                    >
-                                        -
-                                    </Text>
-
-
-                                    <Text
-                                        style={[
-                                            styles.cell,
-                                            styles.decision
+                                            hasRattrapage
+                                                ? styles.decisionWithRattrapage
+                                                : styles.decision
                                         ]}
                                     >
                                         {
@@ -569,6 +726,7 @@ export default function AcademicResultPDF({
                                     </Text>
 
                                 </View>
+
 
                             </View>
 
@@ -581,15 +739,11 @@ export default function AcademicResultPDF({
                 {/* ANNUAL SUMMARY */}
 
                 <View
-                    style={
-                        styles.annualSummary
-                    }
+                    style={styles.annualSummary}
                 >
 
                     <Text
-                        style={
-                            styles.annualText
-                        }
+                        style={styles.annualText}
                     >
                         Moyenne annuelle :{" "}
                         {annualAverage || "-"}
@@ -597,9 +751,7 @@ export default function AcademicResultPDF({
 
 
                     <Text
-                        style={
-                            styles.annualText
-                        }
+                        style={styles.annualText}
                     >
                         Décision du jury :{" "}
                         {annualDecision || "-"}

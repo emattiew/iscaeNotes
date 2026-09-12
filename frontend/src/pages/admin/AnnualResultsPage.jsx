@@ -369,6 +369,8 @@ export default function AnnualResultsPage() {
                     controle_final:
                         note.controle_final ??
                         "-",
+                    rattrapage:
+                        note.rattrapage ?? 0,
 
                     note:
                         Number.isNaN(

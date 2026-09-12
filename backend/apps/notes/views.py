@@ -9,7 +9,7 @@ from rest_framework import serializers
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-
+from django.db import transaction
 from django.utils import timezone
 
 from apps.accounts.permissions import IsAdminRole
@@ -244,8 +244,285 @@ class CollecteViewSet(ModelViewSet):
             },
             status=status.HTTP_200_OK
         )
+    @action(
+        detail=True,
+        methods=['post']
+    )
+    def open_rattrapage(self, request, pk=None):
+
+        collecte = self.get_object()
+
+        
+        if request.user.role != 'admin_staff':
+            return Response(
+                {
+                    'error': 'Seule la scolarité peut ouvrir le rattrapage.'
+                },
+                status=status.HTTP_403_FORBIDDEN
+            )
 
 
+        if collecte.status != 'published':
+            return Response(
+                {
+                    'error':
+                        'Le rattrapage ne peut être ouvert '
+                        'que pour une collecte publiée.'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+
+        if collecte.rattrapage_status != 'closed':
+            return Response(
+                {
+                    'error':
+                        'Le rattrapage a déjà été ouvert '
+                        'ou traité.'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        collecte.rattrapage_status = 'opened'
+        collecte.save(update_fields=['rattrapage_status'])
+
+        return Response(
+            {
+                'message':
+                    'Rattrapage ouvert avec succès.'
+            },
+            status=status.HTTP_200_OK
+        )
+    @action(detail=True, methods=['post'])
+    def save_rattrapage(self, request, pk=None):
+        collecte = self.get_object()
+
+        
+        if request.user.role != 'teacher':
+            return Response(
+                {'error': 'Seul l’enseignant peut saisir les notes de rattrapage.'},
+                status=403
+            )
+
+        if collecte.teacher != request.user:
+            return Response(
+                {'error': 'Cette collecte ne vous appartient pas.'},
+                status=403
+            )
+
+        
+        if collecte.status != 'published':
+            return Response(
+                {'error': 'Le rattrapage ne peut être saisi que pour une collecte publiée.'},
+                status=400
+            )
+
+       
+        if collecte.rattrapage_status != 'opened':
+            return Response(
+                {'error': 'Le rattrapage n’est pas ouvert.'},
+                status=400
+            )
+
+        notes_data = request.data.get('notes', [])
+
+        if not isinstance(notes_data, list):
+            return Response(
+                {'error': 'Format des notes invalide.'},
+                status=400
+            )
+
+        for item in notes_data:
+
+            student_id = item.get('student')
+            rattrapage = item.get('rattrapage')
+
+            if not student_id:
+                continue
+
+            if rattrapage in ['', None]:
+                continue
+
+            try:
+                rattrapage = float(rattrapage)
+            except (TypeError, ValueError):
+                return Response(
+                    {'error': 'Une note de rattrapage est invalide.'},
+                    status=400
+                )
+
+            if rattrapage < 0 or rattrapage > 20:
+                return Response(
+                    {'error': 'Les notes de rattrapage doivent être comprises entre 0 et 20.'},
+                    status=400
+                )
+
+            try:
+                student_note = StudentNote.objects.get(
+                    collecte=collecte,
+                    student_id=student_id
+                )
+            except StudentNote.DoesNotExist:
+                return Response(
+                    {
+                        'error': f'Aucune note existante pour l’étudiant {student_id}.'
+                    },
+                    status=400
+                )
+
+
+            student_note.rattrapage = rattrapage
+            student_note.save(update_fields=['rattrapage'])
+
+        return Response(
+            {'message': 'Notes de rattrapage enregistrées avec succès.'},
+            status=200
+        )
+    @action(detail=True, methods=['post'])
+    def validate_rattrapage(self, request, pk=None):
+
+        collecte = self.get_object()
+
+        # Only the teacher assigned to this collecte can validate
+        if request.user.role != 'teacher':
+            return Response(
+                {
+                    'error':
+                        'Seul l’enseignant peut valider le rattrapage.'
+                },
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        if collecte.teacher != request.user:
+            return Response(
+                {
+                    'error':
+                        'Cette collecte ne vous appartient pas.'
+                },
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        # The normal collecte must already be published
+        if collecte.status != 'published':
+            return Response(
+                {
+                    'error':
+                        'Le rattrapage ne peut être validé que pour une collecte publiée.'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Rattrapage must currently be opened
+        if collecte.rattrapage_status != 'opened':
+            return Response(
+                {
+                    'error':
+                        'Le rattrapage doit être ouvert avant validation.'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Only change the rattrapage workflow status.
+        # Do NOT modify any StudentNote or note_finale.
+        collecte.rattrapage_status = 'validated'
+
+        collecte.save(
+            update_fields=['rattrapage_status']
+        )
+
+        return Response(
+            {
+                'message':
+                    'Rattrapage validé avec succès.'
+            },
+            status=status.HTTP_200_OK
+        )
+    @action(detail=True, methods=['post'])
+    def publish_rattrapage(self, request, pk=None):
+
+        collecte = self.get_object()
+
+        # Only administration can publish the rattrapage
+        if request.user.role != 'admin_staff':
+            return Response(
+                {
+                    'error':
+                        'Seule la scolarité peut publier le rattrapage.'
+                },
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        # The normal collecte must already be published
+        if collecte.status != 'published':
+            return Response(
+                {
+                    'error':
+                        'Le rattrapage ne peut être publié que pour une collecte publiée.'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # The teacher must have validated the rattrapage first
+        if collecte.rattrapage_status != 'validated':
+            return Response(
+                {
+                    'error':
+                        'Le rattrapage doit être validé avant publication.'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        student_notes = StudentNote.objects.filter(
+            collecte=collecte
+        )
+
+        try:
+
+            with transaction.atomic():
+
+                for student_note in student_notes:
+
+                    rattrapage = student_note.rattrapage or 0
+
+                    # Only students who have a rattrapage grade
+                    # receive the new final calculation.
+                    if rattrapage > 0:
+
+                        cc = student_note.controle_continu or 0
+
+                        student_note.note_finale = (
+                            (cc * 0.4) +
+                            (rattrapage * 0.6)
+                        )
+
+                        student_note.save(
+                            update_fields=['note_finale']
+                        )
+
+                collecte.rattrapage_status = 'published'
+
+                collecte.save(
+                    update_fields=['rattrapage_status']
+                )
+
+        except Exception as error:
+
+            print("ERREUR PUBLICATION RATTRAPAGE :", error)
+
+            return Response(
+                {
+                    'error': str(error)
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+        return Response(
+            {
+                'message':
+                    'Rattrapage publié avec succès.'
+            },
+            status=status.HTTP_200_OK
+        )
 class StudentNoteViewSet(ModelViewSet):
 
     serializer_class = StudentNoteSerializer

@@ -78,7 +78,18 @@ class CollecteNote(models.Model):
         choices=STATUS_CHOICES,
         default='prepared'
     )
+    RATTRAPAGE_STATUS_CHOICES = (
+        ('closed', 'Closed'),
+        ('opened', 'Opened'),
+        ('validated', 'Validated'),
+        ('published', 'Published'),
+    )
 
+    rattrapage_status = models.CharField(
+        max_length=20,
+        choices=RATTRAPAGE_STATUS_CHOICES,
+        default='closed'
+    )
     created_at = models.DateTimeField(
         auto_now_add=True
     )
@@ -109,7 +120,9 @@ class StudentNote(models.Model):
     controle_final = models.FloatField(
         default=0
     )
-
+    rattrapage = models.FloatField(
+        default=0
+    )
     note_finale = models.FloatField(
         default=0
     )

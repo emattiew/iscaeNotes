@@ -231,7 +231,19 @@ export default function TeacherCollectesPage() {
 
                                         </button>
                                     )}
-
+                                        {collecte.status === 'published' &&
+                                        collecte.rattrapage_status === 'opened' && (
+                                            <button
+                                                onClick={() =>
+                                                    navigate(
+                                                        `/teacher/collectes/${collecte.id}/rattrapage`
+                                                    )
+                                                }
+                                                className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
+                                            >
+                                                Rattrapage
+                                            </button>
+                                        )}
                                 </td>
 
                             </tr>

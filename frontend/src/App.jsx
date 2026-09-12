@@ -42,6 +42,7 @@ import TeacherReviewPage from "./pages/teacher/TeacherReviewPage";
 import DocumentsPage from "./pages/admin/DocumentsPage";
 import AnnualResultsPage from "./pages/admin/AnnualResultsPage";
 import StudentResultsPage from "./pages/student/StudentResultsPage";
+import TeacherRattrapagePage from "./pages/teacher/TeacherRattrapagePage";
 export default function App() {
 
   return (
@@ -98,7 +99,16 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/teacher/collectes/:id/rattrapage"
+          element={
+            <ProtectedRoute role="teacher">
 
+              <TeacherRattrapagePage />
+
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/admin/dashboard"
           element={
