@@ -709,14 +709,27 @@ class ReclamationViewSet(ModelViewSet):
                 note.controle_final or 0
             )
 
-            note.note_finale = (
+            if note.rattrapage and note.rattrapage > 0:
 
-                cc_value * 0.4
+                note.note_finale = (
 
-                +
+                    cc_value * 0.4
 
-                cf_value * 0.6
-            )
+                    +
+
+                    note.rattrapage * 0.6
+                )
+
+            else:
+
+                note.note_finale = (
+
+                    cc_value * 0.4
+
+                    +
+
+                    cf_value * 0.6
+                )
 
             note.save()
 
