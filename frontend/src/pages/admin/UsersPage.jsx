@@ -43,6 +43,8 @@ export default function UsersPage() {
         matricule: '',
 
         filiere: '',
+
+        niveau: '',
     });
 
 
@@ -158,6 +160,8 @@ export default function UsersPage() {
                 matricule: '',
 
                 filiere: '',
+
+                niveau: '',
             });
 
         } catch (error) {
@@ -206,6 +210,8 @@ export default function UsersPage() {
                 matricule: '',
 
                 filiere: '',
+
+                niveau: '',
             });
             setSuccessMessage(
                 "Utilisateur modifié avec succès"
@@ -379,6 +385,8 @@ export default function UsersPage() {
                             matricule: '',
 
                             filiere: '',
+                            niveau: '',
+                           
                         });
 
                         setShowModal(true);
@@ -568,7 +576,20 @@ export default function UsersPage() {
                                         </select>
                                     )
                                 }
-
+                                <select
+                                    name="niveau"
+                                    value={formData.niveau}
+                                    onChange={handleChange}
+                                    className="border p-3 rounded"
+                                    required
+                                >
+                                    <option value="">
+                                        Sélectionner un niveau
+                                    </option>
+                                    <option value="L1">L1</option>
+                                    <option value="L2">L2</option>
+                                    <option value="L3">L3</option>
+                                </select>
 
                                 <button
                                     type="submit"
@@ -601,7 +622,7 @@ export default function UsersPage() {
                         <tr>
 
                             <th className="p-4 text-left">
-                                Username
+                                Utilisateur
                             </th>
                             <th className="p-4 text-left">
                                 Prénom
@@ -625,7 +646,9 @@ export default function UsersPage() {
                             <th className="p-4 text-left">
                                 Filière
                             </th>
-
+                            <th className="p-4 text-left">
+                                Niveau
+                            </th>
                             <th className="p-4 text-left">
                                 Actions
                             </th>
@@ -668,7 +691,9 @@ export default function UsersPage() {
                                 <td className="p-4">
                                     {user.filiere_name}
                                 </td>
-
+                                <td className="p-4">
+                                    {user.niveau}
+                                </td>
                                 <td className="p-4 flex gap-2">
 
                                     <button
@@ -693,6 +718,7 @@ export default function UsersPage() {
                                                 matricule: user.matricule || '',
 
                                                 filiere: user.filiere || '',
+                                                niveau: user.niveau || '',
                                             });
                                             setShowModal(true);
                                         }}

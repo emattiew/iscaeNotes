@@ -30,7 +30,16 @@ class User(AbstractUser):
         blank=True,
         related_name='students'
     )
-
+    niveau = models.CharField(
+        max_length=2,
+        choices=(
+            ('L1', 'L1'),
+            ('L2', 'L2'),
+            ('L3', 'L3'),
+        ),
+        null=True,
+        blank=True
+    )
     def __str__(self):
 
         return self.username

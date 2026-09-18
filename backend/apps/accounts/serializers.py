@@ -30,7 +30,9 @@ class RegisterSerializer(serializers.ModelSerializer):
             'role',
             'matricule',
             'filiere',
+            'niveau',
             'filiere_name',
+            
         ]
 
 
@@ -108,5 +110,6 @@ class UserListSerializer(serializers.ModelSerializer):
             'role',
             'matricule',
             'filiere',
+            'niveau',
             'filiere_name',
         ]

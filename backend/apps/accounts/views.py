@@ -59,6 +59,7 @@ class ProfileView(APIView):
                 if user.filiere
                 else None
             ),
+            'niveau': user.niveau,
         })
     def put(self, request):
 
