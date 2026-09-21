@@ -47,43 +47,107 @@ export default function StudentResultsPage() {
     };
 
     /*
-     * Group results by academic year
-     * and then by semester.
+     * Determine the academic level from
+     * the semester number.
+     *
+     * S1 + S2 -> L1
+     * S3 + S4 -> L2
+     * S5 + S6 -> L3
      */
-    const groupedResults = {};
+    const getAcademicLevel = (semester) => {
+        const semesterNumber = Number(semester);
+
+        if (
+            semesterNumber === 1 ||
+            semesterNumber === 2
+        ) {
+            return "L1";
+        }
+
+        if (
+            semesterNumber === 3 ||
+            semesterNumber === 4
+        ) {
+            return "L2";
+        }
+
+        if (
+            semesterNumber === 5 ||
+            semesterNumber === 6
+        ) {
+            return "L3";
+        }
+
+        return null;
+    };
+
+    /*
+     * Group results by academic level
+     * and then by semester.
+     *
+     * Academic year is NOT used as the
+     * primary grouping key.
+     *
+     * The actual academic year remains
+     * attached to each result.
+     */
+    const groupedResults = {
+        L1: {},
+        L2: {},
+        L3: {}
+    };
 
     results.forEach((result) => {
-        const year = result.academic_year;
         const semester = result.semester;
 
         if (
-            !year ||
             semester === null ||
             semester === undefined
         ) {
             return;
         }
 
-        if (!groupedResults[year]) {
-            groupedResults[year] = {};
+        const semesterNumber = Number(semester);
+
+        const academicLevel =
+            getAcademicLevel(semesterNumber);
+
+        if (!academicLevel) {
+            return;
         }
 
-        const semesterKey = String(semester);
+        const semesterKey =
+            String(semesterNumber);
 
-        if (!groupedResults[year][semesterKey]) {
-            groupedResults[year][semesterKey] = [];
+        if (
+            !groupedResults[academicLevel][
+                semesterKey
+            ]
+        ) {
+            groupedResults[academicLevel][
+                semesterKey
+            ] = [];
         }
 
-        groupedResults[year][semesterKey].push(result);
+        groupedResults[academicLevel][
+            semesterKey
+        ].push(result);
     });
 
     /*
-     * Academic years.
-     * Most recent year first.
+     * Only display academic levels that
+     * actually contain results.
      */
-    const academicYears = Object.keys(
-        groupedResults
-    ).sort((a, b) => b.localeCompare(a));
+    const academicLevels = [
+        "L1",
+        "L2",
+        "L3"
+    ].filter(
+        (academicLevel) =>
+            Object.keys(
+                groupedResults[academicLevel]
+            ).length > 0
+    );
 
     /*
      * Subject decision.
@@ -159,7 +223,7 @@ export default function StudentResultsPage() {
 
                     /*
                      * IMPORTANT:
-                     * Credit now comes directly
+                     * Credit comes directly
                      * from StudentNoteSerializer.
                      */
                     credit:
@@ -193,10 +257,35 @@ export default function StudentResultsPage() {
     };
 
     /*
+     * Get the real academic year(s)
+     * attached to a semester.
+     *
+     * Normally there should be one academic
+     * year for a semester. We keep all distinct
+     * values instead of inventing anything.
+     */
+    const getSemesterAcademicYears = (
+        semesterResults
+    ) => {
+        return [
+            ...new Set(
+                semesterResults
+                    .map(
+                        (result) =>
+                            result.academic_year
+                    )
+                    .filter(
+                        (year) => year
+                    )
+            )
+        ];
+    };
+
+    /*
      * Open one semester PDF.
      */
     const openSemesterPDF = (
-        academicYear,
+        academicLevel,
         semester
     ) => {
         if (!student) {
@@ -205,7 +294,7 @@ export default function StudentResultsPage() {
 
         const semesterResults =
             groupedResults[
-                academicYear
+                academicLevel
             ]?.[semester] || [];
 
         if (!semesterResults.length) {
@@ -217,6 +306,20 @@ export default function StudentResultsPage() {
                 semester,
                 semesterResults
             );
+
+        const academicYears =
+            getSemesterAcademicYears(
+                semesterResults
+            );
+
+        /*
+         * Keep the actual academic year.
+         * If, unexpectedly, more than one year
+         * exists, show both instead of inventing
+         * a single year.
+         */
+        const academicYear =
+            academicYears.join(" / ");
 
         setSelectedPDF({
             student: {
@@ -245,39 +348,54 @@ export default function StudentResultsPage() {
     };
 
     /*
-     * Open the annual PDF.
+     * Open the annual PDF for one academic level.
+     *
+     * L1 -> S1 + S2
+     * L2 -> S3 + S4
+     * L3 -> S5 + S6
+     *
+     * We only generate an annual result when
+     * BOTH semesters are available.
      */
     const openAnnualPDF = (
-        academicYear
+        academicLevel
     ) => {
         if (!student) {
             return;
         }
 
-        const yearResults =
+        const levelResults =
             groupedResults[
-                academicYear
+                academicLevel
             ];
 
-        if (!yearResults) {
+        if (!levelResults) {
             return;
         }
 
         const semesterKeys =
             Object.keys(
-                yearResults
+                levelResults
             ).sort(
                 (a, b) =>
                     Number(a) -
                     Number(b)
             );
 
+        /*
+         * An annual result requires the
+         * two semesters belonging to the level.
+         */
+        if (semesterKeys.length !== 2) {
+            return;
+        }
+
         const semesters =
             semesterKeys.map(
                 (semester) =>
                     buildSemesterData(
                         semester,
-                        yearResults[
+                        levelResults[
                             semester
                         ]
                     )
@@ -288,8 +406,37 @@ export default function StudentResultsPage() {
         }
 
         /*
+         * Preserve the real academic years
+         * attached to the two semesters.
+         *
+         * Example:
+         * S1 -> 2024-2025
+         * S2 -> 2025-2026
+         *
+         * Result:
+         * "2024-2025 / 2025-2026"
+         */
+        const allAcademicYears = [
+            ...new Set(
+                semesterKeys.flatMap(
+                    (semester) =>
+                        getSemesterAcademicYears(
+                            levelResults[
+                                semester
+                            ]
+                        )
+                )
+            )
+        ];
+
+        const academicYear =
+            allAcademicYears.join(" / ");
+
+        /*
          * Calculate annual average from
          * the semester averages.
+         *
+         * Existing rule is preserved.
          */
         const validAverages =
             semesters
@@ -320,6 +467,8 @@ export default function StudentResultsPage() {
 
         /*
          * Annual decision.
+         *
+         * Existing rule is preserved.
          */
         const annualDecision =
             annualAverage !== "-" &&
@@ -367,7 +516,7 @@ export default function StudentResultsPage() {
                 Mes résultats
             </h1>
 
-            {academicYears.length === 0 ? (
+            {academicLevels.length === 0 ? (
                 <div className="bg-white rounded-lg shadow p-8">
                     <p className="text-gray-600">
                         Aucun résultat publié pour le moment.
@@ -375,12 +524,12 @@ export default function StudentResultsPage() {
                 </div>
             ) : (
                 <div className="space-y-6">
-                    {academicYears.map(
-                        (academicYear) => {
+                    {academicLevels.map(
+                        (academicLevel) => {
                             const semesterKeys =
                                 Object.keys(
                                     groupedResults[
-                                        academicYear
+                                        academicLevel
                                     ]
                                 ).sort(
                                     (a, b) =>
@@ -388,70 +537,109 @@ export default function StudentResultsPage() {
                                         Number(b)
                                 );
 
+                            /*
+                             * A complete academic level
+                             * has exactly its two semesters.
+                             *
+                             * L1 -> S1 + S2
+                             * L2 -> S3 + S4
+                             * L3 -> S5 + S6
+                             */
+                            const hasCompleteLevel =
+                                semesterKeys.length === 2;
+
                             return (
                                 <div
                                     key={
-                                        academicYear
+                                        academicLevel
                                     }
                                     className="bg-white rounded-lg shadow p-6"
                                 >
                                     <div className="flex items-center justify-between mb-5">
                                         <h2 className="text-xl font-semibold">
-                                            Année académique{" "}
+                                            Niveau{" "}
                                             {
-                                                academicYear
+                                                academicLevel
                                             }
                                         </h2>
 
-                                        <button
-                                            onClick={() =>
-                                                openAnnualPDF(
-                                                    academicYear
-                                                )
-                                            }
-                                            className="bg-black text-white px-5 py-2 rounded-lg hover:bg-gray-800 transition"
-                                        >
-                                            Relevé annuel
-                                        </button>
+                                        {hasCompleteLevel && (
+                                            <button
+                                                onClick={() =>
+                                                    openAnnualPDF(
+                                                        academicLevel
+                                                    )
+                                                }
+                                                className="bg-black text-white px-5 py-2 rounded-lg hover:bg-gray-800 transition"
+                                            >
+                                                Relevé annuel
+                                            </button>
+                                        )}
                                     </div>
 
                                     <div className="space-y-3">
                                         {semesterKeys.map(
                                             (
                                                 semester
-                                            ) => (
-                                                <div
-                                                    key={
+                                            ) => {
+                                                const semesterResults =
+                                                    groupedResults[
+                                                        academicLevel
+                                                    ][
                                                         semester
-                                                    }
-                                                    className="flex items-center justify-between border border-gray-200 rounded-lg p-4"
-                                                >
-                                                    <div>
-                                                        <h3 className="font-medium">
-                                                            Semestre{" "}
-                                                            {
-                                                                semester
-                                                            }
-                                                        </h3>
+                                                    ];
 
-                                                        <p className="text-sm text-gray-500 mt-1">
-                                                            Relevé de notes du semestre
-                                                        </p>
-                                                    </div>
+                                                const academicYears =
+                                                    getSemesterAcademicYears(
+                                                        semesterResults
+                                                    );
 
-                                                    <button
-                                                        onClick={() =>
-                                                            openSemesterPDF(
-                                                                academicYear,
-                                                                semester
-                                                            )
+                                                return (
+                                                    <div
+                                                        key={
+                                                            semester
                                                         }
-                                                        className="bg-black text-white px-5 py-2 rounded-lg hover:bg-gray-800 transition"
+                                                        className="flex items-center justify-between border border-gray-200 rounded-lg p-4"
                                                     >
-                                                        Voir le PDF
-                                                    </button>
-                                                </div>
-                                            )
+                                                        <div>
+                                                            <h3 className="font-medium">
+                                                                Semestre{" "}
+                                                                {
+                                                                    semester
+                                                                }
+                                                            </h3>
+
+                                                            <p className="text-sm text-gray-500 mt-1">
+                                                                Relevé de notes du semestre
+                                                            </p>
+
+                                                            {academicYears.length >
+                                                                0 && (
+                                                                <p className="text-sm text-gray-400 mt-1">
+                                                                    Année académique :{" "}
+                                                                    {
+                                                                        academicYears.join(
+                                                                            " / "
+                                                                        )
+                                                                    }
+                                                                </p>
+                                                            )}
+                                                        </div>
+
+                                                        <button
+                                                            onClick={() =>
+                                                                openSemesterPDF(
+                                                                    academicLevel,
+                                                                    semester
+                                                                )
+                                                            }
+                                                            className="bg-black text-white px-5 py-2 rounded-lg hover:bg-gray-800 transition"
+                                                        >
+                                                            Voir le PDF
+                                                        </button>
+                                                    </div>
+                                                );
+                                            }
                                         )}
                                     </div>
                                 </div>

@@ -534,63 +534,57 @@ export default function UsersPage() {
                                 </select>
 
 
-                                <input
-                                    type="text"
-                                    name="matricule"
-                                    value={formData.matricule}
-                                    onChange={handleChange}
-                                    placeholder="Matricule"
-                                    className="border p-3 rounded"
-                                />
-
-
                                 {
                                     formData.role === 'student' && (
+                                        <>
+                                            <input
+                                                type="text"
+                                                name="matricule"
+                                                value={formData.matricule}
+                                                onChange={handleChange}
+                                                placeholder="Matricule"
+                                                className="border p-3 rounded"
+                                            />
 
-                                        <select
-                                            name="filiere"
-                                            value={formData.filiere}
-                                            onChange={handleChange}
-                                            className="border p-3 rounded"
-                                            required
-                                        >
-
-                                            <option value="">
-
-                                                Sélectionner une filière
-
-                                            </option>
-
-                                            {filieres.map((filiere) => (
-
-                                                <option
-                                                    key={filiere.id}
-                                                    value={filiere.id}
-                                                >
-
-                                                    {filiere.code}
-
+                                            <select
+                                                name="filiere"
+                                                value={formData.filiere}
+                                                onChange={handleChange}
+                                                className="border p-3 rounded"
+                                                required
+                                            >
+                                                <option value="">
+                                                    Sélectionner une filière
                                                 </option>
-                                            ))}
 
-                                        </select>
+                                                {filieres.map((filiere) => (
+                                                    <option
+                                                        key={filiere.id}
+                                                        value={filiere.id}
+                                                    >
+                                                        {filiere.code}
+                                                    </option>
+                                                ))}
+                                            </select>
+
+                                            <select
+                                                name="niveau"
+                                                value={formData.niveau}
+                                                onChange={handleChange}
+                                                className="border p-3 rounded"
+                                                required
+                                            >
+                                                <option value="">
+                                                    Sélectionner un niveau
+                                                </option>
+
+                                                <option value="L1">L1</option>
+                                                <option value="L2">L2</option>
+                                                <option value="L3">L3</option>
+                                            </select>
+                                        </>
                                     )
                                 }
-                                <select
-                                    name="niveau"
-                                    value={formData.niveau}
-                                    onChange={handleChange}
-                                    className="border p-3 rounded"
-                                    required
-                                >
-                                    <option value="">
-                                        Sélectionner un niveau
-                                    </option>
-                                    <option value="L1">L1</option>
-                                    <option value="L2">L2</option>
-                                    <option value="L3">L3</option>
-                                </select>
-
                                 <button
                                     type="submit"
                                     className="bg-black text-white p-3 rounded hover:bg-gray-800"
