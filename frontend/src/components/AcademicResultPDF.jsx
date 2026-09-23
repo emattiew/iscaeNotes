@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
     annualSummary: {
         marginTop: 20,
         marginBottom: 20,
-        alignItems: "flex-end",
+        alignItems: "flex-start",
     },
 
     annualText: {
@@ -161,6 +161,18 @@ const styles = StyleSheet.create({
     footer: {
         marginTop: 30,
         textAlign: "right",
+    },
+
+    /* Annual layout: keep the two semester tables side by side */
+    semestersRow: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "flex-start",
+        width: "100%",
+    },
+
+    semesterColumn: {
+        width: "48%",
     },
 
 });
@@ -281,12 +293,24 @@ export default function AcademicResultPDF({
 
                 {/* SEMESTERS */}
 
-                {semesters.map(
-                    (semester) => (
+                <View
+                    style={
+                        semesters.length === 2
+                            ? styles.semestersRow
+                            : undefined
+                    }
+                >
+                    {semesters.map(
+                        (semester) => (
 
-                        <View
-                            key={semester.semester}
-                        >
+                            <View
+                                key={semester.semester}
+                                style={
+                                    semesters.length === 2
+                                        ? styles.semesterColumn
+                                        : undefined
+                                }
+                            >
 
                             <Text
                                 style={styles.sectionTitle}
@@ -623,102 +647,6 @@ export default function AcademicResultPDF({
                                                 : styles.decision
                                         ]}
                                     >
-                                        -
-                                    </Text>
-
-                                </View>
-
-
-                                {/* SEMESTER DECISION */}
-
-                                <View
-                                    style={styles.tableRow}
-                                >
-
-                                    <Text
-                                        style={[
-                                            styles.cell,
-                                            hasRattrapage
-                                                ? styles.subjectWithRattrapage
-                                                : styles.subject
-                                        ]}
-                                    >
-                                        Décision du semestre
-                                    </Text>
-
-
-                                    <Text
-                                        style={[
-                                            styles.cell,
-                                            hasRattrapage
-                                                ? styles.gradeWithRattrapage
-                                                : styles.grade
-                                        ]}
-                                    >
-                                        -
-                                    </Text>
-
-
-                                    <Text
-                                        style={[
-                                            styles.cell,
-                                            hasRattrapage
-                                                ? styles.gradeWithRattrapage
-                                                : styles.grade
-                                        ]}
-                                    >
-                                        -
-                                    </Text>
-
-
-                                    {/* RATTRAPAGE EMPTY CELL */}
-
-                                    {hasRattrapage && (
-
-                                        <Text
-                                            style={[
-                                                styles.cell,
-                                                styles.rattrapage
-                                            ]}
-                                        >
-                                            -
-                                        </Text>
-
-                                    )}
-
-
-                                    <Text
-                                        style={[
-                                            styles.cell,
-                                            hasRattrapage
-                                                ? styles.finalGradeWithRattrapage
-                                                : styles.finalGrade
-                                        ]}
-                                    >
-                                        -
-                                    </Text>
-
-
-                                    <Text
-                                        style={[
-                                            styles.cell,
-                                            hasRattrapage
-                                                ? styles.creditWithRattrapage
-                                                : styles.credit
-                                        ]}
-                                    >
-                                        -
-                                    </Text>
-
-
-                                    <Text
-                                        style={[
-                                            styles.cell,
-                                            hasRattrapage
-                                                ? styles.decisionWithRattrapage
-                                                : styles.decision
-                                        ]}
-                                    >
                                         {
                                             semester.decision ??
                                             "-"
@@ -730,10 +658,11 @@ export default function AcademicResultPDF({
 
                             </View>
 
-                        </View>
+                            </View>
 
-                    )
-                )}
+                        )
+                    )}
+                </View>
 
 
                 {/* ANNUAL SUMMARY */}
