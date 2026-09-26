@@ -586,8 +586,13 @@ const publishRattrapage = async (collecteId) => {
                                     {collecte.academic_year}
                                 </td>
 
-                                <td className="p-4 capitalize">
-                                    {collecte.status}
+                                <td className="p-4">
+                                    {{
+                                        prepared: "Préparée",
+                                        opened: "Ouverte",
+                                        validated: "Validée",
+                                        published: "Publiée",
+                                    }[collecte.status]}
                                 </td>
 
                                 <td className="p-4 flex gap-2">

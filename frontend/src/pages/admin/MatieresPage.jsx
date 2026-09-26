@@ -163,14 +163,19 @@ const deleteMatiere = async () => {
 
         e.preventDefault();
 
-        try {
+            try {
 
-            if (editingId) {
+        const data = {
+            ...formData,
+            credit: formData.coefficient,
+        };
 
-                await api.put(
-                    `/notes/matieres/${editingId}/`,
-                    formData
-                );
+        if (editingId) {
+
+            await api.put(
+                `/notes/matieres/${editingId}/`,
+                data
+            );
 
                 setSuccessMessage(
                     "Matière modifiée avec succès"
@@ -180,7 +185,7 @@ const deleteMatiere = async () => {
 
                 await api.post(
                     "/notes/matieres/",
-                    formData
+                    data
                 );
 
                 setSuccessMessage(
@@ -375,22 +380,13 @@ const deleteMatiere = async () => {
                                     name="coefficient"
                                     value={formData.coefficient}
                                     onChange={handleChange}
-                                    placeholder="Coefficient"
+                                    placeholder="Coefficient / Crédit"
                                     className="border p-3 rounded"
                                     required
                                 />
 
 
-                                <input
-                                    type="number"
-                                    step="0.1"
-                                    name="credit"
-                                    value={formData.credit}
-                                    onChange={handleChange}
-                                    placeholder="Crédit"
-                                    className="border p-3 rounded"
-                                    required
-                                />
+                                
 
 
                                 <button
