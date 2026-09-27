@@ -180,6 +180,8 @@ class ImportStudentsView(APIView):
         created = 0
         skipped = []
 
+        valid_niveaux = ["L1", "L2", "L3"]
+
         for _, row in df.iterrows():
 
             matricule = str(
@@ -192,6 +194,18 @@ class ImportStudentsView(APIView):
 
                 skipped.append(
                     f"{matricule} already exists"
+                )
+
+                continue
+
+            niveau = str(
+                row["niveau"]
+            ).strip().upper()
+
+            if niveau not in valid_niveaux:
+
+                skipped.append(
+                    f"{matricule} invalid niveau"
                 )
 
                 continue
@@ -218,12 +232,19 @@ class ImportStudentsView(APIView):
 
             user = User(
                 username=matricule,
-                first_name=str(row["first_name"]).strip(),
-                last_name=str(row["last_name"]).strip(),
-                email=str(row["email"]).strip(),
+                first_name=str(
+                    row["first_name"]
+                ).strip(),
+                last_name=str(
+                    row["last_name"]
+                ).strip(),
+                email=str(
+                    row["email"]
+                ).strip(),
                 matricule=matricule,
                 role="student",
-                filiere=filiere
+                filiere=filiere,
+                niveau=niveau,
             )
 
             user.set_password(password)

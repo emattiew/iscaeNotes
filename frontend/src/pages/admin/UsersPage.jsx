@@ -15,6 +15,8 @@ export default function UsersPage() {
 
     const [editingUser, setEditingUser] = useState(null);
 
+    const [isImporting, setIsImporting] = useState(false);
+
     const [filieres, setFilieres] = useState([]);
 
     const [successMessage, setSuccessMessage] = useState('');
@@ -269,10 +271,11 @@ export default function UsersPage() {
     };
 
     const handleImport = async (e) => {
-
     const file = e.target.files[0];
 
     if (!file) return;
+
+    setIsImporting(true);
 
     const formData = new FormData();
 
@@ -304,13 +307,16 @@ export default function UsersPage() {
 
         setErrorMessage('');
 
-    } catch (error) {
+        } catch (error) {
 
         console.error(error);
 
         setErrorMessage(
             "Erreur lors de l'import"
         );
+    } finally {
+
+        setIsImporting(false);
     }
 };
     if (loading) {
@@ -400,18 +406,19 @@ export default function UsersPage() {
 
 
                 <label
-                    className="bg-green-600 text-white px-5 py-3 rounded cursor-pointer hover:bg-green-700"
+                    className={`bg-green-600 text-white px-5 py-3 rounded cursor-pointer hover:bg-green-700 ${
+                        isImporting ? "opacity-60 cursor-not-allowed" : ""
+                    }`}
                 >
-
-                    Importer Excel
+                    {isImporting ? "Importation..." : "Importer Excel"}
 
                     <input
                         type="file"
                         accept=".xlsx,.xls"
                         hidden
                         onChange={handleImport}
+                        disabled={isImporting}
                     />
-
                 </label>
 
             </div>
