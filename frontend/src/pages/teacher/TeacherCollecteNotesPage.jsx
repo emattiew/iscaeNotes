@@ -256,13 +256,26 @@ export default function TeacherCollecteNotesPage() {
                 }
             );
 
-            setOcrMatches(
-                response.data.matches
-            );
+            const matches = response.data.matches || [];
 
-            setSuccessMessage(
-                "Analyse OCR terminée"
-            );
+            setOcrMatches(matches);
+
+            if (matches.length === 0) {
+
+                setErrorMessage(
+                    "Image trop peu claire : l'OCR n'a pas pu détecter les informations des étudiants. Veuillez utiliser une image plus nette."
+                );
+
+                setSuccessMessage('');
+
+            } else {
+
+                setSuccessMessage(
+                    "Analyse OCR terminée"
+                );
+
+                setErrorMessage('');
+}
 
         } catch (error) {
 

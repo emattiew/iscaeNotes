@@ -130,7 +130,7 @@ def is_matricule(text):
 
     return bool(
         re.match(
-            r'^IE\d+$',
+            r'^I[A-Z]\d+$',
             text
         )
     )
