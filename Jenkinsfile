@@ -12,13 +12,13 @@ pipeline {
         stage('Prepare Environment') {
             steps {
                 withCredentials([
-                    string(
-                        credentialsId: 'backend-env',
-                        variable: 'BACKEND_ENV'
+                    file(
+                        credentialsId: 'backend-env-file',
+                        variable: 'BACKEND_ENV_FILE'
                     )
                 ]) {
                     sh '''
-                        printf '%s\\n' "$BACKEND_ENV" > backend/.env
+                        cp "$BACKEND_ENV_FILE" backend/.env
 
                         echo "Checking environment file structure..."
 
