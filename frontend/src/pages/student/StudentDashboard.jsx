@@ -170,9 +170,7 @@ const createReclamation =
         <div className="bg-white rounded-2xl shadow-sm p-8 mb-8">
 
                 <h1 className="text-4xl font-bold mb-2">
-
-                    Bonjour {user.username}
-
+                    Bonjour {user.first_name} {user.last_name}
                 </h1>
 
 

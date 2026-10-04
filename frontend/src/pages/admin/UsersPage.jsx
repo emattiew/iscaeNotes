@@ -3,11 +3,13 @@ import { useEffect, useState } from "react";
 import api from "../../services/api";
 
 import AdminLayout from "../../layouts/AdminLayout";
-
+import { Search } from "lucide-react";
 
 export default function UsersPage() {
 
     const [users, setUsers] = useState([]);
+
+    const [searchMatricule, setSearchMatricule] = useState('');
 
     const [loading, setLoading] = useState(true);
 
@@ -511,7 +513,7 @@ export default function UsersPage() {
                                     onChange={handleChange}
                                     placeholder={
                                         editingUser
-                                            ? "Laisser vide pour ne pas changer"
+                                            ? "Nouveau mot de passe"
                                             : "Mot de passe"
                                     }
                                     className="border p-3 rounded"
@@ -613,7 +615,20 @@ export default function UsersPage() {
                 )
             }
 
+            <div className="mb-4 relative max-w-md">
+                <Search
+                    size={20}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                />
 
+                <input
+                    type="text"
+                    value={searchMatricule}
+                    onChange={(e) => setSearchMatricule(e.target.value)}
+                    placeholder="Rechercher par matricule"
+                    className="border border-gray-300 p-3 pl-10 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+            </div>
             <div className="bg-white rounded shadow overflow-hidden">
 
                 <table className="w-full">
@@ -660,7 +675,13 @@ export default function UsersPage() {
 
                     <tbody>
 
-                        {users.map((user) => (
+                        {users
+                            .filter((user) =>
+                                (user.matricule || '')
+                                    .toLowerCase()
+                                    .includes(searchMatricule.toLowerCase())
+                            )
+                            .map((user) => (
 
                             <tr
                                 key={user.id}
@@ -682,7 +703,11 @@ export default function UsersPage() {
                                 </td>
 
                                 <td className="p-4">
-                                    {user.role}
+                                    {{
+                                        student: "Étudiant",
+                                        teacher: "Enseignant",
+                                        admin_staff: "Administration",
+                                    }[user.role]}
                                 </td>
 
                                 <td className="p-4">

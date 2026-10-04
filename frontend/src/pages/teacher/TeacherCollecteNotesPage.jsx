@@ -45,7 +45,7 @@ export default function TeacherCollecteNotesPage() {
 
                 setSuccessMessage('');
 
-            }, 1500);
+            }, 3000);
 
             return () => clearTimeout(timer);
         }
@@ -441,8 +441,14 @@ export default function TeacherCollecteNotesPage() {
                         </p>
 
                         <p className="font-semibold text-lg capitalize">
-                            {collecte.status}
-                        </p>
+                        {collecte.status === 'prepared'
+                            ? 'Préparée'
+                            : collecte.status === 'validated'
+                            ? 'Validée'
+                            : collecte.status === 'published'
+                            ? 'Publiée'
+                            : collecte.status}
+                    </p>
 
                     </div>
 

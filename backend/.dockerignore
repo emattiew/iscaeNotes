@@ -1,0 +1,16 @@
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+.env
+
+.git/
+.gitignore
+
+correction_sheets/
+exam_copies/
+exam_sheets/
+
+*.sqlite3

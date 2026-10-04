@@ -8,3 +8,11 @@ venv/
 
 __pycache__/
 *.pyc
+
+
+*.dump
+
+
+backend/correction_sheets/
+backend/exam_copies/
+backend/exam_sheets/

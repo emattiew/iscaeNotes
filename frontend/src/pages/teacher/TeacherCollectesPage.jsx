@@ -199,7 +199,13 @@ export default function TeacherCollectesPage() {
                                 </td>
 
                                 <td className="p-4 capitalize">
-                                    {collecte.status}
+                                    {collecte.status === 'prepared'
+                                        ? 'Préparée'
+                                        : collecte.status === 'validated'
+                                        ? 'Validée'
+                                        : collecte.status === 'published'
+                                        ? 'Publiée'
+                                        : collecte.status}
                                 </td>
 
                                 <td className="p-4 flex gap-3">
