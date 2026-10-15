@@ -40,6 +40,11 @@ class User(AbstractUser):
         null=True,
         blank=True
     )
+    teacher_filieres = models.ManyToManyField(
+        'notes.Filiere',
+        blank=True,
+        related_name='assigned_teachers'
+    )
     def __str__(self):
 
         return self.username

@@ -41,6 +41,20 @@ export default function CollectesPage() {
         status: 'prepared',
     });
 
+    const filteredMatieres = formData.filiere
+        ? matieres.filter((matiere) =>
+            Array.isArray(matiere.module_filieres) &&
+            matiere.module_filieres.includes(Number(formData.filiere))
+        )
+        : [];
+    const filteredTeachers = formData.filiere
+        ? teachers.filter((teacher) =>
+            (teacher.teacher_filieres || []).some(
+                (filiereId) =>
+                    Number(filiereId) === Number(formData.filiere)
+            )
+        )
+        : [];
 
     useEffect(() => {
 
@@ -143,15 +157,27 @@ export default function CollectesPage() {
     };
 
 
+        
     const handleChange = (e) => {
+        const { name, value } = e.target;
 
-        setFormData({
+        setFormData((prev) => {
+            if (name === "filiere") {
+                return {
+                    ...prev,
+                    filiere: value,
+                    teacher: "",
+                    matiere: "",
+                };
+            }
 
-            ...formData,
-
-            [e.target.name]: e.target.value,
+            return {
+                ...prev,
+                [name]: value,
+            };
         });
     };
+
 
 
     const createCollecte = async (e) => {
@@ -393,56 +419,48 @@ const publishRattrapage = async (collecteId) => {
                                     onChange={handleChange}
                                     className="border p-3 rounded"
                                     required
+                                    disabled={!formData.filiere}
                                 >
-
                                     <option value="">
-
-                                        Sélectionner un enseignant
-
+                                        {!formData.filiere
+                                            ? "Sélectionnez d'abord une filière"
+                                            : filteredTeachers.length === 0
+                                                ? "Aucun enseignant assigné à cette filière"
+                                                : "Sélectionner un enseignant"}
                                     </option>
 
-                                    {teachers.map((teacher) => (
-
-                                        <option
-                                            key={teacher.id}
-                                            value={teacher.id}
-                                        >
-
+                                    {filteredTeachers.map((teacher) => (
+                                        <option key={teacher.id} value={teacher.id}>
                                             {teacher.username}
-
                                         </option>
                                     ))}
-
                                 </select>
 
 
+                                
                                 <select
                                     name="matiere"
                                     value={formData.matiere}
                                     onChange={handleChange}
                                     className="border p-3 rounded"
                                     required
+                                    disabled={!formData.filiere}
                                 >
-
                                     <option value="">
-
-                                        Sélectionner une matière
-
+                                        {!formData.filiere
+                                            ? "Sélectionnez d'abord une filière"
+                                            : filteredMatieres.length === 0
+                                                ? "Aucune matière disponible pour cette filière"
+                                                : "Sélectionner une matière"}
                                     </option>
 
-                                    {matieres.map((matiere) => (
-
-                                        <option
-                                            key={matiere.id}
-                                            value={matiere.id}
-                                        >
-
+                                    {filteredMatieres.map((matiere) => (
+                                        <option key={matiere.id} value={matiere.id}>
                                             {matiere.name}
-
                                         </option>
                                     ))}
-
                                 </select>
+
 
 
                                 <select

@@ -13,11 +13,16 @@ from .models import (
 
 class ModuleSerializer(serializers.ModelSerializer):
 
+    filieres = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=Filiere.objects.all(),
+        required=False
+    )
+
     class Meta:
-
         model = Module
-
         fields = '__all__'
+
 
 
 class MatiereSerializer(serializers.ModelSerializer):
@@ -27,10 +32,14 @@ class MatiereSerializer(serializers.ModelSerializer):
         read_only=True
     )
 
+    module_filieres = serializers.PrimaryKeyRelatedField(
+        source='module.filieres',
+        many=True,
+        read_only=True
+    )
+
     class Meta:
-
         model = Matiere
-
         fields = '__all__'
 
 
@@ -41,6 +50,7 @@ class FiliereSerializer(serializers.ModelSerializer):
         model = Filiere
 
         fields = '__all__'
+
 
 
 class CollecteNoteSerializer(serializers.ModelSerializer):
@@ -61,10 +71,35 @@ class CollecteNoteSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-
         model = CollecteNote
-
         fields = '__all__'
+
+    def validate(self, attrs):
+        # For partial updates, use the existing values when
+        # the request does not provide new ones.
+        matiere = attrs.get(
+            'matiere',
+            getattr(self.instance, 'matiere', None)
+        )
+        filiere = attrs.get(
+            'filiere',
+            getattr(self.instance, 'filiere', None)
+        )
+
+        if matiere and filiere:
+            module = matiere.module
+
+            if not module.filieres.filter(pk=filiere.pk).exists():
+                raise serializers.ValidationError({
+                    'filiere': (
+                        f"La matière « {matiere.name} » appartient au module "
+                        f"« {module.name} », qui n'est pas associé à la filière "
+                        f"« {filiere.code} »."
+                    )
+                })
+
+        return attrs
+
 
 
 class StudentNoteSerializer(serializers.ModelSerializer):

@@ -8,7 +8,7 @@ import { Search } from "lucide-react";
 export default function UsersPage() {
 
     const [users, setUsers] = useState([]);
-
+    const [roleFilter, setRoleFilter] = useState("all");
     const [searchMatricule, setSearchMatricule] = useState('');
 
     const [loading, setLoading] = useState(true);
@@ -49,6 +49,8 @@ export default function UsersPage() {
         filiere: '',
 
         niveau: '',
+
+        teacher_filieres: [],
     });
 
 
@@ -166,6 +168,8 @@ export default function UsersPage() {
                 filiere: '',
 
                 niveau: '',
+
+                teacher_filieres: [],
             });
 
         } catch (error) {
@@ -216,6 +220,8 @@ export default function UsersPage() {
                 filiere: '',
 
                 niveau: '',
+
+                teacher_filieres: [],
             });
             setSuccessMessage(
                 "Utilisateur modifié avec succès"
@@ -394,6 +400,7 @@ export default function UsersPage() {
 
                             filiere: '',
                             niveau: '',
+                            teacher_filieres: [],
                            
                         });
 
@@ -593,7 +600,51 @@ export default function UsersPage() {
                                             </select>
                                         </>
                                     )
+                                    
                                 }
+                                
+                                {formData.role === 'teacher' && (
+                                    <div className="md:col-span-2 border rounded-lg p-4">
+                                        <p className="font-semibold mb-3">
+                                            Filières de l'enseignant
+                                        </p>
+
+                                        {filieres.length === 0 ? (
+                                            <p className="text-gray-500">
+                                                Aucune filière disponible.
+                                            </p>
+                                        ) : (
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                {filieres.map((filiere) => (
+                                                    <label
+                                                        key={filiere.id}
+                                                        className="flex items-center gap-2 cursor-pointer"
+                                                    >
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={formData.teacher_filieres.includes(
+                                                                Number(filiere.id)
+                                                            )}
+                                                            onChange={(e) => {
+                                                                const selected = formData.teacher_filieres;
+                                                                const filiereId = Number(filiere.id);
+
+                                                                setFormData({
+                                                                    ...formData,
+                                                                    teacher_filieres: e.target.checked
+                                                                        ? [...selected, filiereId]
+                                                                        : selected.filter((id) => Number(id) !== filiereId),
+                                                                });
+                                                            }}
+                                                        />
+                                                        <span>{filiere.code}</span>
+                                                    </label>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
                                 <button
                                     type="submit"
                                     className="bg-black text-white p-3 rounded hover:bg-gray-800"
@@ -614,7 +665,18 @@ export default function UsersPage() {
                     </div>
                 )
             }
-
+            <div className="flex flex-col sm:flex-row gap-3 mb-4">
+                <select
+                    value={roleFilter}
+                    onChange={(e) => setRoleFilter(e.target.value)}
+                    className="border border-gray-300 p-3 rounded-lg bg-white"
+                >
+                    <option value="all">Tous les utilisateurs</option>
+                    <option value="teacher">Enseignants uniquement</option>
+                    <option value="admin_staff">Administration uniquement</option>
+                    <option value="student">Étudiants uniquement</option>
+                </select>
+            </div>
             <div className="mb-4 relative max-w-md">
                 <Search
                     size={20}
@@ -629,6 +691,7 @@ export default function UsersPage() {
                     className="border border-gray-300 p-3 pl-10 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
             </div>
+
             <div className="bg-white rounded shadow overflow-hidden">
 
                 <table className="w-full">
@@ -677,7 +740,10 @@ export default function UsersPage() {
 
                         {users
                             .filter((user) =>
-                                (user.matricule || '')
+                                roleFilter === "all" || user.role === roleFilter
+                            )
+                            .filter((user) =>
+                                (user.matricule || "")
                                     .toLowerCase()
                                     .includes(searchMatricule.toLowerCase())
                             )
@@ -715,7 +781,17 @@ export default function UsersPage() {
                                 </td>
 
                                 <td className="p-4">
-                                    {user.filiere_name}
+                                    {user.role === "teacher"
+                                        ? (user.teacher_filieres || [])
+                                            .map((id) => {
+                                                const filiere = filieres.find(
+                                                    (f) => Number(f.id) === Number(id)
+                                                );
+                                                return filiere?.code;
+                                            })
+                                            .filter(Boolean)
+                                            .join(", ") || "Aucune filière"
+                                        : user.filiere_name || "-"}
                                 </td>
                                 <td className="p-4">
                                     {user.niveau}
@@ -745,6 +821,7 @@ export default function UsersPage() {
 
                                                 filiere: user.filiere || '',
                                                 niveau: user.niveau || '',
+                                                teacher_filieres: (user.teacher_filieres || []).map(Number),
                                             });
                                             setShowModal(true);
                                         }}

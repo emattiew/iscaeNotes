@@ -9,8 +9,13 @@ class Module(models.Model):
 
     semestre = models.IntegerField()
 
-    def __str__(self):
+    filieres = models.ManyToManyField(
+        'Filiere',
+        related_name='modules',
+        blank=True
+    )
 
+    def __str__(self):
         return f'{self.name} - S{self.semestre}'
 
 

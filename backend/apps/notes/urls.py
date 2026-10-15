@@ -10,6 +10,7 @@ from .views import (
     StudentNoteViewSet,
     ReclamationViewSet,
     ReclamationPeriodViewSet,
+    ReclamationPeriodStatusViewSet,
     
 )
 
@@ -54,4 +55,11 @@ router.register(
     ReclamationViewSet,
     basename='reclamations'
 )
+
+router.register(
+    'reclamation-period-status',
+    ReclamationPeriodStatusViewSet,
+    basename='reclamation-period-status'
+)
+
 urlpatterns = router.urls

@@ -11,6 +11,8 @@ export default function StudentDashboard() {
 
     const [notes, setNotes] = useState([]);
 
+    const [reclamationPeriodOpen, setReclamationPeriodOpen] = useState(false);
+
     const [loading, setLoading] = useState(true);
 
     const [selectedNote, setSelectedNote] = useState(null);
@@ -31,6 +33,8 @@ export default function StudentDashboard() {
         fetchProfile();
 
         fetchResults();
+
+        fetchReclamationPeriodStatus();
 
     }, []);
 
@@ -81,6 +85,28 @@ export default function StudentDashboard() {
             true
         );
     };
+
+    
+const fetchReclamationPeriodStatus = async () => {
+    try {
+        const response = await api.get(
+            "/notes/reclamation-period-status/"
+        );
+
+        setReclamationPeriodOpen(
+            response.data?.is_open === true
+        );
+    } catch (error) {
+        console.error(
+            "Reclamation status error:",
+            error.response?.status,
+            error.response?.data || error.message
+        );
+
+        setReclamationPeriodOpen(false);
+    }
+};
+
 
 const createReclamation =
     async () => {
@@ -367,14 +393,14 @@ const createReclamation =
 
                                     </div>
 
-                                    <button
-                                        onClick={() =>
-                                            openReclamationModal(note)
-                                        }
-                                        className="mt-6 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-                                    >
-                                        Faire une réclamation
-                                    </button>
+                                    {reclamationPeriodOpen && (
+                                        <button
+                                            onClick={() => openReclamationModal(note)}
+                                            className="mt-6 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+                                        >
+                                            Faire une réclamation
+                                        </button>
+                                    )}
                                     <div className="mt-6 text-sm text-gray-500">
 
                                         Année universitaire :
