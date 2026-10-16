@@ -1,475 +1,707 @@
+
 import { useEffect, useState } from "react";
-
 import api from "../../services/api";
-
 import StudentLayout from "../../layouts/StudentLayout";
 
-
 export default function StudentDashboard() {
-
     const [user, setUser] = useState(null);
-
     const [notes, setNotes] = useState([]);
-
     const [reclamationPeriodOpen, setReclamationPeriodOpen] = useState(false);
-
     const [loading, setLoading] = useState(true);
-
     const [selectedNote, setSelectedNote] = useState(null);
-
-    const [showReclamationModal,setShowReclamationModal] = useState(false);
-
-    const [reclamationMessage, setReclamationMessage] = useState('');
-
-    const [successMessage, setSuccessMessage] = useState('');
-
-    const [errorMessage,
-        setErrorMessage] =
-        useState('');
-
+    const [showReclamationModal, setShowReclamationModal] = useState(false);
+    const [reclamationMessage, setReclamationMessage] = useState("");
+    const [successMessage, setSuccessMessage] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
 
     useEffect(() => {
-
         fetchProfile();
-
         fetchResults();
-
         fetchReclamationPeriodStatus();
-
     }, []);
 
-
     const fetchProfile = async () => {
-
         try {
-
-            const response = await api.get(
-                "/accounts/profile/"
-            );
-
+            const response = await api.get("/accounts/profile/");
             setUser(response.data);
-
         } catch (error) {
-
             console.error(error);
         }
     };
 
-
     const fetchResults = async () => {
-
         try {
-
-            const response = await api.get(
-                "/notes/student-notes/"
-            );
-
+            const response = await api.get("/notes/student-notes/");
             setNotes(response.data);
-
         } catch (error) {
-
             console.error(error);
-
         } finally {
-
             setLoading(false);
         }
     };
-    const openReclamationModal = (
-        note
-    ) => {
 
+    const openReclamationModal = (note) => {
         setSelectedNote(note);
-
-        setShowReclamationModal(
-            true
-        );
+        setShowReclamationModal(true);
     };
 
-    
-const fetchReclamationPeriodStatus = async () => {
-    try {
-        const response = await api.get(
-            "/notes/reclamation-period-status/"
-        );
+    const fetchReclamationPeriodStatus = async () => {
+        try {
+            const response = await api.get(
+                "/notes/reclamation-period-status/"
+            );
 
-        setReclamationPeriodOpen(
-            response.data?.is_open === true
-        );
-    } catch (error) {
-        console.error(
-            "Reclamation status error:",
-            error.response?.status,
-            error.response?.data || error.message
-        );
+            setReclamationPeriodOpen(
+                response.data?.is_open === true
+            );
+        } catch (error) {
+            console.error(
+                "Reclamation status error:",
+                error.response?.status,
+                error.response?.data || error.message
+            );
 
-        setReclamationPeriodOpen(false);
-    }
-};
+            setReclamationPeriodOpen(false);
+        }
+    };
 
+    const createReclamation = async () => {
+        try {
+            await api.post("/notes/reclamations/", {
+                student_note: selectedNote.id,
+                message: reclamationMessage,
+            });
 
-const createReclamation =
-    async () => {
-
-    try {
-
-        await api.post(
-            "/notes/reclamations/",
-            {
-                student_note:
-                    selectedNote.id,
-
-                message:
-                    reclamationMessage
-            }
-        );
-
-        setSuccessMessage(
-            "Réclamation envoyée avec succès"
-        );
-
-        setErrorMessage('');
-
-        setShowReclamationModal(
-            false
-        );
-
-        setReclamationMessage('');
-        
-        setSelectedNote(null);
-
-    } catch (error) {
-
-        console.error(error);
-
-        setErrorMessage(
-            "Erreur lors de l'envoi"
-        );
-
-        setSuccessMessage('');
-    }
-};
+            setSuccessMessage("Réclamation envoyée avec succès");
+            setErrorMessage("");
+            setShowReclamationModal(false);
+            setReclamationMessage("");
+            setSelectedNote(null);
+        } catch (error) {
+            console.error(error);
+            setErrorMessage("Erreur lors de l'envoi");
+            setSuccessMessage("");
+        }
+    };
 
     if (loading || !user) {
-
         return (
-
             <StudentLayout>
-
-                <div>
-
-                    Loading...
-
+                <div className="flex min-h-[60vh] items-center justify-center">
+                    <div className="flex flex-col items-center gap-4">
+                        <div className="h-11 w-11 animate-spin rounded-full border-4 border-emerald-100 border-t-emerald-700" />
+                        <p className="text-sm font-medium text-slate-500">
+                            Chargement de votre espace étudiant...
+                        </p>
+                    </div>
                 </div>
-
             </StudentLayout>
         );
     }
 
-
     return (
+        <StudentLayout>
+            <div className="mx-auto max-w-7xl space-y-8 pb-10">
+                {/* Feedback messages */}
+                {successMessage && (
+                    <div
+                        role="status"
+                        className="flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm font-medium text-emerald-800"
+                    >
+                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-lg">
+                            ✓
+                        </span>
+                        <span>{successMessage}</span>
+                    </div>
+                )}
 
-    <StudentLayout>
+                {errorMessage && (
+                    <div
+                        role="alert"
+                        className="flex items-center gap-3 rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm font-medium text-red-700"
+                    >
+                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-red-100 text-lg">
+                            !
+                        </span>
+                        <span>{errorMessage}</span>
+                    </div>
+                )}
 
-        {
-            successMessage && (
+                {/* Premium welcome banner */}
+                <section className="relative isolate overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-950 via-emerald-900 to-emerald-800 shadow-lg shadow-emerald-950/10">
+                    {/* Decorative shapes */}
+                    <div
+                        aria-hidden="true"
+                        className="pointer-events-none absolute -right-20 -top-28 h-80 w-80 rounded-full border border-white/10"
+                    />
+                    <div
+                        aria-hidden="true"
+                        className="pointer-events-none absolute -right-8 -top-16 h-56 w-56 rounded-full border border-white/10"
+                    />
+                    <div
+                        aria-hidden="true"
+                        className="pointer-events-none absolute -bottom-28 right-1/4 h-64 w-64 rounded-full bg-emerald-500/10 blur-3xl"
+                    />
 
-                <div className="bg-green-600 text-white p-4 rounded mb-4">
+                    <div className="relative p-6 sm:p-8 lg:p-10">
+                        <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
+                            <div className="max-w-2xl">
+                                <div className="inline-flex items-center gap-2 rounded-full border border-emerald-300/20 bg-white/10 px-3.5 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-emerald-100">
+                                    <span className="h-2 w-2 rounded-full bg-emerald-300" />
+                                    Espace étudiant
+                                </div>
 
-                    {successMessage}
+                                <h1 className="mt-5 text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
+                                    Bonjour{" "}
+                                    {user.first_name} {user.last_name}
+                                </h1>
 
-                </div>
-            )
-        }
+                                <p className="mt-4 max-w-xl text-sm leading-7 text-emerald-100/80 sm:text-base">
+                                    Bienvenue sur votre espace académique.
+                                    Consultez vos informations et retrouvez
+                                    vos résultats publiés en un seul endroit.
+                                </p>
 
-        {
-            errorMessage && (
+                                <a
+                                    href="#results"
+                                    className="mt-6 inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-emerald-900 shadow-sm transition hover:-translate-y-0.5 hover:bg-emerald-50 focus:outline-none focus:ring-4 focus:ring-white/20"
+                                >
+                                    Consulter mes résultats
+                                    <svg
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        className="h-4 w-4"
+                                        aria-hidden="true"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            d="M5 12h14m-6-6 6 6-6 6"
+                                        />
+                                    </svg>
+                                </a>
+                            </div>
 
-                <div className="bg-red-100 text-red-700 p-4 rounded mb-4">
+                            <div className="hidden shrink-0 lg:flex lg:items-center lg:justify-center">
+                                <div className="flex h-36 w-36 items-center justify-center rounded-full border border-white/15 bg-white/[0.07] shadow-inner">
+                                    <div className="flex h-24 w-24 items-center justify-center rounded-full border border-emerald-200/20 bg-emerald-400/10">
+                                        <svg
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeWidth="1.2"
+                                            className="h-12 w-12 text-emerald-100"
+                                            aria-hidden="true"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                d="M2.5 9 12 4l9.5 5L12 14 2.5 9Z"
+                                            />
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                d="M6.5 11.1v5c3.3 2.6 7.7 2.6 11 0v-5M21.5 9v6"
+                                            />
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                d="M21.5 15.5v2"
+                                            />
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-                    {errorMessage}
+                        {/* Academic summary cards */}
+                        <div className="mt-9 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                            <div className="flex items-center gap-3.5 rounded-2xl border border-white/10 bg-white/[0.08] p-4 backdrop-blur-sm transition hover:bg-white/[0.12]">
+                                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-300/15 text-emerald-200">
+                                    <svg
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="1.7"
+                                        className="h-5 w-5"
+                                        aria-hidden="true"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            d="M12 3 2.5 8 12 13l9.5-5L12 3Z"
+                                        />
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            d="M6.5 10.1V15c3.3 2.7 7.7 2.7 11 0v-4.9"
+                                        />
+                                    </svg>
+                                </div>
+                                <div className="min-w-0">
+                                    <p className="text-xs font-medium text-emerald-100/70">
+                                        Filière
+                                    </p>
+                                    <p className="mt-1 truncate text-base font-semibold text-white">
+                                        {user.filiere_name}
+                                    </p>
+                                </div>
+                            </div>
 
-                </div>
-            )
-        }
+                            <div className="flex items-center gap-3.5 rounded-2xl border border-white/10 bg-white/[0.08] p-4 backdrop-blur-sm transition hover:bg-white/[0.12]">
+                                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-300/15 text-emerald-200">
+                                    <svg
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="1.7"
+                                        className="h-5 w-5"
+                                        aria-hidden="true"
+                                    >
+                                        <rect
+                                            x="4"
+                                            y="3"
+                                            width="16"
+                                            height="18"
+                                            rx="2.5"
+                                        />
+                                        <path
+                                            strokeLinecap="round"
+                                            d="M8 8h8M8 12h3m-3 4h8"
+                                        />
+                                    </svg>
+                                </div>
+                                <div className="min-w-0">
+                                    <p className="text-xs font-medium text-emerald-100/70">
+                                        Matricule
+                                    </p>
+                                    <p className="mt-1 break-words text-base font-semibold text-white">
+                                        {user.matricule}
+                                    </p>
+                                </div>
+                            </div>
 
-        <div className="bg-white rounded-2xl shadow-sm p-8 mb-8">
+                            <div className="flex items-center gap-3.5 rounded-2xl border border-white/10 bg-white/[0.08] p-4 backdrop-blur-sm transition hover:bg-white/[0.12]">
+                                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-300/15 text-emerald-200">
+                                    <svg
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="1.7"
+                                        className="h-5 w-5"
+                                        aria-hidden="true"
+                                    >
+                                        <rect
+                                            x="3"
+                                            y="5"
+                                            width="18"
+                                            height="16"
+                                            rx="2"
+                                        />
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            d="M16 3v4M8 3v4M3 10h18"
+                                        />
+                                    </svg>
+                                </div>
+                                <div className="min-w-0">
+                                    <p className="text-xs font-medium text-emerald-100/70">
+                                        Année universitaire
+                                    </p>
+                                    <p className="mt-1 text-base font-semibold text-white">
+                                        2025-2026
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
 
-                <h1 className="text-4xl font-bold mb-2">
-                    Bonjour {user.first_name} {user.last_name}
-                </h1>
+                {/* Results section */}
+                <section id="results" className="scroll-mt-6">
+                    <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                        <div>
+                            <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-700">
+                                Suivi académique
+                            </p>
+                            <h2 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+                                Mes résultats
+                            </h2>
+                            <p className="mt-2 text-sm leading-6 text-slate-500 sm:text-base">
+                                Retrouvez les notes validées et publiées pour
+                                vos matières.
+                            </p>
+                        </div>
 
-
-                <p className="text-gray-500 text-lg">
-
-                    Bienvenue sur votre espace étudiant
-
-                </p>
-
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-
-                    <div className="bg-gray-100 rounded-xl p-5">
-
-                        <p className="text-gray-500 text-sm mb-2">
-
-                            Filière
-
-                        </p>
-
-                        <h2 className="text-2xl font-bold">
-
-                            {user.filiere_name}
-
-                        </h2>
-
+                        <div className="inline-flex w-fit items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+                            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700">
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="1.8"
+                                    className="h-5 w-5"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M4 19V5m0 14h16M8 15v-4m4 4V7m4 8V9"
+                                    />
+                                </svg>
+                            </span>
+                            <div>
+                                <p className="text-lg font-bold leading-5 text-slate-900">
+                                    {notes.length}
+                                </p>
+                                <p className="mt-1 text-xs text-slate-500">
+                                    Matière{notes.length !== 1 ? "s" : ""}
+                                </p>
+                            </div>
+                        </div>
                     </div>
 
+                    {notes.length === 0 ? (
+                        <div className="rounded-3xl border border-dashed border-slate-300 bg-white px-6 py-14 text-center shadow-sm sm:px-10">
+                            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700">
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="1.6"
+                                    className="h-8 w-8"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M6 3.75h8l4 4V20a1 1 0 0 1-1 1H6a1.25 1.25 0 0 1-1-1.25V5A1.25 1.25 0 0 1 6 3.75Z"
+                                    />
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M14 4v4h4M8 13h8M8 17h5"
+                                    />
+                                </svg>
+                            </div>
+                            <h3 className="mt-5 text-lg font-semibold text-slate-900">
+                                Aucun résultat publié
+                            </h3>
+                            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500">
+                                Vos résultats apparaîtront ici dès qu'ils
+                                seront publiés par l'administration.
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
+                            {notes.map((note) => (
+                                <article
+                                    key={note.id}
+                                    className="group overflow-hidden rounded-3xl border border-slate-200/90 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:border-emerald-200 hover:shadow-xl hover:shadow-emerald-950/[0.06]"
+                                >
+                                    {/* Subject header */}
+                                    <div className="flex items-start justify-between gap-3 p-5 pb-4 sm:p-6 sm:pb-4">
+                                        <div className="flex min-w-0 items-start gap-3.5">
+                                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-emerald-100 bg-emerald-50 text-emerald-800 transition group-hover:bg-emerald-100">
+                                                <svg
+                                                    viewBox="0 0 24 24"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    strokeWidth="1.6"
+                                                    className="h-6 w-6"
+                                                    aria-hidden="true"
+                                                >
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        d="M5 4.5A2.5 2.5 0 0 1 7.5 2H20v16H7.5A2.5 2.5 0 0 0 5 20.5v-16Z"
+                                                    />
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        d="M5 20.5A2.5 2.5 0 0 1 7.5 18H20M9 6h7M9 10h7"
+                                                    />
+                                                </svg>
+                                            </div>
 
-                    <div className="bg-gray-100 rounded-xl p-5">
+                                            <div className="min-w-0 pt-0.5">
+                                                <h3 className="break-words text-lg font-bold leading-snug text-slate-900 sm:text-xl">
+                                                    {note.matiere_name}
+                                                </h3>
+                                                <p className="mt-2 flex items-center gap-2 text-sm text-slate-500">
+                                                    <svg
+                                                        viewBox="0 0 24 24"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        strokeWidth="1.7"
+                                                        className="h-4 w-4 shrink-0"
+                                                        aria-hidden="true"
+                                                    >
+                                                        <circle
+                                                            cx="12"
+                                                            cy="8"
+                                                            r="3.5"
+                                                        />
+                                                        <path
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                            d="M5 20v-1.5a7 7 0 0 1 14 0V20H5Z"
+                                                        />
+                                                    </svg>
+                                                    <span className="break-words">
+                                                        {note.teacher_name}
+                                                    </span>
+                                                </p>
+                                            </div>
+                                        </div>
 
-                        <p className="text-gray-500 text-sm mb-2">
+                                        <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-emerald-100 bg-emerald-50 px-2.5 py-1.5 text-xs font-semibold text-emerald-800">
+                                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-600" />
+                                            Publié
+                                        </span>
+                                    </div>
 
-                            Matricule
+                                    {/* Grades */}
+                                    <div className="px-5 pb-5 sm:px-6 sm:pb-6">
+                                        <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
+                                            <div className="flex min-w-0 flex-col justify-center rounded-2xl border border-slate-100 bg-slate-50/80 px-2 py-4 text-center sm:px-3">
+                                                <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-slate-500 sm:text-xs">
+                                                    CC
+                                                </p>
+                                                <p className="mt-2 break-words text-xl font-bold tabular-nums text-slate-800 sm:text-2xl">
+                                                    {note.controle_continu}
+                                                </p>
+                                                <p className="mt-1 text-[11px] text-slate-400 sm:text-xs">
+                                                    Continu
+                                                </p>
+                                            </div>
 
-                        </p>
+                                            <div className="flex min-w-0 flex-col justify-center rounded-2xl border border-slate-100 bg-slate-50/80 px-2 py-4 text-center sm:px-3">
+                                                <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-slate-500 sm:text-xs">
+                                                    CF
+                                                </p>
+                                                <p className="mt-2 break-words text-xl font-bold tabular-nums text-slate-800 sm:text-2xl">
+                                                    {note.controle_final}
+                                                </p>
+                                                <p className="mt-1 text-[11px] text-slate-400 sm:text-xs">
+                                                    Final
+                                                </p>
+                                            </div>
 
-                        <h2 className="text-2xl font-bold">
+                                            <div className="relative flex min-w-0 flex-col justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-800 to-emerald-700 px-2 py-4 text-center text-white shadow-md shadow-emerald-900/10 sm:px-3">
+                                                <div
+                                                    aria-hidden="true"
+                                                    className="pointer-events-none absolute -right-5 -top-7 h-20 w-20 rounded-full border border-white/10"
+                                                />
+                                                <p className="relative text-[11px] font-bold uppercase tracking-[0.12em] text-emerald-100 sm:text-xs">
+                                                    Finale
+                                                </p>
+                                                <p className="relative mt-2 break-words text-xl font-bold tabular-nums sm:text-2xl">
+                                                    {note.note_finale}
+                                                </p>
+                                                <p className="relative mt-1 text-[11px] text-emerald-100/80 sm:text-xs">
+                                                    Résultat final
+                                                </p>
+                                            </div>
+                                        </div>
 
-                            {user.matricule}
+                                        {/* Academic year and reclamation */}
+                                        <div className="mt-5 flex flex-col gap-4 border-t border-slate-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
+                                            <p className="flex items-center gap-2 text-xs text-slate-500 sm:text-sm">
+                                                <svg
+                                                    viewBox="0 0 24 24"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    strokeWidth="1.7"
+                                                    className="h-4 w-4 shrink-0 text-slate-400"
+                                                    aria-hidden="true"
+                                                >
+                                                    <rect
+                                                        x="3"
+                                                        y="5"
+                                                        width="18"
+                                                        height="16"
+                                                        rx="2"
+                                                    />
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        d="M16 3v4M8 3v4M3 10h18"
+                                                    />
+                                                </svg>
+                                                <span>
+                                                    Année universitaire :{" "}
+                                                    {note.academic_year}
+                                                </span>
+                                            </p>
 
-                        </h2>
-
-                    </div>
-
-
-                    <div className="bg-gray-100 rounded-xl p-5">
-
-                        <p className="text-gray-500 text-sm mb-2">
-
-                            Année universitaire
-
-                        </p>
-
-                        <h2 className="text-2xl font-bold">
-
-                            2025-2026
-
-                        </h2>
-
-                    </div>
-
-                </div>
-
+                                            {reclamationPeriodOpen && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        openReclamationModal(note)
+                                                    }
+                                                    className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-emerald-200 bg-white px-4 py-2.5 text-sm font-semibold text-emerald-800 transition hover:border-emerald-700 hover:bg-emerald-50 focus:outline-none focus:ring-4 focus:ring-emerald-100 sm:w-auto"
+                                                >
+                                                    <svg
+                                                        viewBox="0 0 24 24"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        strokeWidth="1.7"
+                                                        className="h-4 w-4"
+                                                        aria-hidden="true"
+                                                    >
+                                                        <path
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                            d="M21 11.5a8.4 8.4 0 0 1-8.5 8.5 9 9 0 0 1-4-.9L3 21l1.9-5.5a9 9 0 0 1-.9-4A8.4 8.4 0 0 1 12.5 3H13a8.4 8.4 0 0 1 8 8v.5Z"
+                                                        />
+                                                    </svg>
+                                                    Faire une réclamation
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                </article>
+                            ))}
+                        </div>
+                    )}
+                </section>
             </div>
 
+            {/* Reclamation modal */}
+            {showReclamationModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-950/60 p-4 backdrop-blur-sm">
+                    <div
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="reclamation-modal-title"
+                        className="my-auto w-full max-w-lg overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl"
+                    >
+                        <div className="relative overflow-hidden bg-gradient-to-br from-emerald-950 to-emerald-800 px-6 py-6 sm:px-7">
+                            <div
+                                aria-hidden="true"
+                                className="pointer-events-none absolute -right-8 -top-12 h-36 w-36 rounded-full border border-white/10"
+                            />
 
-            <div className="bg-white rounded-2xl shadow-sm p-8">
+                            <div className="relative flex items-start justify-between gap-4">
+                                <div>
+                                    <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl border border-white/15 bg-white/10 text-emerald-100">
+                                        <svg
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeWidth="1.7"
+                                            className="h-5 w-5"
+                                            aria-hidden="true"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                d="M21 11.5a8.4 8.4 0 0 1-8.5 8.5 9 9 0 0 1-4-.9L3 21l1.9-5.5a9 9 0 0 1-.9-4A8.4 8.4 0 0 1 12.5 3H13a8.4 8.4 0 0 1 8 8v.5Z"
+                                            />
+                                        </svg>
+                                    </div>
 
-                <div className="flex items-center justify-between mb-8">
+                                    <h2
+                                        id="reclamation-modal-title"
+                                        className="text-xl font-bold text-white sm:text-2xl"
+                                    >
+                                        Nouvelle réclamation
+                                    </h2>
+                                    <p className="mt-2 text-sm leading-6 text-emerald-100/80">
+                                        Expliquez votre demande concernant votre note.
+                                    </p>
+                                </div>
 
-                    <div>
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        setShowReclamationModal(false)
+                                    }
+                                    aria-label="Fermer"
+                                    className="rounded-xl p-2 text-emerald-100 transition hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-white/50"
+                                >
+                                    <svg
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        className="h-5 w-5"
+                                        aria-hidden="true"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            d="m6 6 12 12M18 6 6 18"
+                                        />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
 
-                        <h2 className="text-3xl font-bold">
+                        <div className="p-6 sm:p-7">
+                            <label
+                                htmlFor="reclamation-message"
+                                className="mb-2 block text-sm font-semibold text-slate-700"
+                            >
+                                Votre message
+                            </label>
 
-                            Résultats publiés
+                            <textarea
+                                id="reclamation-message"
+                                value={reclamationMessage}
+                                onChange={(e) =>
+                                    setReclamationMessage(e.target.value)
+                                }
+                                className="min-h-36 w-full resize-y rounded-2xl border border-slate-200 bg-slate-50/50 p-4 text-sm leading-6 text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-emerald-600 focus:bg-white focus:ring-4 focus:ring-emerald-50"
+                                placeholder="Expliquez votre réclamation..."
+                            />
 
-                        </h2>
-
-                        <p className="text-gray-500 mt-1">
-
-                            Consultez vos notes publiées
-
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                {
-                    notes.length === 0 ? (
-
-                        <div className="bg-gray-50 border rounded-xl p-10 text-center">
-
-                            <p className="text-gray-500 text-lg">
-
-                                Aucun résultat publié pour le moment
-
+                            <p className="mt-2 text-xs leading-5 text-slate-400">
+                                Veuillez fournir suffisamment de détails pour
+                                expliquer votre demande.
                             </p>
 
-                        </div>
-
-                    ) : (
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-                            {notes.map((note) => (
-
-                                <div
-                                    key={note.id}
-                                    className="border rounded-2xl p-6 bg-gray-50"
+                            <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        setShowReclamationModal(false)
+                                    }
+                                    className="rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 focus:outline-none focus:ring-4 focus:ring-slate-100"
                                 >
+                                    Annuler
+                                </button>
 
-                                    <div className="flex items-start justify-between mb-4">
-
-                                        <div>
-
-                                            <h3 className="text-2xl font-bold">
-
-                                                {note.matiere_name}
-
-                                            </h3>
-
-                                            <p className="text-gray-500 mt-1">
-
-                                                {note.teacher_name}
-
-                                            </p>
-
-                                        </div>
-
-
-                                        <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">
-
-                                            Publié
-
-                                        </span>
-
-                                    </div>
-
-
-                                    <div className="grid grid-cols-3 gap-4 mt-6">
-
-                                        <div className="bg-white rounded-xl p-4 text-center">
-
-                                            <p className="text-gray-500 text-sm mb-1">
-
-                                                CC
-
-                                            </p>
-
-                                            <h4 className="text-2xl font-bold">
-
-                                                {note.controle_continu}
-
-                                            </h4>
-
-                                        </div>
-
-
-                                        <div className="bg-white rounded-xl p-4 text-center">
-
-                                            <p className="text-gray-500 text-sm mb-1">
-
-                                                CF
-
-                                            </p>
-
-                                            <h4 className="text-2xl font-bold">
-
-                                                {note.controle_final}
-
-                                            </h4>
-
-                                        </div>
-
-
-                                        <div className="bg-black text-white rounded-xl p-4 text-center">
-
-                                            <p className="text-sm mb-1">
-
-                                                Finale
-
-                                            </p>
-
-                                            <h4 className="text-2xl font-bold">
-
-                                                {note.note_finale}
-
-                                            </h4>
-
-                                        </div>
-
-                                    </div>
-
-                                    {reclamationPeriodOpen && (
-                                        <button
-                                            onClick={() => openReclamationModal(note)}
-                                            className="mt-6 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-                                        >
-                                            Faire une réclamation
-                                        </button>
-                                    )}
-                                    <div className="mt-6 text-sm text-gray-500">
-
-                                        Année universitaire :
-                                        {" "}
-                                        {note.academic_year}
-
-                                    </div>
-
-                                </div>
-                            ))}
-
+                                <button
+                                    type="button"
+                                    onClick={createReclamation}
+                                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-800 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-900 focus:outline-none focus:ring-4 focus:ring-emerald-100"
+                                >
+                                    <svg
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="1.8"
+                                        className="h-4 w-4"
+                                        aria-hidden="true"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            d="m22 2-7 20-4-9-9-4 20-7ZM22 2 11 13"
+                                        />
+                                    </svg>
+                                    Envoyer la réclamation
+                                </button>
+                            </div>
                         </div>
-                    )
-                }
-
-            </div>
-            {
-    showReclamationModal && (
-
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-
-            <div className="bg-white p-6 rounded-xl w-full max-w-lg">
-
-                <h2 className="text-2xl font-bold mb-4">
-
-                    Nouvelle réclamation
-
-                </h2>
-
-                <textarea
-                    value={reclamationMessage}
-                    onChange={(e) =>
-                        setReclamationMessage(
-                            e.target.value
-                        )
-                    }
-                    className="border w-full p-3 rounded h-32"
-                    placeholder="Expliquez votre réclamation..."
-                />
-
-                <div className="flex gap-3 mt-4">
-
-                    <button
-                        onClick={createReclamation}
-                        className="bg-green-600 text-white px-4 py-2 rounded"
-                    >
-                        Envoyer
-                    </button>
-
-                    <button
-                        onClick={() =>
-                            setShowReclamationModal(
-                                false
-                            )
-                        }
-                        className="bg-gray-300 px-4 py-2 rounded"
-                    >
-                        Annuler
-                    </button>
-
+                    </div>
                 </div>
-
-            </div>
-
-        </div>
-    )
-}
+            )}
         </StudentLayout>
-        
     );
-    
 }

@@ -144,10 +144,9 @@ useEffect(() => {
 
             <TeacherLayout>
 
-                <div>
-
-                    Loading...
-
+                <div className="flex min-h-[50vh] flex-col items-center justify-center gap-3">
+                    <div className="h-10 w-10 animate-spin rounded-full border-4 border-emerald-100 border-t-emerald-700" />
+                    <p className="text-sm font-medium text-slate-600">Chargement...</p>
                 </div>
 
             </TeacherLayout>
@@ -161,7 +160,7 @@ useEffect(() => {
             {
                 successMessage && (
 
-                    <div className="bg-green-600 text-white p-4 rounded mb-4">
+                    <div role="status" className="mb-4 flex items-center gap-3 rounded-xl border border-emerald-300 bg-emerald-50 px-4 py-3.5 text-sm font-semibold text-emerald-900">
 
                         {successMessage}
 
@@ -172,7 +171,7 @@ useEffect(() => {
             {
                 errorMessage && (
 
-                    <div className="bg-red-100 text-red-700 p-4 rounded mb-4">
+                    <div role="alert" className="mb-4 flex items-center gap-3 rounded-xl border border-red-300 bg-red-50 px-4 py-3.5 text-sm font-semibold text-red-800">
 
                         {errorMessage}
 
@@ -180,32 +179,32 @@ useEffect(() => {
                 )
             }
 
-            <h1 className="text-3xl font-bold mb-6">
+            <h1 className="mb-6 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
 
                 Réclamations
 
             </h1>
 
-            <div className="bg-white rounded shadow overflow-hidden">
+            <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
 
-                <table className="w-full">
+                <div className="overflow-x-auto"><table className="w-full min-w-[640px]">
 
-                    <thead className="bg-gray-200">
+                    <thead className="bg-slate-50">
 
                         <tr>
 
-                            <th className="p-4 text-left">
+                            <th className="border-b border-slate-200 px-5 py-4 text-left text-sm font-semibold text-slate-700">
                                 Étudiant
                             </th>
 
-                            <th className="p-4 text-left">
+                            <th className="border-b border-slate-200 px-5 py-4 text-left text-sm font-semibold text-slate-700">
                                 Matière
                             </th>
 
-                            <th className="p-4 text-left">
+                            <th className="border-b border-slate-200 px-5 py-4 text-left text-sm font-semibold text-slate-700">
                                 Statut
                             </th>
-                            <th className="p-4 text-left">
+                            <th className="border-b border-slate-200 px-5 py-4 text-left text-sm font-semibold text-slate-700">
                                 Action
                             </th>
                         </tr>
@@ -220,7 +219,7 @@ useEffect(() => {
 
                                     <tr
                                         key={reclamation.id}
-                                        className="border-t cursor-pointer hover:bg-blue-50 transition duration-200 hover:shadow-md"
+                                        className="cursor-pointer border-t border-slate-100 transition-colors hover:bg-emerald-50/40"
                                         onClick={() => {
 
                                             setSelectedReclamation(
@@ -241,7 +240,7 @@ useEffect(() => {
                                         }}
                                     >
 
-                                        <td className="p-4">
+                                        <td className="px-5 py-4 text-sm text-slate-700">
 
                                             {
                                                 reclamation.student_name
@@ -249,7 +248,7 @@ useEffect(() => {
 
                                         </td>
 
-                                        <td className="p-4">
+                                        <td className="px-5 py-4 text-sm text-slate-700">
 
                                             {
                                                 reclamation.matiere_name
@@ -257,13 +256,12 @@ useEffect(() => {
 
                                         </td>
 
-                                        <td className="p-4 capitalize">
-
-                                            {reclamation.status}
-
-                                        
+                                        <td className="px-5 py-4 text-sm font-medium capitalize text-slate-700">
+                                            <span className="inline-flex rounded-full bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 ring-1 ring-inset ring-slate-200">
+                                                {reclamation.status}
+                                            </span>
                                         </td>
-                                        <td className="p-4">
+                                        <td className="px-5 py-4 text-sm text-slate-700">
 
                                             <button
                                                 onClick={(e) => {
@@ -286,7 +284,7 @@ useEffect(() => {
                                                         reclamation.controle_final ?? ''
                                                     );
                                                 }}
-                                                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+                                                className="rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
                                             >
                                                 Voir la réclamation
                                             </button>
@@ -299,24 +297,24 @@ useEffect(() => {
 
                     </tbody>
 
-                </table>
+                </table></div>
 
             </div>
 
             {
                 selectedReclamation && (
 
-                    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm">
 
-                        <div className="bg-white p-6 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+                        <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl sm:p-8">
 
-                            <h2 className="text-2xl font-bold mb-4">
+                            <h2 className="mb-5 text-2xl font-bold tracking-tight text-slate-900">
 
                                 Réclamation
 
                             </h2>
 
-                            <div className="bg-gray-50 border rounded p-4 mb-4">
+                            <div className="mb-4 space-y-2 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
 
                                 <p>
 
@@ -344,9 +342,9 @@ useEffect(() => {
 
                             </div>
 
-                            <div className="bg-blue-50 border rounded p-4 mb-4">
+                            <div className="mb-4 rounded-xl border border-emerald-200 bg-emerald-50/70 p-4">
 
-                                <h3 className="font-semibold mb-3">
+                                <h3 className="mb-3 font-semibold text-slate-900">
 
                                     Notes publiées
 
@@ -354,7 +352,7 @@ useEffect(() => {
 
                                 <div className="mb-3">
 
-                                    <label className="block font-semibold mb-1">
+                                    <label className="mb-1.5 block text-sm font-semibold text-slate-700">
 
                                         Contrôle Continu
 
@@ -368,14 +366,14 @@ useEffect(() => {
                                                 e.target.value
                                             )
                                         }
-                                        className="border rounded p-2 w-full bg-white"
+                                        className="h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-base text-slate-900 outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20"
                                     />
 
                                 </div>
 
                                 <div className="mb-3">
 
-                                    <label className="block font-semibold mb-1">
+                                    <label className="mb-1.5 block text-sm font-semibold text-slate-700">
 
                                         Contrôle Final
 
@@ -389,7 +387,7 @@ useEffect(() => {
                                                 e.target.value
                                             )
                                         }
-                                        className="border rounded p-2 w-full bg-white"
+                                        className="h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-base text-slate-900 outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20"
                                     />
 
                                 </div>
@@ -406,13 +404,13 @@ useEffect(() => {
 
                             <div className="mb-4">
 
-                                <p className="font-semibold mb-2">
+                                <p className="mb-2 font-semibold text-slate-900">
 
                                     Message de l'étudiant
 
                                 </p>
 
-                                <div className="bg-gray-100 p-3 rounded">
+                                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm leading-6 text-slate-700">
 
                                     {
                                         selectedReclamation.message
@@ -429,11 +427,11 @@ useEffect(() => {
                                         e.target.value
                                     )
                                 }
-                                className="border w-full p-3 rounded h-32"
+                                className="min-h-32 w-full rounded-xl border border-slate-300 bg-white p-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20"
                                 placeholder="Réponse de l'enseignant..."
                             />
 
-                            <div className="flex gap-3 mt-4">
+                            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
 
                                 <button
                                     onClick={() =>
@@ -441,7 +439,7 @@ useEffect(() => {
                                             'accepted'
                                         )
                                     }
-                                    className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                                    className="rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
                                 >
                                     Accepter
                                 </button>
@@ -452,7 +450,7 @@ useEffect(() => {
                                             'rejected'
                                         )
                                     }
-                                    className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+                                    className="rounded-xl bg-red-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                                 >
                                     Rejeter
                                 </button>
@@ -463,7 +461,7 @@ useEffect(() => {
                                             null
                                         )
                                     }
-                                    className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
+                                    className="rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2"
                                 >
                                     Fermer
                                 </button>
