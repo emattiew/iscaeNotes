@@ -332,13 +332,12 @@ export default function UsersPage() {
         return (
 
             <AdminLayout>
-
-                <div>
-
-                    Loading...
-
+                <div className="flex min-h-[50vh] items-center justify-center">
+                    <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-6 py-5 text-sm font-medium text-slate-600 shadow-sm">
+                        <span className="h-5 w-5 animate-spin rounded-full border-2 border-emerald-600 border-t-transparent" />
+                        Chargement des utilisateurs...
+                    </div>
                 </div>
-
             </AdminLayout>
         );
     }
@@ -348,7 +347,7 @@ export default function UsersPage() {
 
         <AdminLayout>
 
-            <h1 className="text-3xl font-bold mb-6">
+            <h1 className="mb-7 text-3xl font-bold tracking-tight text-[#102c27]">
 
                 Utilisateurs
 
@@ -357,7 +356,7 @@ export default function UsersPage() {
 
             {successMessage && (
 
-                <div className="bg-green-600 text-white p-4 rounded mb-4">
+                <div className="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3.5 font-medium text-emerald-800 shadow-sm">
 
                     {successMessage}
 
@@ -367,7 +366,7 @@ export default function UsersPage() {
 
             {errorMessage && (
 
-                <div className="bg-red-600 text-white p-4 rounded mb-4">
+                <div className="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3.5 font-medium text-rose-800 shadow-sm">
 
                     {errorMessage}
 
@@ -375,7 +374,7 @@ export default function UsersPage() {
             )}
 
 
-            <div className="flex gap-3 mb-6">
+            <div className="mb-6 flex flex-wrap gap-3">
 
                 <button
                     onClick={() => {
@@ -406,7 +405,7 @@ export default function UsersPage() {
 
                         setShowModal(true);
                     }}
-                    className="bg-black text-white px-5 py-3 rounded hover:bg-gray-800"
+                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#102c27] px-5 py-3 font-semibold text-white shadow-sm transition hover:bg-[#1b443b] focus:outline-none focus:ring-4 focus:ring-emerald-100"
                 >
 
                     + Créer un utilisateur
@@ -415,7 +414,7 @@ export default function UsersPage() {
 
 
                 <label
-                    className={`bg-green-600 text-white px-5 py-3 rounded cursor-pointer hover:bg-green-700 ${
+                    className={`inline-flex items-center justify-center rounded-xl bg-emerald-600 px-5 py-3 font-semibold text-white shadow-sm transition hover:bg-emerald-700 ${
                         isImporting ? "opacity-60 cursor-not-allowed" : ""
                     }`}
                 >
@@ -436,9 +435,9 @@ export default function UsersPage() {
             {
                 showModal && (
 
-                    <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
+                    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-950/50 p-4 backdrop-blur-sm">
 
-                        <div className="bg-white w-full max-w-2xl rounded-lg p-8 relative">
+                        <div className="relative my-8 max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-slate-100 bg-white p-6 shadow-2xl sm:p-8">
 
                             <button
                                 onClick={() => {
@@ -447,7 +446,7 @@ export default function UsersPage() {
 
                                     setEditingUser(null);
                                 }}
-                                className="absolute top-4 right-4 text-gray-500 hover:text-black text-xl"
+                                className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full text-2xl text-slate-400 transition hover:bg-slate-100 hover:text-slate-800"
                             >
 
                                 ×
@@ -455,7 +454,7 @@ export default function UsersPage() {
                             </button>
 
 
-                            <h2 className="text-2xl font-bold mb-6">
+                            <h2 className="mb-6 text-2xl font-bold tracking-tight text-[#102c27]">
 
                                 {
                                     editingUser
@@ -472,7 +471,7 @@ export default function UsersPage() {
                                         ? updateUser
                                         : createUser
                                 }
-                                className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                                className="grid grid-cols-1 gap-4 md:grid-cols-2"
                             >
 
                                 <input
@@ -481,7 +480,7 @@ export default function UsersPage() {
                                     value={formData.username}
                                     onChange={handleChange}
                                     placeholder="Nom d'utilisateur"
-                                    className="border p-3 rounded"
+                                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-50"
                                     required
                                 />
                                 <input
@@ -490,7 +489,7 @@ export default function UsersPage() {
                                     value={formData.first_name}
                                     onChange={handleChange}
                                     placeholder="Prénom"
-                                    className="border p-3 rounded"
+                                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-50"
                                 />
 
                                 <input
@@ -499,7 +498,7 @@ export default function UsersPage() {
                                     value={formData.last_name}
                                     onChange={handleChange}
                                     placeholder="Nom"
-                                    className="border p-3 rounded"
+                                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-50"
                                 />
 
                                 <input
@@ -508,7 +507,7 @@ export default function UsersPage() {
                                     value={formData.email}
                                     onChange={handleChange}
                                     placeholder="Email"
-                                    className="border p-3 rounded"
+                                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-50"
                                     required
                                 />
 
@@ -523,7 +522,7 @@ export default function UsersPage() {
                                             ? "Nouveau mot de passe"
                                             : "Mot de passe"
                                     }
-                                    className="border p-3 rounded"
+                                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-50"
                                     required={!editingUser}
                                 />
 
@@ -532,7 +531,7 @@ export default function UsersPage() {
                                     name="role"
                                     value={formData.role}
                                     onChange={handleChange}
-                                    className="border p-3 rounded"
+                                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-50"
                                 >
 
                                     <option value="student">
@@ -559,14 +558,14 @@ export default function UsersPage() {
                                                 value={formData.matricule}
                                                 onChange={handleChange}
                                                 placeholder="Matricule"
-                                                className="border p-3 rounded"
+                                                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-50"
                                             />
 
                                             <select
                                                 name="filiere"
                                                 value={formData.filiere}
                                                 onChange={handleChange}
-                                                className="border p-3 rounded"
+                                                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-50"
                                                 required
                                             >
                                                 <option value="">
@@ -587,7 +586,7 @@ export default function UsersPage() {
                                                 name="niveau"
                                                 value={formData.niveau}
                                                 onChange={handleChange}
-                                                className="border p-3 rounded"
+                                                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-50"
                                                 required
                                             >
                                                 <option value="">
@@ -604,24 +603,25 @@ export default function UsersPage() {
                                 }
                                 
                                 {formData.role === 'teacher' && (
-                                    <div className="md:col-span-2 border rounded-lg p-4">
-                                        <p className="font-semibold mb-3">
+                                    <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-4 md:col-span-2">
+                                        <p className="mb-3 font-semibold text-[#102c27]">
                                             Filières de l'enseignant
                                         </p>
 
                                         {filieres.length === 0 ? (
-                                            <p className="text-gray-500">
+                                            <p className="text-sm text-slate-500">
                                                 Aucune filière disponible.
                                             </p>
                                         ) : (
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                                                 {filieres.map((filiere) => (
                                                     <label
                                                         key={filiere.id}
-                                                        className="flex items-center gap-2 cursor-pointer"
+                                                        className="flex cursor-pointer items-center gap-3 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 transition hover:border-emerald-300 hover:bg-emerald-50/50"
                                                     >
                                                         <input
                                                             type="checkbox"
+                                                            className="h-4 w-4 rounded border-slate-300 accent-emerald-700 focus:ring-emerald-600"
                                                             checked={formData.teacher_filieres.includes(
                                                                 Number(filiere.id)
                                                             )}
@@ -647,7 +647,7 @@ export default function UsersPage() {
 
                                 <button
                                     type="submit"
-                                    className="bg-black text-white p-3 rounded hover:bg-gray-800"
+                                    className="rounded-xl bg-[#102c27] px-5 py-3 font-semibold text-white shadow-sm transition hover:bg-[#1b443b] focus:outline-none focus:ring-4 focus:ring-emerald-100 md:col-span-2"
                                 >
 
                                     {
@@ -665,11 +665,11 @@ export default function UsersPage() {
                     </div>
                 )
             }
-            <div className="flex flex-col sm:flex-row gap-3 mb-4">
+            <div className="mb-4 flex flex-col gap-3 sm:flex-row">
                 <select
                     value={roleFilter}
                     onChange={(e) => setRoleFilter(e.target.value)}
-                    className="border border-gray-300 p-3 rounded-lg bg-white"
+                    className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-emerald-600 focus:ring-4 focus:ring-emerald-50"
                 >
                     <option value="all">Tous les utilisateurs</option>
                     <option value="teacher">Enseignants uniquement</option>
@@ -677,10 +677,10 @@ export default function UsersPage() {
                     <option value="student">Étudiants uniquement</option>
                 </select>
             </div>
-            <div className="mb-4 relative max-w-md">
+            <div className="relative mb-5 w-full max-w-md">
                 <Search
                     size={20}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
                 />
 
                 <input
@@ -688,47 +688,47 @@ export default function UsersPage() {
                     value={searchMatricule}
                     onChange={(e) => setSearchMatricule(e.target.value)}
                     placeholder="Rechercher par matricule"
-                    className="border border-gray-300 p-3 pl-10 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-4 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-50"
                 />
             </div>
 
-            <div className="bg-white rounded shadow overflow-hidden">
+            <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
 
-                <table className="w-full">
+                <table className="w-full min-w-[1050px] text-left">
 
-                    <thead className="bg-gray-200">
+                    <thead className="bg-[#102c27] text-white">
 
                         <tr>
 
-                            <th className="p-4 text-left">
+                            <th className="whitespace-nowrap px-4 py-4 text-left text-xs font-semibold uppercase tracking-wide text-white/90">
                                 Utilisateur
                             </th>
-                            <th className="p-4 text-left">
+                            <th className="whitespace-nowrap px-4 py-4 text-left text-xs font-semibold uppercase tracking-wide text-white/90">
                                 Prénom
                             </th>
 
-                            <th className="p-4 text-left">
+                            <th className="whitespace-nowrap px-4 py-4 text-left text-xs font-semibold uppercase tracking-wide text-white/90">
                                 Nom
                             </th>
-                            <th className="p-4 text-left">
+                            <th className="whitespace-nowrap px-4 py-4 text-left text-xs font-semibold uppercase tracking-wide text-white/90">
                                 Email
                             </th>
 
-                            <th className="p-4 text-left">
+                            <th className="whitespace-nowrap px-4 py-4 text-left text-xs font-semibold uppercase tracking-wide text-white/90">
                                 Role
                             </th>
 
-                            <th className="p-4 text-left">
+                            <th className="whitespace-nowrap px-4 py-4 text-left text-xs font-semibold uppercase tracking-wide text-white/90">
                                 Matricule
                             </th>
 
-                            <th className="p-4 text-left">
+                            <th className="whitespace-nowrap px-4 py-4 text-left text-xs font-semibold uppercase tracking-wide text-white/90">
                                 Filière
                             </th>
-                            <th className="p-4 text-left">
+                            <th className="whitespace-nowrap px-4 py-4 text-left text-xs font-semibold uppercase tracking-wide text-white/90">
                                 Niveau
                             </th>
-                            <th className="p-4 text-left">
+                            <th className="whitespace-nowrap px-4 py-4 text-left text-xs font-semibold uppercase tracking-wide text-white/90">
                                 Actions
                             </th>
 
@@ -751,24 +751,24 @@ export default function UsersPage() {
 
                             <tr
                                 key={user.id}
-                                className="border-t"
+                                className="border-t border-slate-100 transition hover:bg-emerald-50/40"
                             >
 
-                                <td className="p-4">
+                                <td className="px-4 py-4 text-sm text-slate-600">
                                     {user.username}
                                 </td>
-                                <td className="p-4">
+                                <td className="px-4 py-4 text-sm text-slate-600">
                                     {user.first_name}
                                 </td>
 
-                                <td className="p-4">
+                                <td className="px-4 py-4 text-sm text-slate-600">
                                     {user.last_name}
                                 </td>
-                                <td className="p-4">
+                                <td className="px-4 py-4 text-sm text-slate-600">
                                     {user.email}
                                 </td>
 
-                                <td className="p-4">
+                                <td className="px-4 py-4 text-sm text-slate-600">
                                     {{
                                         student: "Étudiant",
                                         teacher: "Enseignant",
@@ -776,11 +776,11 @@ export default function UsersPage() {
                                     }[user.role]}
                                 </td>
 
-                                <td className="p-4">
+                                <td className="px-4 py-4 text-sm text-slate-600">
                                     {user.matricule}
                                 </td>
 
-                                <td className="p-4">
+                                <td className="px-4 py-4 text-sm text-slate-600">
                                     {user.role === "teacher"
                                         ? (user.teacher_filieres || [])
                                             .map((id) => {
@@ -793,10 +793,10 @@ export default function UsersPage() {
                                             .join(", ") || "Aucune filière"
                                         : user.filiere_name || "-"}
                                 </td>
-                                <td className="p-4">
+                                <td className="px-4 py-4 text-sm text-slate-600">
                                     {user.niveau}
                                 </td>
-                                <td className="p-4 flex gap-2">
+                                <td className="flex gap-2 whitespace-nowrap px-4 py-4">
 
                                     <button
                                         onClick={() => {
@@ -825,7 +825,7 @@ export default function UsersPage() {
                                             });
                                             setShowModal(true);
                                         }}
-                                        className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+                                        className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-800 transition hover:bg-emerald-100"
                                     >
 
                                         Modifier
@@ -837,7 +837,7 @@ export default function UsersPage() {
                                         onClick={() =>
                                             openDeleteModal(user.id)
                                         }
-                                        className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
+                                        className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-700 transition hover:bg-rose-100"
                                     >
 
                                         Supprimer
@@ -859,23 +859,23 @@ export default function UsersPage() {
             {
                 showDeleteModal && (
 
-                    <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
+                    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-950/50 p-4 backdrop-blur-sm">
 
-                        <div className="bg-white w-full max-w-md rounded-lg p-8">
+                        <div className="w-full max-w-md rounded-2xl border border-slate-100 bg-white p-6 shadow-2xl sm:p-8">
 
-                            <h2 className="text-2xl font-bold mb-4">
+                            <h2 className="mb-4 text-2xl font-bold tracking-tight text-[#102c27]">
 
                                 Confirmation
 
                             </h2>
 
-                            <p className="text-gray-600 mb-6">
+                            <p className="mb-6 text-sm leading-6 text-slate-600">
 
                                 Voulez-vous vraiment supprimer cet utilisateur ?
 
                             </p>
 
-                            <div className="flex justify-end gap-4">
+                            <div className="flex justify-end gap-3">
 
                                 <button
                                     onClick={() => {
@@ -884,7 +884,7 @@ export default function UsersPage() {
 
                                         setUserToDelete(null);
                                     }}
-                                    className="px-5 py-2 rounded border"
+                                    className="rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50"
                                 >
 
                                     Annuler
@@ -894,7 +894,7 @@ export default function UsersPage() {
 
                                 <button
                                     onClick={deleteUser}
-                                    className="bg-red-600 text-white px-5 py-2 rounded hover:bg-red-700"
+                                    className="rounded-xl bg-rose-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-rose-700 focus:outline-none focus:ring-4 focus:ring-rose-100"
                                 >
 
                                     Supprimer

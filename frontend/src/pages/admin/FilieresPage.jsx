@@ -186,10 +186,11 @@ export default function FilieresPage() {
 
             <AdminLayout>
 
-                <div>
-
-                    Loading...
-
+                <div className="flex min-h-[40vh] items-center justify-center">
+                    <div className="flex items-center gap-3 rounded-2xl border border-emerald-100 bg-white px-6 py-5 shadow-sm">
+                        <span className="h-5 w-5 animate-spin rounded-full border-2 border-emerald-700 border-t-transparent" />
+                        <span className="text-sm font-medium text-slate-600">Chargement des filières...</span>
+                    </div>
                 </div>
 
             </AdminLayout>
@@ -201,7 +202,7 @@ export default function FilieresPage() {
 
         <AdminLayout>
 
-            <h1 className="text-3xl font-bold mb-6">
+            <h1 className="mb-7 text-3xl font-bold tracking-tight text-[#102c27]">
 
                 Filières
 
@@ -210,7 +211,7 @@ export default function FilieresPage() {
 
             {successMessage && (
 
-                <div className="bg-green-600 text-white p-4 rounded mb-4">
+                <div className="mb-4 flex items-center rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3.5 text-sm font-medium text-emerald-800 shadow-sm">
 
                     {successMessage}
 
@@ -220,7 +221,7 @@ export default function FilieresPage() {
 
             {errorMessage && (
 
-                <div className="bg-red-600 text-white p-4 rounded mb-4">
+                <div className="mb-4 flex items-center rounded-xl border border-rose-200 bg-rose-50 px-4 py-3.5 text-sm font-medium text-rose-700 shadow-sm">
 
                     {errorMessage}
 
@@ -239,7 +240,7 @@ export default function FilieresPage() {
 
                     setShowModal(true);
                 }}
-                className="bg-black text-white px-5 py-3 rounded mb-6 hover:bg-gray-800"
+                className="mb-6 inline-flex items-center gap-2 rounded-xl bg-[#102c27] px-5 py-3 text-sm font-semibold text-white shadow-sm transition duration-200 hover:bg-[#19463d] focus:outline-none focus:ring-4 focus:ring-emerald-100"
             >
 
                 + Créer une filière
@@ -250,9 +251,9 @@ export default function FilieresPage() {
             {
                 showModal && (
 
-                    <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
+                    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-950/50 p-4 backdrop-blur-sm">
 
-                        <div className="bg-white w-full max-w-lg rounded-lg p-8 relative">
+                        <div className="relative my-8 w-full max-w-lg rounded-2xl border border-slate-100 bg-white p-6 shadow-2xl sm:p-8">
 
                             <button
                                 onClick={() => {
@@ -265,7 +266,7 @@ export default function FilieresPage() {
                                     code: '',
                                 });
                             }}
-                                className="absolute top-4 right-4 text-gray-500 hover:text-black text-xl"
+                                className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-xl text-2xl text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus:ring-4 focus:ring-emerald-100"
                             >
 
                                 ×
@@ -273,7 +274,7 @@ export default function FilieresPage() {
                             </button>
 
 
-                            <h2 className="text-2xl font-bold mb-6">
+                            <h2 className="mb-6 pr-10 text-2xl font-bold tracking-tight text-[#102c27]">
                                 {editingId
                                     ? "Modifier la filière"
                                     : "Créer une filière"}
@@ -291,7 +292,7 @@ export default function FilieresPage() {
                                     value={formData.name}
                                     onChange={handleChange}
                                     placeholder="Nom de la filière"
-                                    className="border p-3 rounded"
+                                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-emerald-700 focus:ring-4 focus:ring-emerald-50"
                                     required
                                 />
 
@@ -302,14 +303,14 @@ export default function FilieresPage() {
                                     value={formData.code}
                                     onChange={handleChange}
                                     placeholder="Code"
-                                    className="border p-3 rounded"
+                                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-emerald-700 focus:ring-4 focus:ring-emerald-50"
                                     required
                                 />
 
 
                                 <button
                                     type="submit"
-                                    className="bg-black text-white p-3 rounded hover:bg-gray-800"
+                                    className="mt-1 w-full rounded-xl bg-[#102c27] px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#19463d] focus:outline-none focus:ring-4 focus:ring-emerald-100"
                                 >
                                     {editingId ? "Modifier" : "Créer"}
                                 </button>
@@ -323,23 +324,23 @@ export default function FilieresPage() {
             }
 
 
-            <div className="bg-white rounded shadow overflow-hidden">
+            <div className="overflow-x-auto rounded-2xl border border-slate-200/80 bg-white shadow-sm">
 
-                <table className="w-full">
+                <table className="w-full min-w-[560px] text-left">
 
-                    <thead className="bg-gray-200">
+                    <thead className="bg-[#102c27] text-white">
 
                         <tr>
 
-                            <th className="p-4 text-left">
+                            <th className="px-5 py-4 text-xs font-semibold uppercase tracking-wider text-white/90">
                                 Nom
                             </th>
 
-                            <th className="p-4 text-left">
+                            <th className="px-5 py-4 text-xs font-semibold uppercase tracking-wider text-white/90">
                                 Code
                             </th>
 
-                            <th className="p-4 text-left">
+                            <th className="px-5 py-4 text-xs font-semibold uppercase tracking-wider text-white/90">
                                 Actions
                             </th>
 
@@ -353,34 +354,34 @@ export default function FilieresPage() {
 
                             <tr
                                 key={filiere.id}
-                                className="border-t"
+                                className="border-t border-slate-100 transition-colors hover:bg-emerald-50/40"
                             >
 
-                                <td className="p-4">
+                                <td className="px-5 py-4 text-sm text-slate-700">
                                     {filiere.name}
                                 </td>
 
-                                <td className="p-4">
+                                <td className="px-5 py-4 text-sm text-slate-700">
                                     {filiere.code}
                                 </td>
 
-                                <td className="p-4 flex gap-2">
+                                <td className="px-5 py-4"><div className="flex flex-wrap items-center gap-2">
 
                                     <button
                                         onClick={() => editFiliere(filiere)}
-                                        className="bg-blue-600 text-white px-3 py-1 rounded"
+                                        className="rounded-lg border border-emerald-200 bg-emerald-50 px-3.5 py-2 text-xs font-semibold text-emerald-800 transition hover:border-emerald-300 hover:bg-emerald-100 focus:outline-none focus:ring-4 focus:ring-emerald-100"
                                     >
                                         Modifier
                                     </button>
 
                                     <button
                                         onClick={() => openDeleteModal(filiere.id)}
-                                        className="bg-red-600 text-white px-3 py-1 rounded"
+                                        className="rounded-lg border border-rose-200 bg-rose-50 px-3.5 py-2 text-xs font-semibold text-rose-700 transition hover:bg-rose-100 focus:outline-none focus:ring-4 focus:ring-rose-100"
                                     >
                                         Supprimer
                                     </button>
 
-                                </td>
+                                </div></td>
 
                             </tr>
                         ))}
@@ -393,17 +394,17 @@ export default function FilieresPage() {
              {
     showDeleteModal && (
 
-        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
+        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-950/50 p-4 backdrop-blur-sm">
 
-            <div className="bg-white w-full max-w-md rounded-lg p-8">
+            <div className="w-full max-w-md rounded-2xl border border-slate-100 bg-white p-6 shadow-2xl sm:p-8">
 
-                <h2 className="text-2xl font-bold mb-4">
+                <h2 className="mb-4 text-2xl font-bold tracking-tight text-[#102c27]">
 
                     Confirmation
 
                 </h2>
 
-                <p className="text-gray-600 mb-6">
+                <p className="mb-6 text-sm leading-6 text-slate-600">
 
                     Voulez-vous vraiment supprimer cette filière ?
 
@@ -418,7 +419,7 @@ export default function FilieresPage() {
 
                             setFiliereToDelete(null);
                         }}
-                        className="px-5 py-2 rounded border"
+                        className="rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 focus:outline-none focus:ring-4 focus:ring-slate-100"
                     >
 
                         Annuler
@@ -427,7 +428,7 @@ export default function FilieresPage() {
 
                     <button
                         onClick={deleteFiliere}
-                        className="bg-red-600 text-white px-5 py-2 rounded hover:bg-red-700"
+                        className="rounded-xl bg-rose-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-rose-700 focus:outline-none focus:ring-4 focus:ring-rose-100"
                     >
 
                         Supprimer

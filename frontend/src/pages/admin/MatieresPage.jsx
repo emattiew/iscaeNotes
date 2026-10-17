@@ -225,10 +225,11 @@ const deleteMatiere = async () => {
 
             <AdminLayout>
 
-                <div>
-
-                    Loading...
-
+                <div className="flex min-h-[45vh] items-center justify-center">
+                    <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-6 py-5 text-sm font-medium text-slate-600 shadow-sm">
+                        <span className="h-5 w-5 animate-spin rounded-full border-2 border-emerald-700/20 border-t-emerald-700" />
+                        Chargement des matières...
+                    </div>
                 </div>
 
             </AdminLayout>
@@ -240,16 +241,17 @@ const deleteMatiere = async () => {
 
         <AdminLayout>
 
-            <h1 className="text-3xl font-bold mb-6">
-
-                Matières
-
-            </h1>
+            <div className="mb-6">
+                <h1 className="text-3xl font-bold tracking-tight text-[#102c27]">
+                    Matières
+                </h1>
+                
+            </div>
 
 
             {successMessage && (
 
-                <div className="bg-green-600 text-white p-4 rounded mb-4">
+                <div className="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800 shadow-sm">
 
                     {successMessage}
 
@@ -259,7 +261,7 @@ const deleteMatiere = async () => {
 
             {errorMessage && (
 
-                <div className="bg-red-600 text-white p-4 rounded mb-4">
+                <div className="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-800 shadow-sm">
 
                     {errorMessage}
 
@@ -281,7 +283,7 @@ const deleteMatiere = async () => {
 
                 setShowModal(true);
             }}
-                className="bg-black text-white px-5 py-3 rounded mb-6 hover:bg-gray-800"
+                className="mb-6 inline-flex items-center gap-2 rounded-xl bg-[#102c27] px-5 py-3 font-semibold text-white shadow-sm transition hover:bg-emerald-900 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:ring-offset-2"
             >
 
                 + Créer une matière
@@ -292,9 +294,9 @@ const deleteMatiere = async () => {
             {
                 showModal && (
 
-                    <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
+                    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-950/55 p-4 backdrop-blur-sm">
 
-                        <div className="bg-white w-full max-w-xl rounded-lg p-8 relative">
+                        <div className="relative my-8 w-full max-w-2xl rounded-2xl border border-slate-100 bg-white p-6 shadow-2xl sm:p-8">
 
                             <button
                                 onClick={() => {
@@ -310,7 +312,7 @@ const deleteMatiere = async () => {
                                         credit: '',
                                     });
                                 }}
-                                className="absolute top-4 right-4 text-gray-500 hover:text-black text-xl"
+                                className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full text-2xl text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
                             >
 
                                 ×
@@ -318,7 +320,7 @@ const deleteMatiere = async () => {
                             </button>
 
 
-                            <h2 className="text-2xl font-bold mb-6">
+                            <h2 className="mb-6 pr-10 text-2xl font-bold tracking-tight text-[#102c27]">
 
                                 {
                                     editingId
@@ -331,14 +333,14 @@ const deleteMatiere = async () => {
 
                             <form
                                 onSubmit={createMatiere}
-                                className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                                className="grid grid-cols-1 gap-5 md:grid-cols-2"
                             >
 
                                 <select
                                     name="module"
                                     value={formData.module}
                                     onChange={handleChange}
-                                    className="border p-3 rounded"
+                                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/10"
                                     required
                                 >
 
@@ -369,7 +371,7 @@ const deleteMatiere = async () => {
                                     value={formData.name}
                                     onChange={handleChange}
                                     placeholder="Nom de la matière"
-                                    className="border p-3 rounded"
+                                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/10"
                                     required
                                 />
 
@@ -381,7 +383,7 @@ const deleteMatiere = async () => {
                                     value={formData.coefficient}
                                     onChange={handleChange}
                                     placeholder="Coefficient / Crédit"
-                                    className="border p-3 rounded"
+                                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/10"
                                     required
                                 />
 
@@ -391,7 +393,7 @@ const deleteMatiere = async () => {
 
                                 <button
                                     type="submit"
-                                    className="bg-black text-white p-3 rounded hover:bg-gray-800"
+                                    className="rounded-xl bg-[#102c27] px-5 py-3 font-semibold text-white shadow-sm transition hover:bg-emerald-900 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:ring-offset-2"
                                 >
 
                                     {editingId ? "Modifier" : "Créer"}
@@ -407,30 +409,30 @@ const deleteMatiere = async () => {
             }
 
 
-            <div className="bg-white rounded shadow overflow-hidden">
+            <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                <div className="overflow-x-auto">
+                <table className="w-full min-w-[760px] text-left">
 
-                <table className="w-full">
-
-                    <thead className="bg-gray-200">
+                    <thead className="bg-[#102c27] text-white">
 
                         <tr>
 
-                            <th className="p-4 text-left">
+                            <th className="whitespace-nowrap px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider text-emerald-50">
                                 Matière
                             </th>
 
-                            <th className="p-4 text-left">
+                            <th className="whitespace-nowrap px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider text-emerald-50">
                                 Module
                             </th>
 
-                            <th className="p-4 text-left">
+                            <th className="whitespace-nowrap px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider text-emerald-50">
                                 Coefficient
                             </th>
 
-                            <th className="p-4 text-left">
+                            <th className="whitespace-nowrap px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider text-emerald-50">
                                 Crédit
                             </th>
-                            <th className="p-4 text-left">
+                            <th className="whitespace-nowrap px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider text-emerald-50">
                                 Actions
                             </th>
                         </tr>
@@ -443,36 +445,36 @@ const deleteMatiere = async () => {
 
                             <tr
                                 key={matiere.id}
-                                className="border-t"
+                                className="border-t border-slate-100 transition-colors hover:bg-emerald-50/40"
                             >
 
-                                <td className="p-4">
+                                <td className="px-5 py-4 text-sm text-slate-700">
                                     {matiere.name}
                                 </td>
 
-                                <td className="p-4">
+                                <td className="px-5 py-4 text-sm text-slate-700">
                                     {matiere.module_name}
                                 </td>
 
-                                <td className="p-4">
+                                <td className="px-5 py-4 text-sm text-slate-700">
                                     {matiere.coefficient}
                                 </td>
 
-                                <td className="p-4">
+                                <td className="px-5 py-4 text-sm text-slate-700">
                                     {matiere.credit}
                                 </td>
-                                <td className="p-4 flex gap-2">
+                                <td className="flex gap-2 whitespace-nowrap px-5 py-4">
 
                                     <button
                                         onClick={() => editMatiere(matiere)}
-                                        className="bg-blue-600 text-white px-3 py-1 rounded"
+                                        className="rounded-lg bg-emerald-100 px-3 py-2 text-sm font-semibold text-emerald-800 transition hover:bg-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                                     >
                                         Modifier
                                     </button>
 
                                     <button
                                         onClick={() => openDeleteModal(matiere.id)}
-                                        className="bg-red-600 text-white px-3 py-1 rounded"
+                                        className="rounded-lg bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-700 transition hover:bg-rose-100 focus:outline-none focus:ring-2 focus:ring-rose-500"
                                     >
                                         Supprimer
                                     </button>
@@ -484,22 +486,22 @@ const deleteMatiere = async () => {
                     </tbody>
 
                 </table>
-
+                </div>
             </div>
             {
     showDeleteModal && (
 
-        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
+        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-950/55 p-4 backdrop-blur-sm">
 
-            <div className="bg-white w-full max-w-md rounded-lg p-8">
+            <div className="w-full max-w-md rounded-2xl border border-slate-100 bg-white p-6 shadow-2xl sm:p-8">
 
-                <h2 className="text-2xl font-bold mb-4">
+                <h2 className="mb-3 text-2xl font-bold tracking-tight text-[#102c27]">
 
                     Confirmation
 
                 </h2>
 
-                <p className="text-gray-600 mb-6">
+                <p className="mb-6 text-sm leading-6 text-slate-600">
 
                     Voulez-vous vraiment supprimer cette matière ?
 
@@ -514,7 +516,7 @@ const deleteMatiere = async () => {
 
                             setMatiereToDelete(null);
                         }}
-                        className="px-5 py-2 rounded border"
+                        className="rounded-xl border border-slate-200 px-5 py-2.5 font-medium text-slate-700 transition hover:bg-slate-50"
                     >
 
                         Annuler
@@ -523,7 +525,7 @@ const deleteMatiere = async () => {
 
                     <button
                         onClick={deleteMatiere}
-                        className="bg-red-600 text-white px-5 py-2 rounded hover:bg-red-700"
+                        className="rounded-xl bg-rose-600 px-5 py-2.5 font-semibold text-white transition hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2"
                     >
 
                         Supprimer

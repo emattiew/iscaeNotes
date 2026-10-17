@@ -550,330 +550,177 @@ const annualDecision =
 
 
     if (loading) {
-
         return (
             <AdminLayout>
-
-                <div>
-                    Loading...
+                <div className="flex min-h-[50vh] items-center justify-center">
+                    <div className="flex flex-col items-center gap-3">
+                        <div className="h-10 w-10 animate-spin rounded-full border-4 border-emerald-100 border-t-emerald-700" />
+                        <p className="text-sm text-slate-500">Chargement...</p>
+                    </div>
                 </div>
-
             </AdminLayout>
         );
     }
 
-
     return (
-
         <AdminLayout>
-
-            <h1 className="text-3xl font-bold mb-6">
-                Résultats annuels
-            </h1>
-
-
-            <div className="bg-white rounded shadow p-6 mb-6">
-
-                <h2 className="text-xl font-semibold mb-4">
-                    Résultats annuels
-                </h2>
-
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                    <select
-                        value={selectedYear}
-                        onChange={(e) =>
-                            setSelectedYear(
-                                e.target.value
-                            )
-                        }
-                        className="border p-3 rounded"
-                    >
-
-                        <option value="">
-                            Sélectionner une année
-                        </option>
-
-
-                        {years.map(
-                            (year) => (
-
-                                <option
-                                    key={year}
-                                    value={year}
-                                >
-                                    {year}
-                                </option>
-
-                            )
-                        )}
-
-                    </select>
-
-
-                    <select
-                        value={
-                            selectedFiliere
-                        }
-                        onChange={(e) =>
-                            setSelectedFiliere(
-                                e.target.value
-                            )
-                        }
-                        className="border p-3 rounded"
-                    >
-
-                        <option value="">
-                            Sélectionner une filière
-                        </option>
-
-
-                        {filieres.map(
-                            (filiere) => (
-
-                                <option
-                                    key={filiere.id}
-                                    value={
-                                        filiere.id
-                                    }
-                                >
-                                    {filiere.code}
-                                </option>
-
-                            )
-                        )}
-
-                    </select>
-
+            <div className="space-y-6 pb-8">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <p className="mb-2 text-sm font-medium text-emerald-700">Gestion académique</p>
+                        <h1 className="text-2xl font-bold tracking-tight text-[#102c27] sm:text-3xl">
+                            Résultats annuels
+                        </h1>
+                    </div>
+                    <div className="flex w-fit items-center gap-3 rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#102c27] text-white">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" className="h-5 w-5">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M8 3.75h6l4.25 4.25v12.25H5.75V3.75H8Z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M14 3.75V8h4.25M8.5 12h7M8.5 15.5h7" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p className="text-xs text-emerald-800">Année académique</p>
+                            <p className="text-sm font-semibold text-[#102c27]">{selectedYear || "Non sélectionnée"}</p>
+                        </div>
+                    </div>
                 </div>
 
-            </div>
+                <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                    <div className="flex items-center gap-3 border-b border-slate-100 px-5 py-4 sm:px-6">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-800">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" className="h-5 w-5">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M7 12h10m-7 6h4" />
+                            </svg>
+                        </div>
+                        <h2 className="font-semibold text-[#102c27]">Filtres</h2>
+                    </div>
+                    <div className="grid grid-cols-1 gap-5 p-5 sm:grid-cols-2 sm:p-6">
+                        <div className="space-y-2">
+                            <label htmlFor="annual-year" className="block text-sm font-medium text-slate-700">Année académique</label>
+                            <select id="annual-year" value={selectedYear} onChange={(e) => setSelectedYear(e.target.value)} className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-emerald-600 focus:bg-white focus:ring-4 focus:ring-emerald-600/10">
+                                <option value="">Sélectionner une année</option>
+                                {years.map((year) => <option key={year} value={year}>{year}</option>)}
+                            </select>
+                        </div>
+                        <div className="space-y-2">
+                            <label htmlFor="annual-filiere" className="block text-sm font-medium text-slate-700">Filière</label>
+                            <select id="annual-filiere" value={selectedFiliere} onChange={(e) => setSelectedFiliere(e.target.value)} className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-emerald-600 focus:bg-white focus:ring-4 focus:ring-emerald-600/10">
+                                <option value="">Sélectionner une filière</option>
+                                {filieres.map((filiere) => <option key={filiere.id} value={filiere.id}>{filiere.code}</option>)}
+                            </select>
+                        </div>
+                    </div>
+                </section>
 
-
-            <div className="bg-white rounded shadow overflow-x-auto">
-
-                {resultsLoading ? (
-
-                    <div className="p-6">
-                        Chargement des résultats...
+                <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                    <div className="flex flex-col gap-3 border-b border-slate-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+                        <h2 className="font-semibold text-[#102c27]">Résultats des étudiants</h2>
+                        <div className="flex flex-wrap items-center gap-2">
+                            {selectedYear && <span className="rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-800">{selectedYear}</span>}
+                            {selectedFiliere && <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-600">{filieres.find((filiere) => String(filiere.id) === String(selectedFiliere))?.code || "Filière"}</span>}
+                        </div>
                     </div>
 
-                ) : (
-
-                    <table className="w-full">
-
-                        <thead className="bg-gray-200">
-
-                            <tr>
-
-                                <th className="p-4 text-left">
-                                    Matricule
-                                </th>
-
-
-                                <th className="p-4 text-left">
-                                    Étudiant
-                                </th>
-
-
-                                {subjects.map(
-                                    (subject) => (
-
-                                        <th
-                                            key={
-                                                subject.id
-                                            }
-                                            className="p-4 text-left"
-                                        >
-                                            {
-                                                subject.name
-                                            }
-                                        </th>
-
-                                    )
-                                )}
-
-
-                                <th className="p-4 text-left">
-                                    Action
-                                </th>
-
-                            </tr>
-
-                        </thead>
-
-
-                        <tbody>
-
-                            {studentsResults.map(
-                                (student) => (
-
-                                    <tr
-                                        key={
-                                            student.id
-                                        }
-                                        className="border-t"
-                                    >
-
-                                        <td className="p-4">
-                                            {
-                                                student.matricule ||
-                                                "-"
-                                            }
-                                        </td>
-
-
-                                        <td className="p-4">
-                                            {
-                                                student.first_name
-                                            }{" "}
-                                            {
-                                                student.last_name
-                                            }
-                                        </td>
-
-
-                                        {subjects.map(
-                                            (subject) => {
-
-                                                const collecte =
-                                                    filteredCollectes.find(
-                                                        (
-                                                            collecte
-                                                        ) =>
-                                                            String(
-                                                                collecte.matiere
-                                                            ) ===
-                                                            String(
-                                                                subject.id
-                                                            )
+                    {resultsLoading ? (
+                        <div className="flex min-h-56 flex-col items-center justify-center gap-3 p-8">
+                            <div className="h-9 w-9 animate-spin rounded-full border-4 border-emerald-100 border-t-emerald-700" />
+                            <p className="text-sm text-slate-500">Chargement des résultats...</p>
+                        </div>
+                    ) : !selectedYear || !selectedFiliere ? (
+                        <div className="flex min-h-56 flex-col items-center justify-center p-8 text-center">
+                            <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-50 text-emerald-800">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" className="h-6 w-6">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 5.75A1.75 1.75 0 0 1 5.75 4h12.5A1.75 1.75 0 0 1 20 5.75v12.5A1.75 1.75 0 0 1 18.25 20H5.75A1.75 1.75 0 0 1 4 18.25V5.75Z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M8 9h8M8 12.5h5" />
+                                </svg>
+                            </div>
+                            <h3 className="font-semibold text-[#102c27]">Sélectionnez une année et une filière</h3>
+                        </div>
+                    ) : studentsResults.length === 0 ? (
+                        <div className="flex min-h-56 flex-col items-center justify-center p-8 text-center">
+                            <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 text-slate-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" className="h-6 w-6">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M7 3.75h7l4.25 4.25v12.25H5.75V3.75H7Z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M14 3.75V8h4.25M8.5 12h7" />
+                                </svg>
+                            </div>
+                            <h3 className="font-semibold text-[#102c27]">Aucun étudiant trouvé</h3>
+                        </div>
+                    ) : (
+                        <>
+                            <div className="border-b border-slate-100 bg-slate-50/70 px-5 py-3 sm:px-6">
+                                <p className="text-sm text-slate-600"><span className="font-semibold text-[#102c27]">{studentsResults.length}</span> étudiant(s)</p>
+                            </div>
+                            <div className="overflow-x-auto">
+                                <table className="w-full min-w-max text-left">
+                                    <thead className="bg-[#102c27] text-white">
+                                        <tr>
+                                            <th className="whitespace-nowrap px-5 py-4 text-xs font-semibold uppercase tracking-wider">Matricule</th>
+                                            <th className="sticky left-0 z-10 min-w-52 bg-[#102c27] px-5 py-4 text-xs font-semibold uppercase tracking-wider">Étudiant</th>
+                                            {subjects.map((subject) => <th key={subject.id} className="max-w-48 px-5 py-4 text-xs font-semibold uppercase tracking-wider"><span className="block min-w-28 whitespace-normal leading-5">{subject.name}</span></th>)}
+                                            <th className="whitespace-nowrap px-5 py-4 text-xs font-semibold uppercase tracking-wider">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-100">
+                                        {studentsResults.map((student) => (
+                                            <tr key={student.id} className="group transition-colors hover:bg-emerald-50/40">
+                                                <td className="whitespace-nowrap px-5 py-4"><span className="rounded-lg bg-slate-100 px-2.5 py-1.5 font-mono text-xs font-medium text-slate-600">{student.matricule || "-"}</span></td>
+                                                <td className="sticky left-0 z-[1] bg-white px-5 py-4 transition-colors group-hover:bg-emerald-50/40">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-sm font-bold text-emerald-900">{`${student.first_name || ""} ${student.last_name || ""}`.trim().charAt(0).toUpperCase() || "?"}</div>
+                                                        <p className="whitespace-nowrap text-sm font-semibold text-slate-800">{student.first_name} {student.last_name}</p>
+                                                    </div>
+                                                </td>
+                                                {subjects.map((subject) => {
+                                                    const collecte = filteredCollectes.find((collecte) => String(collecte.matiere) === String(subject.id));
+                                                    const note = student.notes.find((result) => collecte && String(result.collecte) === String(collecte.id));
+                                                    const grade = note ? Number(note.note_finale).toFixed(2) : "-";
+                                                    return (
+                                                        <td key={subject.id} className="px-5 py-4">
+                                                            {grade === "-" ? <span className="text-sm text-slate-300">—</span> : <span className={`inline-flex min-w-14 justify-center rounded-lg px-2.5 py-1.5 text-sm font-semibold ${Number(note.note_finale) >= 10 ? "bg-emerald-50 text-emerald-800" : "bg-rose-50 text-rose-700"}`}>{grade}</span>}
+                                                        </td>
                                                     );
-
-
-                                                const note =
-                                                    student.notes.find(
-                                                        (
-                                                            result
-                                                        ) =>
-                                                            collecte &&
-                                                            String(
-                                                                result.collecte
-                                                            ) ===
-                                                            String(
-                                                                collecte.id
-                                                            )
-                                                    );
-
-
-                                                return (
-
-                                                    <td
-                                                        key={
-                                                            subject.id
-                                                        }
-                                                        className="p-4"
-                                                    >
-
-                                                        {note
-                                                            ? Number(
-                                                                  note.note_finale
-                                                              ).toFixed(
-                                                                  2
-                                                              )
-                                                            : "-"}
-
-                                                    </td>
-
-                                                );
-                                            }
-                                        )}
-
-
-                                        <td className="p-4">
-
-                                            <button
-                                                onClick={() =>
-                                                    setSelectedStudent(
-                                                        getStudentAnnualPDFData(
-                                                            student
-                                                        )
-                                                    )
-                                                }
-                                                className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition"
-                                            >
-                                                Voir PDF
-                                            </button>
-
-                                        </td>
-
-                                    </tr>
-
-                                )
-                            )}
-
-                        </tbody>
-
-                    </table>
-
-                )}
-
+                                                })}
+                                                <td className="px-5 py-4">
+                                                    <button onClick={() => setSelectedStudent(getStudentAnnualPDFData(student))} className="inline-flex items-center gap-2 whitespace-nowrap rounded-xl bg-[#102c27] px-3.5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-emerald-900 focus:outline-none focus:ring-4 focus:ring-emerald-700/20">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" className="h-4 w-4">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M7 3.75h7l4.25 4.25v12.25H5.75V3.75H7Z" />
+                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M14 3.75V8h4.25M8.5 12h7M8.5 15.5h7" />
+                                                        </svg>
+                                                        Voir PDF
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </>
+                    )}
+                </section>
             </div>
-
 
             {selectedStudent && (
-
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-
-                    <div className="bg-white w-[90%] h-[90%] rounded-lg shadow-lg relative">
-
-                        <button
-                            onClick={() =>
-                                setSelectedStudent(
-                                    null
-                                )
-                            }
-                            className="absolute top-3 right-3 bg-black text-white px-4 py-2 rounded-lg z-10"
-                        >
-                            Fermer
-                        </button>
-
-
-                        <PDFViewer
-                            width="100%"
-                            height="100%"
-                        >
-
-                            <AcademicResultPDF
-                                student={
-                                    selectedStudent.student
-                                }
-
-                                academicYear={
-                                    selectedStudent.academicYear
-                                }
-
-                                semesters={
-                                    selectedStudent.semesters
-                                }
-
-                                annualAverage={
-                                    selectedStudent.annualAverage
-                                }
-
-                                annualDecision={
-                                    selectedStudent.annualDecision
-                                }
-                            />
-
-                        </PDFViewer>
-
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-3 backdrop-blur-sm sm:p-6" onClick={() => setSelectedStudent(null)}>
+                    <div className="relative flex h-[92vh] w-full max-w-7xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex shrink-0 items-center justify-between gap-4 border-b border-slate-200 px-5 py-4 sm:px-6">
+                            <div className="min-w-0">
+                                <h2 className="font-semibold text-[#102c27]">Relevé annuel</h2>
+                                <p className="mt-1 text-xs text-slate-500">{selectedStudent.student?.first_name} {selectedStudent.student?.last_name} · {selectedStudent.academicYear}</p>
+                            </div>
+                            <button onClick={() => setSelectedStudent(null)} aria-label="Fermer le relevé annuel" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 text-slate-500 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-700 focus:outline-none focus:ring-4 focus:ring-rose-100">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-5 w-5"><path strokeLinecap="round" strokeLinejoin="round" d="m6 6 12 12M18 6 6 18" /></svg>
+                            </button>
+                        </div>
+                        <div className="min-h-0 flex-1">
+                            <PDFViewer width="100%" height="100%" style={{ border: "none" }}>
+                                <AcademicResultPDF student={selectedStudent.student} academicYear={selectedStudent.academicYear} semesters={selectedStudent.semesters} annualAverage={selectedStudent.annualAverage} annualDecision={selectedStudent.annualDecision} />
+                            </PDFViewer>
+                        </div>
                     </div>
-
                 </div>
-
             )}
-
         </AdminLayout>
     );
 }
