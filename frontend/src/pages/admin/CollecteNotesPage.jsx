@@ -115,7 +115,7 @@ export default function CollecteNotesPage() {
 
                     rattrapage:
                         note.rattrapage ?? 0,
-                    
+
                     note_finale:
                         note.note_finale ?? 0,
                 };
@@ -219,20 +219,20 @@ export default function CollecteNotesPage() {
 
         <AdminLayout>
 
-            <h1 className="text-3xl font-bold mb-6">
+            <h1 className="text-3xl font-bold mb-6 text-slate-800">
 
                 Gestion des notes
 
             </h1>
 
 
-            <div className="bg-white rounded shadow p-6 mb-6">
+            <div className="bg-white rounded shadow-sm border border-slate-200 p-6 mb-6">
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
                     <div>
 
-                        <p className="text-gray-500 text-sm">
+                        <p className="text-slate-500 text-sm">
                             Matière
                         </p>
 
@@ -245,7 +245,7 @@ export default function CollecteNotesPage() {
 
                     <div>
 
-                        <p className="text-gray-500 text-sm">
+                        <p className="text-slate-500 text-sm">
                             Filière
                         </p>
 
@@ -258,7 +258,7 @@ export default function CollecteNotesPage() {
 
                     <div>
 
-                        <p className="text-gray-500 text-sm">
+                        <p className="text-slate-500 text-sm">
                             Enseignant
                         </p>
 
@@ -271,7 +271,7 @@ export default function CollecteNotesPage() {
 
                     <div>
 
-                        <p className="text-gray-500 text-sm">
+                        <p className="text-slate-500 text-sm">
                             Année universitaire
                         </p>
 
@@ -284,7 +284,7 @@ export default function CollecteNotesPage() {
 
                     <div>
 
-                        <p className="text-gray-500 text-sm">
+                        <p className="text-slate-500 text-sm">
                             Statut
                         </p>
 
@@ -301,7 +301,7 @@ export default function CollecteNotesPage() {
 
             {successMessage && (
 
-                <div className="bg-green-600 text-white p-4 rounded mb-4">
+                <div className="bg-emerald-700 text-white p-4 rounded mb-4">
 
                     {successMessage}
 
@@ -311,7 +311,7 @@ export default function CollecteNotesPage() {
 
             {errorMessage && (
 
-                <div className="bg-red-100 text-red-700 p-4 rounded mb-4">
+                <div className="bg-red-700 text-white p-4 rounded mb-4">
 
                     {errorMessage}
 
@@ -322,7 +322,7 @@ export default function CollecteNotesPage() {
             {
                 collecte.status !== 'prepared' && (
 
-                    <div className="bg-yellow-100 text-yellow-800 p-4 rounded mb-4">
+                    <div className="bg-amber-700 text-white p-4 rounded mb-4">
 
                         Cette collecte est verrouillée.
                         Les notes ne peuvent plus être modifiées.
@@ -332,11 +332,11 @@ export default function CollecteNotesPage() {
             }
 
 
-            <div className="bg-white rounded shadow overflow-hidden">
+            <div className="bg-white rounded shadow-sm border border-slate-200 overflow-hidden">
 
                 <table className="w-full">
 
-                    <thead className="bg-gray-200">
+                    <thead className="bg-slate-100">
 
                         <tr>
 
@@ -371,7 +371,7 @@ export default function CollecteNotesPage() {
 
                             <tr
                                 key={student.id}
-                                className="border-t"
+                                className="border-t border-slate-200"
                             >
 
                                 <td className="p-4">
@@ -386,7 +386,7 @@ export default function CollecteNotesPage() {
 
                                     <input
                                         type="number"
-                                        className="border p-2 rounded w-24"
+                                        className="border border-slate-300 p-2 rounded w-24 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                                         placeholder="CC"
                                         disabled={
                                             collecte.status !== 'prepared'
@@ -409,7 +409,7 @@ export default function CollecteNotesPage() {
 
                                     <input
                                         type="number"
-                                        className="border p-2 rounded w-24"
+                                        className="border border-slate-300 p-2 rounded w-24 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                                         placeholder="CF"
                                         disabled={
                                             collecte.status !== 'prepared'
@@ -431,7 +431,7 @@ export default function CollecteNotesPage() {
 
                                     <input
                                         type="number"
-                                        className="border p-2 rounded w-24 bg-gray-100"
+                                        className="border border-slate-300 p-2 rounded w-24 bg-slate-100 text-slate-600"
                                         value={
                                             notes[student.id]?.rattrapage ?? ''
                                         }
@@ -443,7 +443,7 @@ export default function CollecteNotesPage() {
 
                                     <input
                                         type="number"
-                                        className="border p-2 rounded w-24 bg-gray-100"
+                                        className="border border-slate-300 p-2 rounded w-24 bg-slate-100 text-slate-600"
                                         value={
                                             notes[student.id]?.note_finale ?? ''
                                         }
@@ -452,7 +452,7 @@ export default function CollecteNotesPage() {
 
                                 </td>
                             </tr>
-                            
+
                         ))}
 
                     </tbody>
@@ -469,7 +469,7 @@ export default function CollecteNotesPage() {
 
                         <button
                             onClick={saveNotes}
-                            className="bg-black text-white px-6 py-3 rounded hover:bg-gray-800"
+                            className="bg-[#102c27] text-white px-6 py-3 rounded hover:bg-[#1b453d]"
                         >
 
                             Enregistrer les notes

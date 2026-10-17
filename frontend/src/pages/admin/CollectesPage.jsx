@@ -47,6 +47,7 @@ export default function CollectesPage() {
             matiere.module_filieres.includes(Number(formData.filiere))
         )
         : [];
+
     const filteredTeachers = formData.filiere
         ? teachers.filter((teacher) =>
             (teacher.teacher_filieres || []).some(
@@ -157,7 +158,6 @@ export default function CollectesPage() {
     };
 
 
-        
     const handleChange = (e) => {
         const { name, value } = e.target;
 
@@ -177,7 +177,6 @@ export default function CollectesPage() {
             };
         });
     };
-
 
 
     const createCollecte = async (e) => {
@@ -276,56 +275,58 @@ export default function CollectesPage() {
     };
 
     const openRattrapage = async (collecteId) => {
-    try {
-        await api.post(
-            `/notes/collectes/${collecteId}/open_rattrapage/`
-        );
+        try {
+            await api.post(
+                `/notes/collectes/${collecteId}/open_rattrapage/`
+            );
 
-        setSuccessMessage(
-            "Rattrapage ouvert avec succès"
-        );
+            setSuccessMessage(
+                "Rattrapage ouvert avec succès"
+            );
 
-        setErrorMessage('');
+            setErrorMessage('');
 
-        fetchCollectes();
+            fetchCollectes();
 
-    } catch (error) {
-        console.error(error);
+        } catch (error) {
+            console.error(error);
 
-        setErrorMessage(
-            error.response?.data?.error ||
-            "Erreur lors de l'ouverture du rattrapage"
-        );
+            setErrorMessage(
+                error.response?.data?.error ||
+                "Erreur lors de l'ouverture du rattrapage"
+            );
 
-        setSuccessMessage('');
-    }
-};
-const publishRattrapage = async (collecteId) => {
-    try {
-        await api.post(
-            `/notes/collectes/${collecteId}/publish_rattrapage/`
-        );
+            setSuccessMessage('');
+        }
+    };
 
-        setSuccessMessage(
-            "Rattrapage publié avec succès"
-        );
+    const publishRattrapage = async (collecteId) => {
+        try {
+            await api.post(
+                `/notes/collectes/${collecteId}/publish_rattrapage/`
+            );
 
-        setErrorMessage('');
+            setSuccessMessage(
+                "Rattrapage publié avec succès"
+            );
 
-        fetchCollectes();
+            setErrorMessage('');
 
-    } catch (error) {
+            fetchCollectes();
 
-        console.error(error);
+        } catch (error) {
 
-        setErrorMessage(
-            error.response?.data?.error ||
-            "Erreur lors de la publication du rattrapage"
-        );
+            console.error(error);
 
-        setSuccessMessage('');
-    }
-};
+            setErrorMessage(
+                error.response?.data?.error ||
+                "Erreur lors de la publication du rattrapage"
+            );
+
+            setSuccessMessage('');
+        }
+    };
+
     if (loading) {
 
         return (
@@ -347,7 +348,7 @@ const publishRattrapage = async (collecteId) => {
 
         <AdminLayout>
 
-            <h1 className="text-3xl font-bold mb-6">
+            <h1 className="text-3xl font-bold mb-6 text-slate-800">
 
                 Collectes
 
@@ -356,7 +357,7 @@ const publishRattrapage = async (collecteId) => {
 
             {successMessage && (
 
-                <div className="bg-green-600 text-white p-4 rounded mb-4">
+                <div className="bg-emerald-700 text-white p-4 rounded mb-4">
 
                     {successMessage}
 
@@ -366,7 +367,7 @@ const publishRattrapage = async (collecteId) => {
 
             {errorMessage && (
 
-                <div className="bg-red-600 text-white p-4 rounded mb-4">
+                <div className="bg-red-700 text-white p-4 rounded mb-4">
 
                     {errorMessage}
 
@@ -376,7 +377,7 @@ const publishRattrapage = async (collecteId) => {
 
             <button
                 onClick={() => setShowModal(true)}
-                className="bg-black text-white px-5 py-3 rounded mb-6 hover:bg-gray-800"
+                className="bg-[#102c27] text-white px-5 py-3 rounded mb-6 hover:bg-[#1b453d]"
             >
 
                 + Créer une collecte
@@ -387,13 +388,13 @@ const publishRattrapage = async (collecteId) => {
             {
                 showModal && (
 
-                    <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
+                    <div className="fixed inset-0 bg-slate-950/40 backdrop-blur-sm flex items-center justify-center z-50">
 
-                        <div className="bg-white w-full max-w-2xl rounded-lg p-8 relative">
+                        <div className="bg-white w-full max-w-2xl rounded-lg p-8 relative border border-slate-200 shadow-2xl">
 
                             <button
                                 onClick={() => setShowModal(false)}
-                                className="absolute top-4 right-4 text-gray-500 hover:text-black text-xl"
+                                className="absolute top-4 right-4 text-slate-500 hover:text-slate-900 text-xl"
                             >
 
                                 ×
@@ -417,7 +418,7 @@ const publishRattrapage = async (collecteId) => {
                                     name="teacher"
                                     value={formData.teacher}
                                     onChange={handleChange}
-                                    className="border p-3 rounded"
+                                    className="border border-slate-300 bg-white text-slate-700 p-3 rounded focus:outline-none focus:ring-2 focus:ring-emerald-500"
                                     required
                                     disabled={!formData.filiere}
                                 >
@@ -437,12 +438,11 @@ const publishRattrapage = async (collecteId) => {
                                 </select>
 
 
-                                
                                 <select
                                     name="matiere"
                                     value={formData.matiere}
                                     onChange={handleChange}
-                                    className="border p-3 rounded"
+                                    className="border border-slate-300 bg-white text-slate-700 p-3 rounded focus:outline-none focus:ring-2 focus:ring-emerald-500"
                                     required
                                     disabled={!formData.filiere}
                                 >
@@ -462,12 +462,11 @@ const publishRattrapage = async (collecteId) => {
                                 </select>
 
 
-
                                 <select
                                     name="filiere"
                                     value={formData.filiere}
                                     onChange={handleChange}
-                                    className="border p-3 rounded"
+                                    className="border border-slate-300 bg-white text-slate-700 p-3 rounded focus:outline-none focus:ring-2 focus:ring-emerald-500"
                                     required
                                 >
 
@@ -497,7 +496,7 @@ const publishRattrapage = async (collecteId) => {
                                     name="academic_year"
                                     value={formData.academic_year}
                                     onChange={handleChange}
-                                    className="border p-3 rounded"
+                                    className="border border-slate-300 bg-white text-slate-700 p-3 rounded focus:outline-none focus:ring-2 focus:ring-emerald-500"
                                     placeholder="Année universitaire"
                                     required
                                 />
@@ -507,7 +506,7 @@ const publishRattrapage = async (collecteId) => {
                                     name="status"
                                     value={formData.status}
                                     onChange={handleChange}
-                                    className="border p-3 rounded"
+                                    className="border border-slate-300 bg-white text-slate-700 p-3 rounded focus:outline-none focus:ring-2 focus:ring-emerald-500"
                                 >
 
                                     <option value="prepared">
@@ -527,7 +526,7 @@ const publishRattrapage = async (collecteId) => {
 
                                 <button
                                     type="submit"
-                                    className="bg-black text-white p-3 rounded hover:bg-gray-800"
+                                    className="bg-[#102c27] text-white p-3 rounded hover:bg-[#1b453d]"
                                 >
 
                                     Créer la collecte
@@ -543,11 +542,11 @@ const publishRattrapage = async (collecteId) => {
             }
 
 
-            <div className="bg-white rounded shadow overflow-hidden">
+            <div className="bg-white rounded shadow-sm border border-slate-200 overflow-hidden">
 
                 <table className="w-full">
 
-                    <thead className="bg-gray-200">
+                    <thead className="bg-slate-100">
 
                         <tr>
 
@@ -585,7 +584,7 @@ const publishRattrapage = async (collecteId) => {
 
                             <tr
                                 key={collecte.id}
-                                className="border-t"
+                                className="border-t border-slate-200"
                             >
 
                                 <td className="p-4">
@@ -621,7 +620,7 @@ const publishRattrapage = async (collecteId) => {
                                                 `/admin/collectes/${collecte.id}/notes`
                                             )
                                         }
-                                        className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800"
+                                        className="bg-[#102c27] text-white px-4 py-2 rounded hover:bg-[#1b453d]"
                                     >
 
                                         Gérer les notes
@@ -641,7 +640,7 @@ const publishRattrapage = async (collecteId) => {
                                                         collecte.id
                                                     )
                                                 }
-                                                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                                                className="bg-emerald-700 text-white px-4 py-2 rounded hover:bg-emerald-800"
                                             >
 
                                                 Valider
@@ -660,7 +659,7 @@ const publishRattrapage = async (collecteId) => {
                                                         collecte.id
                                                     )
                                                 }
-                                                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                                                className="bg-slate-700 text-white px-4 py-2 rounded hover:bg-slate-800"
                                             >
 
                                                 Publier
@@ -668,31 +667,33 @@ const publishRattrapage = async (collecteId) => {
                                             </button>
                                         )
                                     }
-                                    {
-                                    collecte.status === 'published' &&
-                                    collecte.rattrapage_status === 'closed' && (
 
+                                    {
+                                        collecte.status === 'published' &&
+                                        collecte.rattrapage_status === 'closed' && (
+
+                                            <button
+                                                onClick={() =>
+                                                    openRattrapage(collecte.id)
+                                                }
+                                                className="bg-blue-700 text-white px-4 py-2 rounded hover:bg-blue-800"
+                                            >
+                                                Ouvrir Rattrapage
+                                            </button>
+
+                                        )
+                                    }
+
+                                    {collecte.rattrapage_status === 'validated' && (
                                         <button
                                             onClick={() =>
-                                                openRattrapage(collecte.id)
+                                                publishRattrapage(collecte.id)
                                             }
-                                            className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
+                                            className="bg-purple-700 text-white px-4 py-2 rounded hover:bg-purple-800"
                                         >
-                                            Ouvrir Rattrapage
+                                            Publier Rattrapage
                                         </button>
-
-                                    )
-                                }
-                                {collecte.rattrapage_status === 'validated' && (
-                                    <button
-                                        onClick={() =>
-                                            publishRattrapage(collecte.id)
-                                        }
-                                        className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
-                                    >
-                                        Publier Rattrapage
-                                    </button>
-                                )}
+                                    )}
                                 </td>
 
                             </tr>
