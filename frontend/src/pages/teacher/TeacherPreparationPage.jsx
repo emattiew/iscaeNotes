@@ -5,7 +5,7 @@ import {
     useState
 
 } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 import TeacherLayout from "../../layouts/TeacherLayout";
 
@@ -28,6 +28,7 @@ import {
 export default function TeacherPreparationPage() {
 
     const { id } = useParams();
+    const navigate = useNavigate();
 
     
 
@@ -447,7 +448,14 @@ console.log(examSheet);
 
         <TeacherLayout>
 
-            <h1 className="text-5xl font-bold mb-8">
+            <button
+                onClick={() => navigate(-1)}
+                className="mb-6 inline-flex items-center gap-2 rounded-lg bg-[#102c27] px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-800"
+            >
+                ← Retour à la correction IA
+            </button>
+
+            <h1 className="mb-8 text-3xl font-bold tracking-tight text-slate-800 sm:text-4xl">
 
                 Préparation de l'examen
 
@@ -455,7 +463,7 @@ console.log(examSheet);
 
             {successMessage && (
 
-                <div className="bg-green-600 text-white p-4 rounded mb-5">
+                <div className="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3.5 font-medium text-emerald-800 shadow-sm">
 
                     {successMessage}
 
@@ -465,7 +473,7 @@ console.log(examSheet);
 
             {errorMessage && (
 
-                <div className="bg-red-100 text-red-700 p-4 rounded mb-5">
+                <div className="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3.5 font-medium text-red-700 shadow-sm">
 
                     {errorMessage}
 
@@ -473,9 +481,9 @@ console.log(examSheet);
 
             )}
 
-            <div className="bg-white rounded-2xl shadow-sm p-8 mb-8">
+            <div className="mb-7 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
 
-                <h2 className="text-2xl font-semibold mb-6">
+                <h2 className="mb-5 text-xl font-semibold tracking-tight text-slate-800 sm:text-2xl">
 
                     Sujet d'examen
 
@@ -487,9 +495,9 @@ console.log(examSheet);
 
                         <>
 
-                            <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+                            <div className="mb-5 flex flex-col gap-2 rounded-xl border border-emerald-200 bg-emerald-50 p-4 sm:flex-row sm:items-center sm:justify-between">
 
-                                <p className="text-green-700 font-medium">
+                                <p className="mb-1 font-semibold text-emerald-800">
 
                                      Sujet déjà importé
 
@@ -503,7 +511,7 @@ console.log(examSheet);
 
                                     rel="noreferrer"
 
-                                    className="text-blue-600 underline"
+                                    className="inline-flex items-center font-semibold text-emerald-700 underline decoration-emerald-300 underline-offset-4 transition hover:text-emerald-900"
 
                                 >
 
@@ -517,14 +525,15 @@ console.log(examSheet);
                                 type="file"
                                 accept="image/*"
                                 onChange={addExamImages}
+                                className="block w-full cursor-pointer rounded-xl border border-slate-200 bg-slate-50 text-sm text-slate-600 file:mr-4 file:cursor-pointer file:border-0 file:bg-emerald-50 file:px-4 file:py-3 file:font-semibold file:text-emerald-800 hover:file:bg-emerald-100"
                             />
 
                             {
                                 examImages.length > 0 && (
 
-                                    <div className="mt-4">
+                                    <div className="mt-4 space-y-2">
 
-                                        <p className="font-medium mb-2">
+                                        <p className="mb-3 text-sm font-semibold text-slate-700">
 
                                             Pages sélectionnées
 
@@ -536,7 +545,7 @@ console.log(examSheet);
 
                                                 <div
                                                     key={index}
-                                                    className="flex justify-between items-center border rounded-lg p-3 mb-2"
+                                                    className="mb-2 flex flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 sm:flex-row sm:items-center sm:justify-between"
                                                 >
 
                                                     <span>
@@ -548,7 +557,7 @@ console.log(examSheet);
                                                     <button
                                                         type="button"
                                                         onClick={() => removeExamImage(index)}
-                                                        className="text-red-600 hover:text-red-800"
+                                                        className="self-start rounded-lg px-3 py-1.5 text-sm font-semibold text-red-600 transition hover:bg-red-50 hover:text-red-700 sm:self-auto"
                                                     >
 
                                                         Supprimer
@@ -572,7 +581,7 @@ console.log(examSheet);
 
                                 disabled={examLoading}
 
-                                className="bg-yellow-600 text-white px-6 py-3 rounded hover:bg-yellow-700"
+                                className="mt-4 inline-flex items-center justify-center rounded-xl bg-amber-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-60"
 
                             >
 
@@ -602,15 +611,15 @@ console.log(examSheet);
                                 type="file"
                                 accept="image/*"
                                 onChange={addExamImages}
-                                className="mb-6"
+                                className="mb-5 block w-full cursor-pointer rounded-xl border border-slate-200 bg-slate-50 text-sm text-slate-600 file:mr-4 file:cursor-pointer file:border-0 file:bg-emerald-50 file:px-4 file:py-3 file:font-semibold file:text-emerald-800 hover:file:bg-emerald-100"
                             />
 
                             {
                                 examImages.length > 0 && (
 
-                                    <div className="mt-4">
+                                    <div className="mt-4 space-y-2">
 
-                                        <p className="font-medium mb-2">
+                                        <p className="mb-3 text-sm font-semibold text-slate-700">
 
                                             Pages sélectionnées
 
@@ -622,7 +631,7 @@ console.log(examSheet);
 
                                                 <div
                                                     key={index}
-                                                    className="flex justify-between items-center border rounded-lg p-3 mb-2"
+                                                    className="mb-2 flex flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 sm:flex-row sm:items-center sm:justify-between"
                                                 >
 
                                                     <span>
@@ -634,7 +643,7 @@ console.log(examSheet);
                                                     <button
                                                         type="button"
                                                         onClick={() => removeExamImage(index)}
-                                                        className="text-red-600 hover:text-red-800"
+                                                        className="self-start rounded-lg px-3 py-1.5 text-sm font-semibold text-red-600 transition hover:bg-red-50 hover:text-red-700 sm:self-auto"
                                                     >
 
                                                         Supprimer
@@ -660,7 +669,7 @@ console.log(examSheet);
 
                                 disabled={examLoading}
 
-                                className="bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700"
+                                className="mt-4 inline-flex items-center justify-center rounded-xl bg-emerald-700 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60"
 
                             >
 
@@ -688,9 +697,9 @@ console.log(examSheet);
 
             </div>
 
-            <div className="bg-white rounded-2xl shadow-sm p-8">
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
 
-                <h2 className="text-2xl font-semibold mb-6">
+                <h2 className="mb-5 text-xl font-semibold tracking-tight text-slate-800 sm:text-2xl">
 
                     Questions détectées
 
@@ -702,7 +711,7 @@ console.log(examSheet);
 
                     (
 
-                        <p className="text-gray-500">
+                        <p className="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-4 py-8 text-center text-sm text-slate-500">
 
                             Aucune question détectée.
 
@@ -718,10 +727,10 @@ console.log(examSheet);
 
                          <div
                             key={question.question_number}
-                            className="border rounded-xl p-5 mb-5"
+                            className="mb-4 rounded-xl border border-slate-200 bg-white p-4 sm:p-5"
                         >
 
-                            <h3 className="text-xl font-semibold mb-5">
+                            <h3 className="mb-4 text-base font-semibold text-slate-800 sm:text-lg">
 
                                 Question {question.question_number}
 
@@ -729,7 +738,7 @@ console.log(examSheet);
 
                             <div className="mb-5">
 
-                                <label className="block font-medium mb-2">
+                                <label className="mb-2 block text-sm font-semibold text-slate-700">
 
                                     Question
 
@@ -752,7 +761,7 @@ console.log(examSheet);
 
                                     }}
 
-                                    className="w-full border rounded-lg p-3"
+                                    className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
 
                                 />
 
@@ -760,7 +769,7 @@ console.log(examSheet);
 
                             <div>
 
-                                <label className="block font-medium mb-2">
+                                <label className="mb-2 block text-sm font-semibold text-slate-700">
 
                                     Points
 
@@ -785,7 +794,7 @@ console.log(examSheet);
 
                                     }}
 
-                                    className="w-32 border rounded-lg p-2"
+                                    className="w-full max-w-32 rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
 
                                 />
 
@@ -801,11 +810,11 @@ console.log(examSheet);
 
             </div>
 
-            <div className="flex justify-end mt-8">
+            <div className="mt-6 flex justify-end">
 
                 <button
                     onClick={handleValidateQuestions}
-                    className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700"
+                    className="inline-flex items-center justify-center rounded-xl bg-emerald-700 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-800"
                 >
 
                     Valider les questions
@@ -813,9 +822,9 @@ console.log(examSheet);
                 </button>
 
             </div>
-            <div className="bg-white rounded-2xl shadow-sm p-8 mt-10">
+            <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
 
-                <h2 className="text-2xl font-semibold mb-6">
+                <h2 className="mb-5 text-xl font-semibold tracking-tight text-slate-800 sm:text-2xl">
 
                     Correction officielle
 
@@ -827,9 +836,9 @@ console.log(examSheet);
 
                         <>
 
-                            <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+                            <div className="mb-5 flex flex-col gap-2 rounded-xl border border-emerald-200 bg-emerald-50 p-4 sm:flex-row sm:items-center sm:justify-between">
 
-                                <p className="text-green-700 font-medium">
+                                <p className="mb-1 font-semibold text-emerald-800">
 
                                     Correction déjà importée
 
@@ -843,7 +852,7 @@ console.log(examSheet);
 
                                     rel="noreferrer"
 
-                                    className="text-blue-600 underline"
+                                    className="inline-flex items-center font-semibold text-emerald-700 underline decoration-emerald-300 underline-offset-4 transition hover:text-emerald-900"
 
                                 >
 
@@ -857,14 +866,15 @@ console.log(examSheet);
                                 type="file"
                                 accept="image/*"
                                 onChange={addCorrectionImages}
+                                className="block w-full cursor-pointer rounded-xl border border-slate-200 bg-slate-50 text-sm text-slate-600 file:mr-4 file:cursor-pointer file:border-0 file:bg-emerald-50 file:px-4 file:py-3 file:font-semibold file:text-emerald-800 hover:file:bg-emerald-100"
                             />
 
                             {
                                 correctionImages.length > 0 && (
 
-                                    <div className="mt-4">
+                                    <div className="mt-4 space-y-2">
 
-                                        <p className="font-medium mb-2">
+                                        <p className="mb-3 text-sm font-semibold text-slate-700">
 
                                             Pages sélectionnées
 
@@ -876,7 +886,7 @@ console.log(examSheet);
 
                                                 <div
                                                     key={index}
-                                                    className="flex justify-between items-center border rounded-lg p-3 mb-2"
+                                                    className="mb-2 flex flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 sm:flex-row sm:items-center sm:justify-between"
                                                 >
 
                                                     <span>
@@ -888,7 +898,7 @@ console.log(examSheet);
                                                     <button
                                                         type="button"
                                                         onClick={() => removeCorrectionImage(index)}
-                                                        className="text-red-600 hover:text-red-800"
+                                                        className="self-start rounded-lg px-3 py-1.5 text-sm font-semibold text-red-600 transition hover:bg-red-50 hover:text-red-700 sm:self-auto"
                                                     >
 
                                                         Supprimer
@@ -914,7 +924,7 @@ console.log(examSheet);
 
                                 disabled={correctionLoading}
 
-                                className="bg-yellow-600 text-white px-6 py-3 rounded hover:bg-yellow-700"
+                                className="mt-4 inline-flex items-center justify-center rounded-xl bg-amber-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-60"
 
                             >
 
@@ -944,15 +954,15 @@ console.log(examSheet);
                                 type="file"
                                 accept="image/*"
                                 onChange={addCorrectionImages}
-                                className="mb-6"
+                                className="mb-5 block w-full cursor-pointer rounded-xl border border-slate-200 bg-slate-50 text-sm text-slate-600 file:mr-4 file:cursor-pointer file:border-0 file:bg-emerald-50 file:px-4 file:py-3 file:font-semibold file:text-emerald-800 hover:file:bg-emerald-100"
                             />
 
                             {
                                 correctionImages.length > 0 && (
 
-                                    <div className="mt-4">
+                                    <div className="mt-4 space-y-2">
 
-                                        <p className="font-medium mb-2">
+                                        <p className="mb-3 text-sm font-semibold text-slate-700">
 
                                             Pages sélectionnées
 
@@ -964,7 +974,7 @@ console.log(examSheet);
 
                                                 <div
                                                     key={index}
-                                                    className="flex justify-between items-center border rounded-lg p-3 mb-2"
+                                                    className="mb-2 flex flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 sm:flex-row sm:items-center sm:justify-between"
                                                 >
 
                                                     <span>
@@ -976,7 +986,7 @@ console.log(examSheet);
                                                     <button
                                                         type="button"
                                                         onClick={() => removeCorrectionImage(index)}
-                                                        className="text-red-600 hover:text-red-800"
+                                                        className="self-start rounded-lg px-3 py-1.5 text-sm font-semibold text-red-600 transition hover:bg-red-50 hover:text-red-700 sm:self-auto"
                                                     >
 
                                                         Supprimer
@@ -1001,7 +1011,7 @@ console.log(examSheet);
 
                                 disabled={correctionLoading}
 
-                                className="bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700"
+                                className="mt-4 inline-flex items-center justify-center rounded-xl bg-emerald-700 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60"
 
                             >
 
@@ -1028,9 +1038,9 @@ console.log(examSheet);
                 }
 
             </div>
-            <div className="bg-white rounded-2xl shadow-sm p-8 mt-8">
+            <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
 
-                <h2 className="text-2xl font-semibold mb-6">
+                <h2 className="mb-5 text-xl font-semibold tracking-tight text-slate-800 sm:text-2xl">
 
                     Réponses attendues
 
@@ -1044,7 +1054,7 @@ console.log(examSheet);
 
                     (
 
-                        <p className="text-gray-500">
+                        <p className="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-4 py-8 text-center text-sm text-slate-500">
 
                             Aucune réponse détectée.
 
@@ -1065,17 +1075,17 @@ console.log(examSheet);
 
                                         key={answer.question_number}
 
-                                        className="border rounded-xl p-5 mb-5"
+                                        className="mb-4 rounded-xl border border-slate-200 bg-white p-4 sm:p-5"
 
                                     >
 
-                                        <h3 className="text-xl font-semibold mb-4">
+                                        <h3 className="mb-4 text-base font-semibold text-slate-800 sm:text-lg">
 
                                             Question {answer.question_number}
 
                                         </h3>
 
-                                        <label className="block font-medium mb-2">
+                                        <label className="mb-2 block text-sm font-semibold text-slate-700">
 
                                             Réponse attendue
 
@@ -1098,7 +1108,7 @@ console.log(examSheet);
 
                                             }}
 
-                                            className="w-full border rounded-lg p-3"
+                                            className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
 
                                         />
 
@@ -1108,13 +1118,13 @@ console.log(examSheet);
 
                             }
 
-                            <div className="flex justify-end mt-8">
+                            <div className="mt-6 flex justify-end">
 
                                 <button
 
                                     onClick={handleValidateExpectedAnswers}
 
-                                    className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700"
+                                    className="inline-flex items-center justify-center rounded-xl bg-emerald-700 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-800"
 
                                 >
 

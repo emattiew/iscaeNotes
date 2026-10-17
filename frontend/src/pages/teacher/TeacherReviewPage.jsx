@@ -8,7 +8,8 @@ import {
 
 import {
 
-    useParams
+    useParams,
+    useNavigate
 
 } from "react-router-dom";
 
@@ -25,8 +26,9 @@ import {
 export default function TeacherReviewPage() {
 
     const { copyId } = useParams();
+    const navigate = useNavigate();
     const [successMessage, setSuccessMessage] = useState("");
-    
+
 const [errorMessage, setErrorMessage] = useState("");
     const [
 
@@ -92,7 +94,7 @@ const [errorMessage, setErrorMessage] = useState("");
 
     };
     const handleValidation = async () => {
-        
+
             setSuccessMessage(
         "La correction a été validée avec succès."
     );
@@ -171,7 +173,14 @@ const [errorMessage, setErrorMessage] = useState("");
 
         <TeacherLayout>
 
-            <h1 className="text-4xl font-bold mb-8">
+            <button
+                onClick={() => navigate(-1)}
+                className="mb-6 inline-flex items-center gap-2 rounded-lg bg-[#102c27] px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-800"
+            >
+                ← Retour à la page de correction
+            </button>
+
+            <h1 className="text-4xl font-bold mb-8 text-slate-800">
 
                 Révision de la correction
 
@@ -180,7 +189,7 @@ const [errorMessage, setErrorMessage] = useState("");
 
                 successMessage && (
 
-                    <div className="bg-green-600 text-white p-4 rounded mb-5">
+                    <div className="bg-emerald-600 text-white p-4 rounded mb-5">
 
                         {successMessage}
 
@@ -194,7 +203,7 @@ const [errorMessage, setErrorMessage] = useState("");
 
                 errorMessage && (
 
-                    <div className="bg-red-100 text-red-700 p-4 rounded mb-5">
+                    <div className="bg-red-50 text-red-700 p-4 rounded mb-5">
 
                         {errorMessage}
 
@@ -213,11 +222,11 @@ const [errorMessage, setErrorMessage] = useState("");
 
                             key={correction.id}
 
-                            className="bg-white rounded-xl shadow-sm p-6"
+                            className="bg-white border border-slate-200 rounded-xl shadow-sm p-6"
 
                         >
 
-                            <h2 className="text-xl font-semibold mb-4">
+                            <h2 className="text-xl font-semibold mb-4 text-slate-800">
 
                                 Question {correction.question_number}
 
@@ -307,7 +316,7 @@ const [errorMessage, setErrorMessage] = useState("");
                                             );
 
                                         }}
-                                        className="border rounded-lg px-3 py-2 w-24"
+                                        className="border border-slate-300 rounded-lg px-3 py-2 w-24 focus:outline-none focus:ring-2 focus:ring-emerald-500"
 
                                     />
 
@@ -350,7 +359,7 @@ const [errorMessage, setErrorMessage] = useState("");
 
                         onClick={handleValidation}
 
-                        className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700"
+                        className="bg-emerald-600 text-white px-6 py-3 rounded-lg hover:bg-emerald-700"
 
                     >
 

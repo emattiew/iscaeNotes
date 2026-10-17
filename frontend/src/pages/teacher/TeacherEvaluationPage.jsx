@@ -278,8 +278,14 @@ const handleCorrection = async () => {
     return (
 
         <TeacherLayout>
+            <button
+                onClick={() => navigate(-1)}
+                className="mb-6 inline-flex items-center gap-2 rounded-lg bg-[#102c27] px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-800"
+            >
+                ← Retour à la correction IA
+            </button>
 
-            <h1 className="text-5xl font-bold mb-8">
+            <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-800 mb-6">
 
                 Correction assistée par IA
 
@@ -288,7 +294,7 @@ const handleCorrection = async () => {
 
                 successMessage && (
 
-                    <div className="bg-green-600 text-white p-4 rounded mb-5">
+                    <div className="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800">
 
                         {successMessage}
 
@@ -302,7 +308,7 @@ const handleCorrection = async () => {
 
                 errorMessage && (
 
-                    <div className="bg-red-100 text-red-700 p-4 rounded mb-5">
+                    <div className="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
 
                         {errorMessage}
 
@@ -311,11 +317,11 @@ const handleCorrection = async () => {
                 )
 
             }
-            <div className="bg-white rounded-2xl shadow-sm p-8">
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:p-8">
 
-                <div className="mb-8">
+                <div className="mb-7">
 
-                    <label className="block font-medium mb-3">
+                    <label className="mb-2 block text-sm font-semibold text-slate-700">
 
                         Étudiant
 
@@ -333,7 +339,7 @@ const handleCorrection = async () => {
 
                         }
 
-                        className="w-full border rounded-lg p-3"
+                        className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
 
                     >
 
@@ -367,9 +373,9 @@ const handleCorrection = async () => {
 
                 </div>
 
-                <div className="mb-8">
+                <div className="mb-7">
 
-                    <label className="block font-medium mb-3">
+                    <label className="mb-2 block text-sm font-semibold text-slate-700">
 
                         Copie d'examen
 
@@ -381,9 +387,9 @@ const handleCorrection = async () => {
 
                             <>
 
-                                <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+                                <div className="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
 
-                                    <p className="text-green-700 font-medium">
+                                    <p className="mb-2 text-sm font-semibold text-emerald-800">
 
                                         ✓ Copie déjà importée
 
@@ -397,7 +403,7 @@ const handleCorrection = async () => {
 
                                         rel="noreferrer"
 
-                                        className="text-blue-600 underline"
+                                        className="text-sm font-semibold text-emerald-700 underline underline-offset-4 hover:text-emerald-800"
 
                                     >
 
@@ -415,6 +421,7 @@ const handleCorrection = async () => {
                                     multiple
 
                                     onChange={addImages}
+                                    className="block w-full cursor-pointer rounded-xl border border-dashed border-slate-300 bg-slate-50 p-3 text-sm text-slate-600 file:mr-4 file:cursor-pointer file:rounded-lg file:border-0 file:bg-emerald-50 file:px-4 file:py-2 file:font-semibold file:text-emerald-700 hover:border-emerald-400"
 
                                 />
                                 
@@ -429,6 +436,7 @@ const handleCorrection = async () => {
                                 accept="image/*"
                                 multiple
                                 onChange={addImages}
+                                className="block w-full cursor-pointer rounded-xl border border-dashed border-slate-300 bg-slate-50 p-3 text-sm text-slate-600 file:mr-4 file:cursor-pointer file:rounded-lg file:border-0 file:bg-emerald-50 file:px-4 file:py-2 file:font-semibold file:text-emerald-700 hover:border-emerald-400"
                             />
 
                         )
@@ -437,9 +445,9 @@ const handleCorrection = async () => {
                     {
                         images.length > 0 && (
 
-                            <div className="mt-4">
+                            <div className="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4">
 
-                                <p className="font-medium mb-2">
+                                <p className="mb-3 text-sm font-semibold text-slate-700">
 
                                     Pages sélectionnées
 
@@ -453,7 +461,7 @@ const handleCorrection = async () => {
 
                                             key={index}
 
-                                            className="flex justify-between items-center border rounded-lg p-3 mb-2"
+                                            className="mb-2 flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white p-3"
 
                                         >
 
@@ -469,7 +477,7 @@ const handleCorrection = async () => {
 
                                                 onClick={() => removeImage(index)}
 
-                                                className="text-red-600 hover:text-red-800"
+                                                className="shrink-0 rounded-lg px-3 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50 hover:text-red-700"
 
                                             >
 
@@ -489,7 +497,7 @@ const handleCorrection = async () => {
                     }
                 </div>
 
-                <div className="flex justify-end">
+                <div className="flex justify-end border-t border-slate-100 pt-5">
 
                     <button
 
@@ -500,16 +508,16 @@ const handleCorrection = async () => {
                         (images.length === 0 && !aiDone)
                     }
 
-                    className={`px-6 py-3 rounded-lg text-white ${
+                    className={`rounded-xl px-5 py-3 text-sm font-semibold text-white shadow-sm transition focus:outline-none focus:ring-2 focus:ring-offset-2 ${
                         !selectedStudent || (images.length === 0 && !aiDone)
-                            ? "bg-gray-400 cursor-not-allowed"
+                            ? "cursor-not-allowed bg-slate-300"
                             : images.length > 0
-                                ? "bg-yellow-600 hover:bg-yellow-700"
+                                ? "bg-amber-500 hover:bg-amber-600 focus:ring-amber-300"
                                 : aiDone
-                                    ? "bg-blue-600 hover:bg-blue-700"
+                                    ? "bg-blue-600 hover:bg-blue-700 focus:ring-blue-300"
                                     : examCopy
-                                        ? "bg-yellow-600 hover:bg-yellow-700"
-                                        : "bg-green-600 hover:bg-green-700"
+                                        ? "bg-amber-500 hover:bg-amber-600 focus:ring-amber-300"
+                                        : "bg-emerald-600 hover:bg-emerald-700 focus:ring-emerald-300"
                     }`}
 
                 >
