@@ -43,9 +43,55 @@ from .serializers import (
 )
 from .gemini_service import (
     test_gemini,
-    evaluate_answer
+    evaluate_answer,
+    extract_exam_questions_ocr,
+    extract_expected_answers_ocr,
+    extract_exam_copy_ocr,
+    
 )
 from rest_framework.views import APIView
+def scan_pages_with_ocr(page_sources, gemini_function):
+    """
+    Try Gemini OCR first.
+    If Gemini fails, process all pages with EasyOCR.
+    """
+
+    try:
+        extracted_pages = []
+
+        for page_number, image_path in page_sources:
+            page_text = gemini_function(
+                image_path,
+                page_number=page_number
+            )
+
+            if not page_text or not page_text.strip():
+                raise ValueError(
+                    f"Gemini returned no text for page {page_number}."
+                )
+
+            extracted_pages.append(page_text.strip())
+
+        return "\n\n".join(extracted_pages).strip()
+
+    except Exception as exc:
+        print(
+            f"Gemini OCR failed. Falling back to EasyOCR: {exc}"
+        )
+
+        reader = easyocr.Reader(["fr"])
+        extracted_pages = []
+
+        for page_number, image_path in page_sources:
+            result = reader.readtext(image_path)
+
+            page_text = "\n".join(
+                item[1] for item in result
+            )
+
+            extracted_pages.append(page_text.strip())
+
+        return "\n\n".join(extracted_pages).strip()
 def check_collecte_status(exam):
 
     if exam.collecte.status in [
@@ -386,54 +432,41 @@ class ExamCopyViewSet(viewsets.ModelViewSet):
             serializer.data,
             status=status.HTTP_201_CREATED
         )
-    
-    @action(
-        detail=True,
-        methods=["post"]
-    )
+    @action(detail=True, methods=["post"])
     def process_ocr(self, request, pk=None):
-
         copy = self.get_object()
-        check_collecte_status(
-            copy.exam
-        )
-        reader = easyocr.Reader(['fr'])
 
-        raw_text = ""
+        check_collecte_status(copy.exam)
 
-        pages = copy.pages.all()
+        pages = copy.pages.all().order_by("page_number")
 
         if pages.exists():
-
-            for page in pages:
-
-                result = reader.readtext(
-                    page.image.path
-                )
-
-                page_text = "\n".join(
-                    item[1]
-                    for item in result
-                )
-
-                raw_text += page_text + "\n"
-
+            page_sources = [
+                (page.page_number, page.image.path)
+                for page in pages
+            ]
         else:
+            page_sources = [(1, copy.image.path)]
 
-            result = reader.readtext(
-                copy.image.path
-            )
+        raw_text = scan_pages_with_ocr(
+            page_sources,
+            extract_exam_copy_ocr
+        )
 
-            raw_text = "\n".join(
-                item[1]
-                for item in result
+        if not raw_text:
+            return Response(
+                {
+                    "error": (
+                        "No text could be extracted "
+                        "from this exam copy."
+                    )
+                },
+                status=status.HTTP_422_UNPROCESSABLE_ENTITY
             )
 
         OCRResult.objects.update_or_create(
             copy=copy,
-            defaults={
-                "raw_text": raw_text
-            }
+            defaults={"raw_text": raw_text}
         )
 
         copy.processed = True
@@ -708,74 +741,49 @@ class CorrectionSheetViewSet(viewsets.ModelViewSet):
             status=status.HTTP_201_CREATED
 
         )
-    
-    @action(
-        detail=True,
-        methods=["post"]
-    )
-    def process_ocr(
-        self,
-        request,
-        pk=None
-    ):
+    @action(detail=True, methods=["post"])
+    def process_ocr(self, request, pk=None):
+        correction_sheet = self.get_object()
 
-        correction_sheet = (
-            self.get_object()
-        )
-        check_collecte_status(
-            correction_sheet.exam
-        )
-        reader = easyocr.Reader(
-            ['fr']
-        )
+        check_collecte_status(correction_sheet.exam)
 
-        raw_text = ""
-
-        pages = correction_sheet.pages.all()
+        pages = correction_sheet.pages.all().order_by("page_number")
 
         if pages.exists():
-
-            for page in pages:
-
-                result = reader.readtext(
-                    page.image.path
-                )
-
-                page_text = "\n".join(
-                    item[1]
-                    for item in result
-                )
-
-                raw_text += page_text + "\n"
-
+            page_sources = [
+                (page.page_number, page.image.path)
+                for page in pages
+            ]
         else:
+            page_sources = [(1, correction_sheet.image.path)]
 
-            result = reader.readtext(
-                correction_sheet.image.path
-            )
+        raw_text = scan_pages_with_ocr(
+            page_sources,
+            extract_expected_answers_ocr
+        )
 
-            raw_text = "\n".join(
-                item[1]
-                for item in result
+        if not raw_text:
+            return Response(
+                {
+                    "error": (
+                        "No text could be extracted "
+                        "from this correction sheet."
+                    )
+                },
+                status=status.HTTP_422_UNPROCESSABLE_ENTITY
             )
 
         CorrectionOCRResult.objects.update_or_create(
             correction_sheet=correction_sheet,
-            defaults={
-                "raw_text": raw_text
-            }
+            defaults={"raw_text": raw_text}
         )
+
         print(raw_text)
+
         return Response({
-
-            "correction_sheet_id":
-                correction_sheet.id,
-
-            "processed":
-                True,
-
-            "raw_text":
-                raw_text
+            "correction_sheet_id": correction_sheet.id,
+            "processed": True,
+            "raw_text": raw_text
         })
 
     @action(
@@ -1333,73 +1341,47 @@ class ExamSheetViewSet(viewsets.ModelViewSet):
 
         )
 
-    @action(
-        detail=True,
-        methods=["post"]
-    )
-    def process_ocr(
-        self,
-        request,
-        pk=None
-    ):
+    @action(detail=True, methods=["post"])
+    def process_ocr(self, request, pk=None):
+        exam_sheet = self.get_object()
 
-        exam_sheet = (
-            self.get_object()
-        )
-        check_collecte_status(
-            exam_sheet.exam
-        )
-        reader = easyocr.Reader(
-            ['fr']
-        )
+        check_collecte_status(exam_sheet.exam)
 
-        raw_text = ""
-
-        pages = exam_sheet.pages.all()
+        pages = exam_sheet.pages.all().order_by("page_number")
 
         if pages.exists():
-
-            for page in pages:
-
-                result = reader.readtext(
-                    page.image.path
-                )
-
-                page_text = "\n".join(
-                    item[1]
-                    for item in result
-                )
-
-                raw_text += page_text + "\n"
-
+            page_sources = [
+                (page.page_number, page.image.path)
+                for page in pages
+            ]
         else:
+            page_sources = [(1, exam_sheet.image.path)]
 
-            result = reader.readtext(
-                exam_sheet.image.path
-            )
+        raw_text = scan_pages_with_ocr(
+            page_sources,
+            extract_exam_questions_ocr
+        )
 
-            raw_text = "\n".join(
-                item[1]
-                for item in result
+        if not raw_text:
+            return Response(
+                {
+                    "error": (
+                        "No text could be extracted "
+                        "from this exam sheet."
+                    )
+                },
+                status=status.HTTP_422_UNPROCESSABLE_ENTITY
             )
 
         ExamOCRResult.objects.update_or_create(
             exam_sheet=exam_sheet,
-            defaults={
-                "raw_text": raw_text
-            }
+            defaults={"raw_text": raw_text}
         )
-        
+
         return Response({
-
-            "exam_sheet_id":
-                exam_sheet.id,
-
-            "processed":
-                True,
-
-            "raw_text":
-                raw_text
+            "exam_sheet_id": exam_sheet.id,
+            "processed": True,
+            "raw_text": raw_text
         })
 
     @action(

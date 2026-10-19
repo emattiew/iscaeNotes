@@ -1,33 +1,15 @@
 import re
 
 
+
 def split_answers(raw_text):
     """
-    Split OCR text from a student's exam copy
-    into one answer section per main question.
-
-    Supports formats such as:
-    Question 1
-    Question_1
-    Q1
-    Q 1
-    Exercice 1
-    Ex 1
-    Problème 1
-
-    Numbered sub-questions such as:
-    1)
-    2)
-    (a)
-    (b)
-
-    are kept inside their main question.
+    Split a student's exam copy into one section per main question.
+    Preserve numbered sub-answers inside each main question.
     """
 
-    # Normalize line endings
     text = raw_text.replace("\r\n", "\n").replace("\r", "\n")
 
-    # OCR may produce Question_1 instead of Question 1
     text = re.sub(
         r'Question[_\s]+',
         'Question ',
@@ -35,93 +17,69 @@ def split_answers(raw_text):
         flags=re.IGNORECASE
     )
 
-    # Remove page indicators
     text = re.sub(
         r'Page\s+\d+\s*/\s*\d+',
         '',
         text,
         flags=re.IGNORECASE
-    )
+    ).strip()
 
-    # Main question headings only.
-    # They must start at the beginning of a line.
-    patterns = [
-        r'^\s*Question\s+\d+\b',
-        r'^\s*Q\s*\d+\b',
-        r'^\s*Exercice\s+\d+\b',
-        r'^\s*Ex\s*\d+\b',
-        r'^\s*Probl[eè]me\s+\d+\b',
-    ]
+    if not text:
+        return []
 
-    best_parts = []
-
-    for pattern in patterns:
-
-        first_match = re.search(
+    def split_sections(source, pattern):
+        matches = list(re.finditer(
             pattern,
-            text,
+            source,
             flags=re.IGNORECASE | re.MULTILINE
-        )
+        ))
 
-        if not first_match:
-            continue
+        if len(matches) < 2:
+            return []
 
-        # Ignore everything before the first main question
-        answer_text = text[first_match.start():]
+        parts = []
 
-        # Split only at main question headings
-        parts = re.split(
-            r'(?=' + pattern + r')',
-            answer_text,
-            flags=re.IGNORECASE | re.MULTILINE
-        )
-
-        cleaned_parts = []
-
-        for part in parts:
-            part = part.strip()
-
-            if len(part) >= 20:
-                cleaned_parts.append(part)
-
-        if len(cleaned_parts) > len(best_parts):
-            best_parts = cleaned_parts
-
-    # Fallback for exams that do not use "Question 1", "Q1", etc.
-    if not best_parts:
-
-        pattern = r'^\s*\d+\s*[\.\)]'
-
-        first_match = re.search(
-            pattern,
-            text,
-            flags=re.MULTILINE
-        )
-
-        if first_match:
-
-            answer_text = text[first_match.start():]
-
-            parts = re.split(
-                r'(?=' + pattern + r')',
-                answer_text,
-                flags=re.MULTILINE
+        for i, match in enumerate(matches):
+            start = match.start()
+            end = (
+                matches[i + 1].start()
+                if i + 1 < len(matches)
+                else len(source)
             )
 
-            best_parts = [
-                part.strip()
-                for part in parts
-                if len(part.strip()) >= 20
-            ]
+            part = source[start:end].strip()
 
-    # Final fallback
-    if not best_parts:
-        best_parts = [text.strip()]
+            if len(part) >= 20:
+                parts.append(part)
+
+        return parts if len(parts) >= 2 else []
+
+    # 1. Explicit main-question headings.
+    question_pattern = (
+        r'^[ \t]*(?:Question[ \t_]+\d+|Q[ \t]*\d+)\b[^\n]*'
+    )
+
+    parts = split_sections(text, question_pattern)
+
+    if parts:
+        best_parts = parts
+    else:
+        # 2. Exercise/problem headings.
+        exercise_pattern = (
+            r'^[ \t]*(?:Exercice|Ex|Probl[eè]me)[ \t]+\d+\b[^\n]*'
+        )
+
+        parts = split_sections(text, exercise_pattern)
+
+        if parts:
+            best_parts = parts
+        else:
+            # 3. Do not split on ordinary numbered answers.
+            best_parts = [text]
 
     print("\n===== SPLIT ANSWERS =====")
 
     for i, part in enumerate(best_parts, start=1):
-
         print(f"\nPART {i}")
         print(part[:500])
 
@@ -129,20 +87,15 @@ def split_answers(raw_text):
     print("===== END =====\n")
 
     return best_parts
-def split_expected_answers(raw_text):
 
-    # Normalize OCR text
+
+def split_expected_answers(raw_text):
+    """
+    Split an official correction sheet into one section per main question.
+    Keep numbered answers and bullet points inside their main question.
+    """
     text = raw_text.replace("\r\n", "\n").replace("\r", "\n")
 
-    # OCR can sometimes use "_" instead of a space
-    text = re.sub(
-        r'Question[_\s]+',
-        'Question ',
-        text,
-        flags=re.IGNORECASE
-    )
-
-    # Remove page indicators
     text = re.sub(
         r'Page\s+\d+\s*/\s*\d+',
         '',
@@ -150,149 +103,175 @@ def split_expected_answers(raw_text):
         flags=re.IGNORECASE
     )
 
-    # Main answer/question headings.
-    # IMPORTANT:
-    # ^ means the heading must start at the beginning of a line.
-    patterns = [
-        r'^\s*Question\s+\d+\b',
-        r'^\s*Q\s*\d+\b',
-        r'^\s*Exercice\s+\d+\b',
-        r'^\s*Ex\s*\d+\b',
-        r'^\s*Probl[eè]me\s+\d+\b',
-        r'^\s*\d+\s*[\.\)]',
-        r'^\s*[IVX]+\s*[\.\)]',
-    ]
+    text = re.sub(
+        r'^[ \t]*Corrig[eé]\s*[—–-].*$',
+        '',
+        text,
+        flags=re.IGNORECASE | re.MULTILINE
+    ).strip()
 
-    best_parts = []
+    if not text:
+        return []
 
-    for pattern in patterns:
-
-        first_match = re.search(
+    def split_sections(source, pattern):
+        matches = list(re.finditer(
             pattern,
-            text,
+            source,
             flags=re.IGNORECASE | re.MULTILINE
-        )
+        ))
 
-        if not first_match:
-            continue
+        if len(matches) < 2:
+            return []
 
-        # Ignore everything before the first answer/question
-        answer_text = text[first_match.start():]
+        parts = []
 
-        parts = re.split(
-            r'(?=' + pattern + r')',
-            answer_text,
-            flags=re.IGNORECASE | re.MULTILINE
-        )
+        for i, match in enumerate(matches):
+            start = match.start()
+            end = (
+                matches[i + 1].start()
+                if i + 1 < len(matches)
+                else len(source)
+            )
 
-        cleaned_parts = []
+            part = source[start:end].strip()
 
-        for part in parts:
+            if len(part) >= 10:
+                parts.append(part)
 
-            part = part.strip()
+        return parts if len(parts) >= 2 else []
 
-            if len(part) >= 20:
-                cleaned_parts.append(part)
+    # 1. Prefer explicit main-question headings.
+    question_pattern = (
+        r'^[ \t]*Question[ \t_]+\d+\b[^\n]*'
+    )
 
-        if len(cleaned_parts) > len(best_parts):
-            best_parts = cleaned_parts
+    parts = split_sections(text, question_pattern)
 
-    # Fallback
-    if not best_parts:
-        best_parts = [text.strip()]
+    if parts:
+        return parts
 
-    print("\n===== EXPECTED ANSWERS =====")
+    # 2. Support documents organized by exercise or problem.
+    exercise_pattern = (
+        r'^[ \t]*(?:Exercice|Ex|Probl[eè]me)[ \t]+\d+\b[^\n]*'
+    )
 
-    for i, part in enumerate(best_parts, start=1):
-        print(f"\nPART {i}")
-        print(part[:500])
+    parts = split_sections(text, exercise_pattern)
 
-    print("\n===== END =====\n")
+    if parts:
+        return parts
 
-    return best_parts
+    # 3. If no main-question headings exist, preserve the text.
+    # Do not split at 1., 2., 3. because these may be sub-answers.
+    return [text]
+
+
+
 def split_questions(raw_text):
     """
     Split OCR text into main exam questions.
 
-    The parser supports common formats such as:
-    Question 1
-    Q1
-    Exercice 1
-    Ex 1
-    Problème 1
-    1.
-    2)
-    I.
-    II.
+    Priority:
+    1. Explicit Question N headings.
+    2. Explicit Exercice / Ex / Problème headings.
+    3. Numbered questions such as 1. or 1).
+    4. Keep the full text if no reliable split is found.
     """
-
-    # Normalize line endings
     text = raw_text.replace("\r\n", "\n").replace("\r", "\n")
 
-    # Remove page indicators
     text = re.sub(
         r'Page\s+\d+\s*/\s*\d+',
         '',
         text,
         flags=re.IGNORECASE
+    ).strip()
+
+    if not text:
+        return []
+
+    def split_at_headings(source, pattern):
+        matches = list(re.finditer(
+            pattern,
+            source,
+            flags=re.IGNORECASE | re.MULTILINE
+        ))
+
+        if len(matches) < 2:
+            return []
+
+        parts = []
+
+        for i, match in enumerate(matches):
+            start = match.start()
+            end = (
+                matches[i + 1].start()
+                if i + 1 < len(matches)
+                else len(source)
+            )
+
+            part = source[start:end].strip()
+
+            if len(part) >= 10:
+                parts.append(part)
+
+        return parts if len(parts) >= 2 else []
+
+    # 1. Explicit main-question headings.
+    question_pattern = (
+        r'^[ \t]*Question[ \t_]+\d+\b[^\n]*'
     )
 
-    # Patterns for main question headings
-    patterns = [
-        r'^\s*Question\s+\d+\b',
-        r'^\s*Q\s*\d+\b',
-        r'^\s*Exercice\s+\d+\b',
-        r'^\s*Ex\s*\d+\b',
-        r'^\s*Probl[eè]me\s+\d+\b',
-        r'^\s*\d+\s*[\.\)]',
-        r'^\s*[IVX]+\s*[\.\)]',
-    ]
+    parts = split_at_headings(text, question_pattern)
 
-    best_parts = []
+    if parts:
+        return parts
 
-    for pattern in patterns:
+    # 2. Explicit exercise/problem headings.
+    exercise_pattern = (
+        r'^[ \t]*(?:Exercice|Ex|Probl[eè]me)[ \t]+\d+\b[^\n]*'
+    )
 
-        # Find where the first question starts
-        first_match = re.search(
-            pattern,
-            text,
-            flags=re.IGNORECASE | re.MULTILINE
-        )
+    parts = split_at_headings(text, exercise_pattern)
 
-        if not first_match:
-            continue
+    if parts:
+        return parts
 
-        # Remove everything before the first question
-        question_text = text[first_match.start():]
+    # 3. Numbered main questions: 1. / 1) / 1 -
+    # Only use this fallback when numbering starts at 1 and
+    # continues sequentially. This helps avoid splitting on
+    # arbitrary numbered lists.
+    numbered_pattern = (
+        r'^[ \t]*(\d{1,2})[ \t]*[.)][ \t]+'
+    )
 
-        # Split from the question headings
-        parts = re.split(
-            r'(?=' + pattern + r')',
-            question_text,
-            flags=re.IGNORECASE | re.MULTILINE
-        )
+    matches = list(re.finditer(
+        numbered_pattern,
+        text,
+        flags=re.MULTILINE
+    ))
 
-        cleaned_parts = []
+    if len(matches) >= 2:
+        numbers = [int(match.group(1)) for match in matches]
 
-        for part in parts:
-            part = part.strip()
+        # Require a sequential sequence: 1, 2, 3, ...
+        # If it isn't sequential, don't guess.
+        if numbers == list(range(1, len(numbers) + 1)):
+            parts = []
 
-            if len(part) >= 20:
-                cleaned_parts.append(part)
+            for i, match in enumerate(matches):
+                start = match.start()
+                end = (
+                    matches[i + 1].start()
+                    if i + 1 < len(matches)
+                    else len(text)
+                )
 
-        if len(cleaned_parts) > len(best_parts):
-            best_parts = cleaned_parts
+                part = text[start:end].strip()
 
-    # Fallback
-    if not best_parts:
-        best_parts = [text.strip()]
+                if len(part) >= 10:
+                    parts.append(part)
 
-    print("\n===== QUESTIONS =====")
+            if len(parts) >= 2:
+                return parts
 
-    for i, part in enumerate(best_parts, start=1):
-        print(f"\nQUESTION {i}")
-        print(part[:500])
-
-    print("\n===== END =====\n")
-
-    return best_parts
+    # 4. Safest fallback: preserve the complete text.
+    return [text]
