@@ -464,7 +464,7 @@ export default function CollectesPage() {
                             <thead className="bg-[#102c27] text-white">
                                 <tr>
                                     <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">
-                                        Teacher
+                                       Enseignant
                                     </th>
 
                                     <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider">
