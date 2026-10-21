@@ -175,23 +175,112 @@ Rules:
     return _extract_paper_text(image_path, prompt)
 
 
+
+
 def extract_exam_copy_ocr(image_path, page_number=1):
     """Transcribe a student's handwritten exam copy faithfully."""
+
     prompt = f"""
-You are an OCR system for handwritten university exam copies.
-Transcribe the student's handwriting as accurately as possible.
+You are an advanced OCR system specialized in handwritten
+university exam copies. You must recognize difficult handwriting
+and correctly understand the structure and organization of the page.
 
 This is page {page_number} of a student's exam copy.
 
-Rules:
-- Transcribe only what the student actually wrote.
-- Do not correct, rewrite, summarize, evaluate, or answer anything.
-- Preserve the original language and order.
-- Preserve question numbers, sub-questions, formulas, numbers,
-  symbols, code, and technical terms.
-- Keep each answer under its question heading when identifiable.
-- Do not invent missing words or question numbers.
-- If handwriting is unreadable, mark it as [illisible].
-- Return plain text only. Do not use Markdown code fences.
+YOUR TWO MAIN TASKS:
+1. Read the student's handwriting as accurately as possible.
+2. Determine which question and answer each piece of text belongs to.
+
+CRITICAL: UNDERSTAND QUESTION STRUCTURE AND CONTINUATIONS
+
+Do not determine question boundaries using line breaks or
+physical proximity alone. Interpret the page layout, numbering,
+indentation, meaning, and logical sequence together.
+
+- A question may continue across several lines.
+- A sentence that starts on one line may continue on the next.
+- A long answer may contain multiple lines, paragraphs, and lists.
+- A continuation of an existing answer must remain under that
+  question, even if it appears close to the next question number.
+- Do not automatically assign text to the next question merely
+  because it appears lower on the page.
+- A new question normally begins at an identifiable question
+  number or heading, such as Q1, Q2, Q3, or a clearly numbered
+  question marker.
+- Distinguish main question numbers from sub-question numbers
+  such as 1), 2), 3), and from numbered points within an answer.
+- If a question number is written in the margin, use its position
+  and visual relationship to the following text to identify the
+  correct question.
+- When a line begins with a dash or continues a list, check whether
+  it belongs to the preceding answer before assigning it elsewhere.
+- Use the semantic meaning of the text to help determine whether
+  it completes the previous sentence, list, or explanation.
+- Do not split a sentence or a list across different questions
+  simply because of its physical position.
+- Do not merge two separate questions just because their answers
+  discuss related topics.
+
+USE CONTEXT AND REASONING CAREFULLY
+
+Read the page as a whole before organizing the transcription.
+Consider the visible question numbers, line alignment, indentation,
+handwriting, sentence continuity, and meaning together.
+
+For example, if a question asks for a definition and the next line
+completes that definition, keep both lines under the same question.
+Do not classify the second line as the answer to the next question
+unless the page provides clear evidence that a new question began.
+
+If the layout remains genuinely ambiguous, preserve the most likely
+structure based on the available visual evidence. Do not invent
+question numbers or move text between questions without evidence.
+
+CROSSED-OUT TEXT
+
+- Omit words, phrases, or sentences that are clearly deliberately
+  crossed out or struck through.
+- Do not transcribe text that the student has clearly cancelled.
+- Do not mistake underlining, ordinary letter strokes, or overwritten
+  handwriting for deliberate cancellation.
+- If it is unclear whether text was crossed out, use the surrounding
+  visual context and retain it when there is insufficient evidence
+  that the student intended to remove it.
+
+DIFFICULT HANDWRITING
+
+- Carefully inspect messy, slanted, overlapping, or irregular writing.
+- Use surrounding words, sentence meaning, and the subject matter
+  to recognize difficult words and technical terminology.
+- Distinguish similar-looking letters and numbers where possible.
+- Preserve readable words even when other parts of the sentence
+  are unclear.
+- Do not discard an entire answer because a few words are illegible.
+- Do not replace the student's answer with a scientifically correct
+  answer that the student did not actually write.
+- Never invent words just to make a sentence sound complete.
+- Mark genuinely unreadable portions as [illisible].
+
+TRANSCRIPTION AND OUTPUT
+
+- Transcribe only what the student wrote, excluding clearly
+  crossed-out content.
+- Preserve the original language, spelling, grammar, and wording.
+- Preserve question numbers, sub-question numbers, lists, formulas,
+  symbols, numbers, and technical terms.
+- Group every line under the question and sub-question it belongs to.
+- Preserve the original order of the questions and answers.
+- Do not answer, correct, summarize, or grade the exam.
+- Return the complete transcription as plain text only.
+- Do not include explanations, confidence scores, or Markdown fences.
+
+Before returning the transcription, verify that:
+1. Continuation lines have not been assigned to the wrong question.
+2. Every identifiable main question remains in the correct order.
+3. Sub-questions are grouped under their correct main question.
+4. Crossed-out content has been omitted where clearly identifiable.
+5. No missing text has been invented.
 """
+
     return _extract_paper_text(image_path, prompt)
+

@@ -92,7 +92,12 @@ def split_answers(raw_text):
 def split_expected_answers(raw_text):
     """
     Split an official correction sheet into one section per main question.
-    Keep numbered answers and bullet points inside their main question.
+    Supports:
+    - Question 1 / Question_1
+    - Exercice 1 / Problème 1
+    - 1. / 1) / 1 - numbered headings
+
+    Preserves numbered sub-answers and bullet points inside each section.
     """
     text = raw_text.replace("\r\n", "\n").replace("\r", "\n")
 
@@ -103,8 +108,9 @@ def split_expected_answers(raw_text):
         flags=re.IGNORECASE
     )
 
+    # Remove the correction document's title/header if present.
     text = re.sub(
-        r'^[ \t]*Corrig[eé]\s*[—–-].*$',
+        r'^[ \t]*Correction officielle[^\n]*\n?',
         '',
         text,
         flags=re.IGNORECASE | re.MULTILINE
@@ -140,28 +146,61 @@ def split_expected_answers(raw_text):
 
         return parts if len(parts) >= 2 else []
 
-    # 1. Prefer explicit main-question headings.
+    # 1. Explicit main-question headings.
     question_pattern = (
-        r'^[ \t]*Question[ \t_]+\d+\b[^\n]*'
+        r'^[ \t]*(?:Question[ \t_]+\d+|Q[ \t]*\d+)\b[^\n]*'
     )
 
     parts = split_sections(text, question_pattern)
-
     if parts:
         return parts
 
-    # 2. Support documents organized by exercise or problem.
+    # 2. Exercise/problem headings.
     exercise_pattern = (
         r'^[ \t]*(?:Exercice|Ex|Probl[eè]me)[ \t]+\d+\b[^\n]*'
     )
 
     parts = split_sections(text, exercise_pattern)
-
     if parts:
         return parts
 
-    # 3. If no main-question headings exist, preserve the text.
-    # Do not split at 1., 2., 3. because these may be sub-answers.
+    # 3. Numbered headings such as:
+    # 1. Four functions...
+    # 2. Role of the organization chart...
+    #
+    # Only split if numbering starts at 1 and continues
+    # sequentially, avoiding arbitrary numbered sub-lists.
+    numbered_pattern = r'^[ \t]*(\d{1,2})[ \t]*[.)][ \t]+'
+
+    matches = list(re.finditer(
+        numbered_pattern,
+        text,
+        flags=re.MULTILINE
+    ))
+
+    if len(matches) >= 2:
+        numbers = [int(match.group(1)) for match in matches]
+
+        if numbers == list(range(1, len(numbers) + 1)):
+            parts = []
+
+            for i, match in enumerate(matches):
+                start = match.start()
+                end = (
+                    matches[i + 1].start()
+                    if i + 1 < len(matches)
+                    else len(text)
+                )
+
+                part = text[start:end].strip()
+
+                if len(part) >= 10:
+                    parts.append(part)
+
+            if len(parts) >= 2:
+                return parts
+
+    # 4. Safe fallback: retain the complete correction.
     return [text]
 
 
