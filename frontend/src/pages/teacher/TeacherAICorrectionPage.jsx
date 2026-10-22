@@ -166,9 +166,7 @@ export default function TeacherAICorrectionPage() {
                     <h1 className="text-2xl font-bold tracking-tight text-slate-800 sm:text-3xl">
                         Correction assistée par IA
                     </h1>
-                    <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
-                        Gérez vos examens et lancez la correction automatique.
-                    </p>
+
                 </div>
             </div>
 
