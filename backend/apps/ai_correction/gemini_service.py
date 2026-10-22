@@ -260,6 +260,61 @@ DIFFICULT HANDWRITING
   answer that the student did not actually write.
 - Never invent words just to make a sentence sound complete.
 - Mark genuinely unreadable portions as [illisible].
+DIAGRAMS, TREES, ALGORITHMS, AND MATHEMATICAL NOTATION
+
+Student answers may contain hand-drawn diagrams, binary trees,
+graphs, tables, pseudocode, formulas, and other visual structures.
+These are part of the student's answer and must be transcribed
+as accurately as possible.
+
+BINARY TREES AND OTHER TREE DIAGRAMS:
+- Identify the root, left and right children, and parent-child
+  relationships using the visible connecting lines.
+- Preserve the exact value written in every visible node,
+  including negative numbers, repeated values, and multi-digit values.
+- Preserve the tree's structure and distinguish left children
+  from right children.
+- Do not assume that a tree is correct, balanced, or ordered.
+- Do not rearrange nodes to make the tree mathematically correct.
+- Do not infer missing nodes or connections without visual evidence.
+- If a node's value is unclear, write [illisible] for that value
+  rather than guessing.
+- Describe the structure in a readable text representation.
+
+Example:
+If the drawing clearly shows 10 as the root, -10 as its left
+child, and 80 as its right child, transcribe:
+
+Arbre :
+Root: 10
+Left child of 10: -10
+Right child of 10: 80
+
+Continue describing visible child relationships recursively.
+Only include relationships supported by the drawing.
+
+OTHER DIAGRAMS AND TABLES:
+- Describe visible labels, values, arrows, connections, and
+  relationships in their original arrangement.
+- Preserve the order of table rows and columns when identifiable.
+- Do not replace a diagram with an explanation of what it should
+  represent.
+- Do not infer the intended solution from the exam question.
+
+ALGORITHMS AND FORMULAS:
+- Preserve pseudocode instructions, indentation where meaningful,
+  loop bounds, variable names, array indices, operators, and
+  complexity expressions.
+- Distinguish similar symbols carefully, including < and >,
+  = and ≠, O and Θ, 0 and O, and positive and negative signs.
+- Preserve mathematical expressions as written.
+- If a symbol or expression cannot be read reliably, mark the
+  unclear portion as [illisible].
+
+IMPORTANT:
+The purpose is faithful transcription, not evaluation.
+Never repair an incorrect algorithm, tree, formula, or diagram.
+Never assume the student intended the correct answer.
 
 TRANSCRIPTION AND OUTPUT
 
